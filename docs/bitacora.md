@@ -2,6 +2,17 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Decisiones del propietario: impagos, curación, inventario y oro más caro
+
+- Victoria: cerrar una temporada en el n.º 1 (ya era así; ahora es decisión aceptada en la biblia).
+- Impagos: si no llega el oro, cobran primero los más poderosos; quien no cobra pierde 15 de lealtad y avisa; a las 2 semanas seguidas sin cobrar se va al rival con plaza más rico (si estaba de misión, el equipo sigue sin él).
+- Curación: los lesionados se curan al momento pagando oro (150 + 8 × poder por día que queda).
+- Inventario de héroes en Gestionar gremio → Héroes: lesionados (con botón Curar), de misión (cuál y cuándo vuelve) y libres, con aviso de quién no ha cobrado. El botón principal resume cuántos hay de cada. La formación de misión indica quién no está disponible.
+- Economía: sueldos 100 + 25 × poder + 12 × reputación; sede hasta nivel 7 (3.000–60.000); ojeadores 3.000/9.000/20.000. Rebalanceo con el simulador (ver informe).
+- Biblia actualizada con las decisiones y su registro de cambios. Guardado versión 4: las partidas anteriores empiezan de cero.
+- 43 tests; probado en navegador sin errores.
+- Queda: pregunta 12 (¿es demasiado difícil llegar al n.º 1?), orden de pago de los sueldos y el resto de preguntas abiertas.
+
 ## 2026-11-06 — El juego rehecho según la biblia del proyecto
 
 - Petición del propietario: rehacer el juego con la nueva biblia (`docs/biblia.md`) manteniendo la interfaz. El diseño anterior pasa a `docs/archivo/`.

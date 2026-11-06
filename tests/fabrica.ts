@@ -14,6 +14,7 @@ export function heroe(datos: Partial<Heroe> & Pick<Heroe, 'id'>): Heroe {
     lealtad: 60,
     estado: 'libre',
     diasLesion: 0,
+    semanasSinCobrar: 0,
     ...datos,
   };
 }

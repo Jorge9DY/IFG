@@ -20,7 +20,7 @@
     "fraccionExperienciaFracaso": 0.5
   },
   "heroes": {
-    "experienciaPorPunto": 10,
+    "experienciaPorPunto": 7,
     "lealtadInicial": 60,
     "_notaPotencial": "Probabilidad (%) de cada letra de potencial en los novatos.",
     "potencialPorLetra": {
@@ -30,11 +30,20 @@
   },
   "sueldos": {
     "_nota": "Sección 4: el sueldo crece con el poder y la reputación. Fórmula provisional.",
-    "base": 50,
-    "porPoder": 16,
-    "porReputacion": 8,
-    "redondeo": 10,
-    "lealtadSiNoCobra": 15
+    "base": 100,
+    "porPoder": 25,
+    "porReputacion": 12,
+    "redondeo": 10
+  },
+  "impagos": {
+    "_nota": "Decisión del propietario: un héroe que no cobra durante varias semanas seguidas se va a otro gremio. Avisa antes.",
+    "semanasParaIrse": 2,
+    "lealtadPorSemana": 15
+  },
+  "curacion": {
+    "_nota": "Curar a un lesionado con oro (decisión del propietario). Coste provisional por día de lesión que queda.",
+    "porDia": 150,
+    "porPoderPorDia": 8
   },
   "valor": {
     "_nota": "Precio de referencia de un héroe (provisional): poder, margen de crecimiento y reputación.",
@@ -61,15 +70,15 @@
     "factorCoste": 1.0
   },
   "instalaciones": {
-    "_nota": "Sección 4: la sede da plazas y prestigio; los ojeadores estrechan el rango de potencial. Niveles y costes provisionales.",
-    "sede": { "plazas": [5, 7, 9, 12, 15], "coste": [2000, 5000, 10000, 20000] },
-    "ojeadores": { "anchura": [4, 3, 2, 1], "coste": [1500, 4000, 8000] }
+    "_nota": "Sección 4: la sede da plazas y prestigio; los ojeadores estrechan el rango de potencial. Niveles y costes provisionales; más caros por decisión del propietario para que el oro siga apretando.",
+    "sede": { "plazas": [5, 7, 9, 11, 13, 15, 18], "coste": [3000, 8000, 15000, 25000, 40000, 60000] },
+    "ojeadores": { "anchura": [4, 3, 2, 1], "coste": [3000, 9000, 20000] }
   },
   "ranking": {
     "_nota": "Sección 6: Puntos = Fuerza + Prestigio. Pesos provisionales, aproximadamente iguales al principio.",
     "heroesFuerza": 5,
     "prestigioPorNivelInstalacion": 20,
-    "prestigioPorMisionAlta": 3,
+    "prestigioPorMisionAlta": 2,
     "prestigioPorNovatoDestacado": 15
   },
   "temporada": {

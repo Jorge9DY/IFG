@@ -27,8 +27,8 @@
       "poder": [36, 54],
       "potencial": ["B", "A", "A"],
       "reputacion": [30, 60],
-      "nivelSede": 4,
-      "nivelOjeadores": 2,
+      "nivelSede": 3,
+      "nivelOjeadores": 1,
       "misionesAltas": 3,
       "novatosDestacados": 3,
       "perfil": { "prioridad": "destacado", "agresividad": 1.1, "mejora": 1.0, "vende": true }
@@ -43,10 +43,10 @@
       "poder": [28, 48],
       "potencial": ["A", "A", "S"],
       "reputacion": [10, 35],
-      "nivelSede": 3,
-      "nivelOjeadores": 3,
+      "nivelSede": 2,
+      "nivelOjeadores": 2,
       "misionesAltas": 2,
-      "novatosDestacados": 4,
+      "novatosDestacados": 2,
       "perfil": { "prioridad": "potencial", "agresividad": 1.0, "mejora": 0.5, "vende": true }
     },
     {

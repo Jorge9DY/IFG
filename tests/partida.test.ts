@@ -90,16 +90,6 @@ describe('partida', () => {
     expect(() => finalizarDia(estado)).toThrow();
   });
 
-  it('no pagar los sueldos deja el oro en negativo y baja la lealtad', () => {
-    const estado = partida();
-    avanzarHasta(estado, 7);
-    jugador(estado).oro = 0;
-    const r = finalizarDia(estado);
-    expect(r.sueldos?.completo).toBe(false);
-    expect(jugador(estado).oro).toBeLessThan(0);
-    for (const h of heroesDe(estado, 'jugador')) expect(h.lealtad).toBe(balance.heroes.lealtadInicial - balance.sueldos.lealtadSiNoCobra);
-  });
-
   it('al terminar la Prueba se actualiza el ranking y empieza el día 8 con reclutas nuevos', () => {
     const estado = partida();
     avanzarHasta(estado, 7);

@@ -2,8 +2,8 @@
 // Finalizar día arriba a la derecha, Gestionar gremio a la izquierda, Lanzar misiones a la derecha y
 // Mercado de héroes abajo en el centro. Todo lo demás vive dentro de sus menús. Solo lee el estado y llama al motor.
 
-import { sueldosDe } from '../motor/economia';
-import { diasParaPrueba, esDia7, heroe as obtenerHeroe, heroesDe, jugador, puesto, rivales, type EstadoJuego } from '../motor/estado';
+import { condicionesCuracion, curar, sueldosDe } from '../motor/economia';
+import { diasParaPrueba, esDia7, heroe as obtenerHeroe, heroesDe, jugador, misionDe, puesto, rivales, type EstadoJuego } from '../motor/estado';
 import { esDestacado, letraDe, rangoPotencial, sueldo, textoPotencial } from '../motor/heroes';
 import { NOMBRE_INSTALACION, infoInstalacion, mejorar, plazas, type Instalacion } from '../motor/instalaciones';
 import { comprar, condicionesCompra, condicionesRecluta, ofertaVenta, reclutar, vender } from '../motor/mercado';
@@ -29,7 +29,7 @@ import { borrar, cargar, guardar } from './guardado';
 import { esc, num, pct } from './html';
 
 export type Panel = 'nueva' | 'misiones' | 'mercado' | 'gremio' | 'prueba' | 'dia' | 'semana' | 'victoria';
-type PestanaGremio = 'plantilla' | 'reclutar' | 'instalaciones' | 'ranking';
+type PestanaGremio = 'heroes' | 'reclutar' | 'instalaciones' | 'ranking';
 
 const TITULOS: Record<Panel, string> = {
   nueva: 'Gremio de héroes',
@@ -73,7 +73,7 @@ export class Interfaz {
   private equipo: string[] = [];
   private pestanaMercado: 'comprar' | 'vender' = 'comprar';
   private gremioRival = 'dragon';
-  private pestanaGremio: PestanaGremio = 'plantilla';
+  private pestanaGremio: PestanaGremio = 'heroes';
   private resumenDia: ResumenDia | null = null;
   private resumenSemana: ResumenSemana | null = null;
 
@@ -114,7 +114,7 @@ export class Interfaz {
     if (punto === 'puerta') return this.finalizarElDia();
     if (punto === 'tablon') return this.abrirMisiones();
     if (punto === 'mostrador') return this.abrir('mercado');
-    const pestana: Record<string, PestanaGremio> = { recepcion: 'reclutar', dormitorios: 'plantilla', pizarra: 'ranking' };
+    const pestana: Record<string, PestanaGremio> = { recepcion: 'reclutar', dormitorios: 'heroes', pizarra: 'ranking' };
     if (pestana[punto]) {
       this.pestanaGremio = pestana[punto]!;
       this.abrir('gremio');
@@ -154,7 +154,13 @@ export class Interfaz {
       }
       const libres = heroesLibres(estado).length;
       const bloqueo = estado.fase !== 'gestion' ? 'disabled' : '';
-      this.el.menu.innerHTML = `<button class="boton-grande gastar" data-abrir="gremio" ${bloqueo}><span class="signo">−</span>Gestionar gremio<small>Reclutar héroes y mejorar instalaciones</small></button>`;
+      const todos = heroesDe(estado, estado.jugadorId);
+      const cuenta = (e: Heroe['estado']): number => todos.filter((h) => h.estado === e).length;
+      const resumen = [`${libres} ${libres === 1 ? 'libre' : 'libres'}`, cuenta('en mision') ? `${cuenta('en mision')} de misión` : '', cuenta('lesionado') ? `${cuenta('lesionado')} ${cuenta('lesionado') === 1 ? 'lesionado' : 'lesionados'}` : '']
+        .filter(Boolean)
+        .join(' · ');
+      const sinCobrar = todos.some((h) => h.semanasSinCobrar > 0) ? '<em class="alerta-texto">Hay héroes sin cobrar</em>' : '';
+      this.el.menu.innerHTML = `<button class="boton-grande gastar" data-abrir="gremio" data-pestana="heroes" ${bloqueo}><span class="signo">−</span>Gestionar gremio<small>Héroes: ${resumen}</small><small>Reclutar y mejorar instalaciones</small>${sinCobrar}</button>`;
       this.el.equipo.innerHTML = `<button class="boton-grande ganar" data-abrir="misiones" ${bloqueo}><span class="signo">+</span>Lanzar misiones<small>${estado.tablon.length} en el tablón · ${libres} ${libres === 1 ? 'héroe libre' : 'héroes libres'}</small></button>`;
       this.el.accion.innerHTML = `<button class="boton-grande mercado" data-abrir="mercado" ${bloqueo}>Mercado de héroes<small>Compra a otros gremios o vende a los tuyos</small></button>`;
     }
@@ -283,6 +289,10 @@ export class Interfaz {
         </button>`;
       })
       .join('');
+    const ocupados = heroesDe(estado, estado.jugadorId)
+      .filter((h) => h.estado !== 'libre')
+      .map((h) => `${esc(h.nombre.split(' ')[0] ?? '')} (${h.estado === 'lesionado' ? `lesionado, ${h.diasLesion} d.` : 'de misión'})`)
+      .join(', ');
     const r = RANGO[mision.rango];
     const motivo = motivoNoLanzar(estado, mision.id, this.equipo);
     return `<div class="cabecera-mision">
@@ -291,6 +301,7 @@ export class Interfaz {
         <div class="medidor d-${nivelDificultad(prob)}"><b>${prob === null ? '—' : pct(prob)}</b><span>de éxito</span></div>
       </div>
       <div class="fichas">${fichas || '<p class="tenue">No tienes héroes libres.</p>'}</div>
+      ${ocupados ? `<p class="tenue">No disponibles: ${ocupados}. <button data-accion="ir-heroes">Ver héroes</button></p>` : ''}
       <p class="tenue">Si fracasa, cobras menos y alguien puede lesionarse.</p>
       <div class="botones"><button data-accion="otra-mision">Volver al tablón</button><button data-accion="lanzar" class="principal" ${motivo ? `disabled title="${esc(motivo)}"` : ''}>Lanzar misión</button></div>`;
   }
@@ -335,7 +346,7 @@ export class Interfaz {
   }
 
   private panelGremio(estado: EstadoJuego): string {
-    const nombres: Record<PestanaGremio, string> = { plantilla: 'Plantilla', reclutar: 'Reclutar', instalaciones: 'Instalaciones', ranking: 'Ranking' };
+    const nombres: Record<PestanaGremio, string> = { heroes: 'Héroes', reclutar: 'Reclutar', instalaciones: 'Instalaciones', ranking: 'Ranking' };
     const pestañas = `<div class="pestanas">${(Object.keys(nombres) as PestanaGremio[])
       .map((p) => `<button data-accion="pestana-gremio" data-id="${p}" class="${this.pestanaGremio === p ? 'activo' : ''}">${nombres[p]}</button>`)
       .join('')}</div>`;
@@ -373,15 +384,48 @@ export class Interfaz {
       case 'ranking':
         return `${pestañas}${this.tablaRanking(estado)}
           <p class="tenue">Puntos = Fuerza (poder de tus 5 mejores héroes) + Prestigio (instalaciones, misiones de rango alto y novatos destacados fichados). El ranking oficial se actualiza el día 7; al final de cada temporada (28 días) se reparte un premio según la posición.</p>`;
-      default: {
-        const cartas = heroesDe(estado, j.id)
-          .sort((a, b) => b.poder - a.poder)
-          .map((h) => this.carta(estado, h, `<span class="precio">Experiencia ${h.experiencia}/${balance.heroes.experienciaPorPunto} para el siguiente punto</span>`))
-          .join('');
-        return `${pestañas}<h3>Tus héroes · ${j.plantilla.length} de ${plazas(j)} plazas</h3><div class="cartas">${cartas}</div>
-          <p class="tenue">Sueldos de la semana: <strong>${num(sueldosDe(estado, j.id))}</strong> de oro, el día 7.</p>`;
-      }
+      default:
+        return `${pestañas}${this.inventario(estado)}`;
     }
+  }
+
+  /** Inventario de héroes: quién está libre, de misión o lesionado, con la curación a mano. */
+  private inventario(estado: EstadoJuego): string {
+    const j = jugador(estado);
+    const heroes = heroesDe(estado, j.id).sort((a, b) => b.poder - a.poder);
+    const fila = (h: Heroe): string => {
+      let detalle = '';
+      let accion = '';
+      if (h.estado === 'en mision') {
+        const m = misionDe(estado, h.id);
+        const vuelve = m ? m.diaVuelta - estado.dia : 0;
+        detalle = m ? `«${esc(m.mision.titulo)}» · ${vuelve === 0 ? 'vuelve hoy al finalizar el día' : `vuelve en ${vuelve + 1} días`}` : '';
+      } else if (h.estado === 'lesionado') {
+        const c = condicionesCuracion(estado, h.id);
+        detalle = `${h.diasLesion} ${h.diasLesion === 1 ? 'día' : 'días'} de reposo`;
+        accion = `<button class="principal" data-accion="curar" data-id="${h.id}" ${c.bloqueo ? `disabled title="${esc(c.bloqueo)}"` : ''}>Curar por ${num(c.precio)}</button>`;
+      } else {
+        detalle = 'Listo para una misión';
+      }
+      const aviso = h.semanasSinCobrar > 0
+        ? `<span class="alerta-texto">Sin cobrar ${h.semanasSinCobrar} ${h.semanasSinCobrar === 1 ? 'semana' : 'semanas'}: se irá si no cobra el próximo día 7</span>`
+        : '';
+      return `<div class="fila-heroe e-${h.estado.replace(' ', '-')}">
+        ${this.potencial(estado, h)}
+        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">Poder ${h.poder} · sueldo ${num(sueldo(h))} · lealtad ${h.lealtad}</span>${aviso}</div>
+        <div class="situacion"><span class="estado-chip e-${h.estado.replace(' ', '-')}">${h.estado === 'en mision' ? 'de misión' : h.estado}</span><span class="tenue">${detalle}</span></div>
+        <div class="accion-fila">${accion}</div>
+      </div>`;
+    };
+    const grupos: [Heroe['estado'], string][] = [['lesionado', 'Lesionados'], ['en mision', 'De misión'], ['libre', 'Libres']];
+    const bloques = grupos
+      .map(([e, titulo]) => {
+        const lista = heroes.filter((h) => h.estado === e);
+        return lista.length ? `<h3>${titulo} · ${lista.length}</h3><div class="inventario">${lista.map(fila).join('')}</div>` : '';
+      })
+      .join('');
+    return `<p class="tenue">${j.plantilla.length} de ${plazas(j)} plazas · sueldos de la semana: <strong>${num(sueldosDe(estado, j.id))}</strong> de oro el día 7. Si no llega el oro, cobran primero los más poderosos.</p>
+      ${bloques || '<p class="tenue">No tienes héroes.</p>'}`;
   }
 
   private tablaRanking(estado: EstadoJuego, filas = estado.ranking): string {
@@ -462,15 +506,19 @@ export class Interfaz {
     if (!r) return '';
     const misiones = r.informes
       .map((i) => {
-        const lesionados = i.partes.filter((p) => p.diasLesion > 0).map((p) => obtenerHeroe(estado, p.heroeId).nombre.split(' ')[0]);
-        const mejoran = i.partes.filter((p) => p.poderGanado > 0).map((p) => `${obtenerHeroe(estado, p.heroeId).nombre.split(' ')[0]} +${p.poderGanado}`);
+        const lesionados = i.partes.filter((p) => p.diasLesion > 0).map((p) => (estado.heroes[p.heroeId]?.nombre ?? '').split(' ')[0]);
+        const mejoran = i.partes.filter((p) => p.poderGanado > 0).map((p) => `${(estado.heroes[p.heroeId]?.nombre ?? '').split(' ')[0]} +${p.poderGanado}`);
         return `<div class="resultado r-${i.exito ? 'exito' : 'fracaso'}"><b>${i.exito ? '¡Misión cumplida!' : 'La misión ha fracasado'}</b><span>«${esc(i.mision.titulo)}» · +${num(i.oro)} oro</span>
           ${mejoran.length ? `<p class="tenue">Mejoran: ${esc(mejoran.join(', '))} de poder</p>` : ''}
           ${lesionados.length ? `<p class="caidos">Lesionados: ${esc(lesionados.join(', '))}</p>` : ''}</div>`;
       })
       .join('');
-    const sueldos = r.sueldos
-      ? `<div class="resultado ${r.sueldos.completo ? '' : 'r-fracaso'}"><b>Día de sueldos</b><span>−${num(r.sueldos.total)} oro</span>${r.sueldos.completo ? '' : '<p class="caidos">No llegaba el oro: tus héroes cobran tarde y pierden lealtad.</p>'}</div>`
+    const nombre = (id: string): string => estado.heroes[id]?.nombre ?? '';
+    const p = r.sueldos;
+    const sueldos = p
+      ? `<div class="resultado ${p.completo ? '' : 'r-fracaso'}"><b>Día de sueldos</b><span>−${num(p.pagado)} oro${p.completo ? '' : ` de ${num(p.total)}`}</span>
+          ${p.impagados.length ? `<p class="caidos">Sin cobrar: ${esc(p.impagados.map(nombre).join(', '))}. Pierden lealtad y, si la semana que viene tampoco cobran, se irán.</p>` : ''}
+          ${p.seVan.length ? `<p class="caidos">Se van por no cobrar: ${esc(p.seVan.map((x) => `${x.nombre}${x.destino ? ` (a ${estado.gremios[x.destino]?.nombre ?? ''})` : ''}`).join(', '))}.</p>` : ''}</div>`
       : '';
     const noticias = r.noticias.length ? `<h3>Noticias</h3><ul class="lista">${r.noticias.slice(0, 4).map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : '';
     const boton = r.prueba
@@ -510,7 +558,10 @@ export class Interfaz {
     const objetivo = (evento.target as HTMLElement).closest<HTMLElement>('[data-accion], [data-abrir]');
     if (!objetivo || (objetivo as HTMLButtonElement).disabled) return;
     const abrir = objetivo.dataset.abrir as Panel | undefined;
-    if (abrir) return abrir === 'misiones' ? this.abrirMisiones() : this.abrir(abrir);
+    if (abrir) {
+      if (objetivo.dataset.pestana) this.pestanaGremio = objetivo.dataset.pestana as PestanaGremio;
+      return abrir === 'misiones' ? this.abrirMisiones() : this.abrir(abrir);
+    }
     try {
       this.ejecutar(objetivo.dataset.accion ?? '', objetivo.dataset.id ?? '');
     } catch (error) {
@@ -607,6 +658,16 @@ export class Interfaz {
         this.mensaje = `¡${NOMBRE_INSTALACION[id as Instalacion]} mejorada!`;
         this.guardar();
         return this.repintar();
+      case 'curar': {
+        const h = obtenerHeroe(estado, id);
+        const precio = curar(estado, id);
+        this.mensaje = `${h.nombre} está curado (−${num(precio)} oro).`;
+        this.guardar();
+        return this.repintar();
+      }
+      case 'ir-heroes':
+        this.pestanaGremio = 'heroes';
+        return this.abrir('gremio');
       case 'ir-prueba':
         return this.abrir('prueba');
       case 'siguiente-candidato':

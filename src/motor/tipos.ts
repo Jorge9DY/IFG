@@ -24,6 +24,8 @@ export interface Heroe {
   estado: EstadoHeroe;
   /** Días que faltan para recuperarse de una lesión. */
   diasLesion: number;
+  /** Semanas seguidas sin cobrar el sueldo. */
+  semanasSinCobrar: number;
 }
 
 export type RangoMision = 'bajo' | 'medio' | 'alto';

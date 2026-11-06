@@ -42,10 +42,12 @@ No se pasa a la siguiente fase sin superar su puerta (biblia, sección 17). El r
 - [x] Reclutamiento básico (provisional): candidatos modestos que se renuevan cada semana
 - [x] Interfaz de cinco elementos (sección 3) sobre la sede 3D
 - [x] Simulador con dos estrategias e informe de balance
-- [ ] Condición exacta de victoria (provisional: cerrar una temporada en el n.º 1)
-- [ ] Fórmula de éxito, lesiones y recuperación confirmadas
+- [x] Condición de victoria: cerrar una temporada en el n.º 1
+- [x] Fórmula de éxito y lesiones aceptada de momento; curar lesionados con oro
 - [ ] Cifras equilibradas: recompensas, sueldos, costes y premios
-- [ ] Consecuencias de no pagar los sueldos (provisional: oro negativo y −15 de lealtad)
+- [x] Impagos: el héroe avisa, pierde lealtad y se va a otro gremio tras 2 semanas sin cobrar
+- [x] Inventario de héroes en Gestionar gremio: libres, de misión y lesionados
+- [x] Sueldos e instalaciones más caros para mantener la tensión económica
 - [ ] Puerta 1: prueba con jugadores de la economía sin narrativa
 
 ## Fase 2 — Competencia

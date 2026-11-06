@@ -9,24 +9,29 @@ Simulación con `npm run simular -- 300 1`: 300 partidas por estrategia (semilla
 
 ## Resultados
 
+Tras aplicar las decisiones del propietario (sueldos más altos, instalaciones más caras, impagos que hacen irse a los héroes).
+
 | Métrica | Prudente | Ambiciosa |
 | --- | --: | --: |
 | Puesto medio al cerrar la temporada 1 | 5,0 | 5,0 |
-| Puesto medio al cerrar la temporada 2 | 5,0 | 4,6 |
-| Puesto medio al cerrar la temporada 3 | 4,9 | 3,3 |
-| Puesto medio al cerrar la temporada 4 | 4,9 | 2,2 |
-| Victoria en 4 temporadas o menos | 0% | 24% |
-| Semanas con sueldos impagados (de 16) | 0,0 | 0,1 |
-| Semanas con menos de 1.000 de oro tras sueldos | 0,0 | 0,3 |
-| Tasa de éxito en misiones | 85% | 85% |
-| Novatos fichados | 11,0 | 21,1 |
-| Ventas / compras en el mercado | 0 / 0 | 19,5 / 8,7 |
-| Oro al final | 89.132 | 22.487 |
-| Fuerza final (top 5) | 268 | 422 |
+| Puesto medio al cerrar la temporada 2 | 4,9 | 4,4 |
+| Puesto medio al cerrar la temporada 3 | 4,5 | 3,6 |
+| Puesto medio al cerrar la temporada 4 | 4,2 | 3,2 |
+| Victoria en 4 temporadas o menos | 0% | 5% |
+| Semanas con sueldos impagados (de 16) | 0,1 | 0,2 |
+| Tasa de éxito en misiones | 88% | 87% |
+| Novatos fichados | 6,1 | 8,8 |
+| Ventas / compras en el mercado | 0 / 0 | 5,5 / 2,6 |
+| Mejoras de instalaciones | 4,2 | 4,5 |
+| Oro al final | 29.392 | 13.336 |
+| Fuerza final (top 5) | 283 | 338 |
+
+Versión anterior (sueldos e instalaciones baratos): el ambicioso ganaba en el 24% de las partidas y acababa con unos 22.000 de oro; el prudente acumulaba unos 89.000 sin usarlos.
 
 ## Lectura
 
-- **El arco funciona:** se empieza último y solo se sube invirtiendo en héroes (pujas fuertes, compras y ventas). Quien acumula oro sin arriesgar no sale del 5.º puesto.
-- **La partida dura varias temporadas,** como pide la biblia: con un juego activo, el 1.º puesto llega entre la temporada 3 y la 4.
-- **Falta tensión económica a medio plazo:** el oro solo aprieta las primeras semanas. Con 16 semanas casi nunca se baja de 1.000 de oro tras pagar sueldos. Hacen falta más usos del oro o sueldos más altos (pregunta 11).
-- **Las lesiones** apartan a los héroes unos días, pero sin muertes el riesgo es moderado; encaja con «Fracasar puede reducir la recompensa y causar lesiones».
+- **El oro sobra mucho menos:** los sueldos crecen con la plantilla y cada nivel de la sede cuesta mucho más. El oro final baja de ~89.000 a ~29.000 (prudente) y de ~22.000 a ~13.000 (ambicioso). Aun así, el bot casi nunca baja de 1.000 de oro tras pagar sueldos: la tensión está en elegir entre pujar, mejorar o curar, no en quedarse sin nada.
+- **Los rivales también sufren los sueldos:** varios se quedan sin oro, no pueden pujar y alguno pierde héroes que no cobran. Eso abre huecos para el jugador.
+- **Subir cuesta más:** el bot ambicioso acaba de media 3.º tras 4 temporadas y gana el 5% de las veces. Una persona juega mejor, pero conviene probarlo (pregunta 12).
+- **El prudente sigue acumulando oro** (~29.000 tras 4 temporadas) porque el bot no se atreve a pujar fuerte; no es un fallo de la economía.
+- Ajustes hechos al equilibrar: experiencia por punto de poder 10 → 7, prestigio por misión alta 3 → 2, y la Corona Dorada y las Sombras Negras empiezan con menos instalaciones y novatos destacados.

@@ -49,6 +49,7 @@ export function generarHeroe(azar: Azar, id: string, o: OpcionesHeroe): Heroe {
     lealtad: balance.heroes.lealtadInicial,
     estado: 'libre',
     diasLesion: 0,
+    semanasSinCobrar: 0,
   };
 }
 

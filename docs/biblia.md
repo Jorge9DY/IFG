@@ -68,7 +68,7 @@ No es solo administrar una empresa: es levantar una organización legendaria con
 | Día | 1 turno | Misiones, mercado, eventos. |
 | Semana | 7 días | Día 7: pago de sueldos y después Prueba de los Novatos. Se actualiza el ranking. |
 | Temporada | 4 semanas (28 días) | Cierre oficial del ranking y premio en oro según la posición. |
-| Partida | Varias temporadas | Termina al llegar al n.º 1 (condición exacta: \[Abierto\]). |
+| Partida | Varias temporadas | Termina al cerrar una temporada en el n.º 1 **\[Aceptado\]**. |
 
 Motivo: sin temporadas no hay presión de tiempo ni un final claro. Pagar sueldos justo antes de la subasta genera cada semana el dilema «¿pago a todos o pujo fuerte?».
 
@@ -84,7 +84,9 @@ Motivo: sin temporadas no hay presión de tiempo ni un final claro. Pagar sueldo
 | Centro derecha | Lanzar misiones | Tablón con las tres misiones. |
 | Centro inferior | Mercado de héroes | Comprar a otros gremios o vender los propios. |
 
-Pantallas secundarias propuestas, accesibles desde estos menús: ficha del héroe, registro del gremio y ranking (ver Motor narrativo). Dónde se accede a la plantilla y al ranking desde la pantalla principal: \[Abierto\].
+Pantallas secundarias propuestas, accesibles desde estos menús: ficha del héroe, registro del gremio y ranking (ver Motor narrativo).
+
+**\[Aceptado\] Inventario de héroes** dentro de Gestionar gremio: muestra de un vistazo quién está libre, de misión (cuál y cuándo vuelve) o lesionado (cuántos días), y desde ahí se cura a los lesionados con oro. Dónde se accede al ranking: \[Abierto\].
 
 ## 4. Economía
 
@@ -112,7 +114,8 @@ Los sueldos son el gasto fijo semanal del gremio. El diseño ya los daba por hec
 - Cada héroe tiene un sueldo que crece con su poder y su reputación.
 - Se pagan el día 7, antes de la Prueba de los Novatos.
 - Tener plantilla cuesta: acumular héroes sin usarlos deja de ser gratis.
-- No poder pagar: consecuencias por definir (pérdida de lealtad, deuda, salidas) \[Abierto\].
+- **\[Aceptado\]** No poder pagar: el héroe que no cobra pierde lealtad y avisa; si pasa varias semanas seguidas sin cobrar (*ilustrativo:* 2), se va a otro gremio. Cobrar reinicia la cuenta. Orden de pago cuando no llega para todos: los más poderosos primero (provisional).
+- **\[Aceptado\]** Sueldos altos: tener plantilla debe costar de verdad durante toda la partida.
 
 ### Decisiones tipo
 
@@ -126,6 +129,8 @@ Los sueldos son el gasto fijo semanal del gremio. El diseño ya los daba por hec
 **\[Aceptado\]** Mejorar el gremio aumenta la capacidad de plantilla y el prestigio.
 
 **\[Aceptado\]** Instalación de ojeadores: estrecha el rango de potencial que se ve de los novatos (ver Prueba de los Novatos).
+
+**\[Aceptado\]** Las instalaciones son caras: junto con los sueldos, son el gran destino del oro y evitan que se acumule sin uso.
 
 **\[Abierto\]** Lista de instalaciones, niveles, costes y efectos concretos.
 
@@ -148,6 +153,10 @@ El diseño original permitía elegir solo una de las tres. Con misiones de hasta
 ### Fracaso y lesiones
 
 **\[Aceptado\]** Fracasar puede reducir la recompensa y causar lesiones que obligan a descansar.
+
+**\[Aceptado\]** Un lesionado se puede curar al momento pagando oro (más caro cuantos más días le quedan y cuanto más poder tiene), desde el inventario de héroes.
+
+**\[Aceptado de momento\]** La fórmula provisional de éxito y lesiones del prototipo sirve como base; se revisará al equilibrar.
 
 **\[Abierto\]**
 
@@ -554,11 +563,11 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 - [x] Sueldos semanales pagados el día 7 (sección 4).
 - [x] Ranking = Fuerza (top 5) + Prestigio (sección 6).
 - [x] Temporadas de 4 semanas con premio final (sección 2).
-- [ ] Condición exacta de victoria de la partida.
-- [ ] Fórmula de éxito de misión, lesiones y recuperación.
+- [x] Condición de victoria: cerrar una temporada en el n.º 1.
+- [x] Fórmula de éxito de misión, lesiones y recuperación (base provisional aceptada de momento; curación con oro).
 - [ ] Cifras equilibradas: recompensas, sueldos, costes de reclutamiento y premios de temporada.
 - [ ] Reclutamiento básico: cómo aparecen héroes fuera de la Prueba de los Novatos.
-- [ ] Qué pasa si no puedes pagar los sueldos.
+- [x] Qué pasa si no puedes pagar los sueldos: tras varias semanas sin cobrar, el héroe se va.
 
 ### Fase 2
 
@@ -581,6 +590,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-06 | Decisiones del propietario tras probar el prototipo: victoria al cerrar una temporada en el n.º 1; un héroe que no cobra varias semanas seguidas se va a otro gremio; sueldos e instalaciones más caros para que el oro siga apretando; inventario de héroes con su estado en Gestionar gremio; curar lesionados con oro; la fórmula de éxito y lesiones vale de momento. |
 | 2026-11-06 | Aprobadas y pasadas a \[Aceptado\]: sueldos semanales el día 7, varias misiones al día con equipos de 1/2/3 héroes y tablón diario, ranking Fuerza (top 5) + Prestigio, ranking semanal, temporadas de 4 semanas con premio, subasta por turnos con límite oculto de los rivales, potencial en rango con ojeadores, regla de no castigar lo inevitable, hoja de ruta por fases, consecuencias de fracasar misiones (menos recompensa y lesiones) y marcha voluntaria de un héroe ignorado reiteradamente. |
 | 2026-11-06 | Biblia creada a partir del documento de diseño original. Moneda unificada como oro. |
 | (anterior) | Calendario semanal sustituido por avance diario con «Finalizar día». |

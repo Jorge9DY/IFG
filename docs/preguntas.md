@@ -8,17 +8,17 @@ Las preguntas del diseño anterior (temporadas de 20 semanas, deuda, muertes, et
 
 La biblia cita «4 fases, 3 puertas» pero el esquema no venía en el documento. El plan las reparte así, siguiendo la sección 18: 1 núcleo económico, 2 competencia (Prueba, mercado, rivales, instalaciones), 3 héroes con voluntad, 4 narrativa. ¿Es correcto?
 
-## 2. Condición de victoria (sección 2)
+## 2. Condición de victoria (sección 2) — RESUELTA
 
-Provisional: ganas al cerrar una temporada en el n.º 1. ¿Basta con eso, o hace falta mantenerse, ganar varias temporadas o superar un evento final?
+Respuesta: de momento, la partida termina al cerrar una temporada en el n.º 1.
 
-## 3. Fórmula de éxito de misión y lesiones (sección 5)
+## 3. Fórmula de éxito de misión y lesiones (sección 5) — RESUELTA
 
-Provisional: 75% de éxito con un poder de equipo igual a la dificultad, ±1 punto por cada 1% de diferencia (entre 5% y 95%). Dificultades 20/55/125. Fracasar paga el 25% y da media experiencia. Lesión: 0/5/10% al tener éxito y 20/35/50% al fracasar, de 1–2, 2–3 y 3–5 días. ¿Te vale como base?
+Respuesta: de momento sirve (75% de éxito con el poder justo; dificultades 20/55/125; fracasar paga el 25%; lesiones de 1 a 5 días). Además, los lesionados se pueden curar con oro desde el inventario de héroes (coste provisional: 150 + 8 × poder por cada día de lesión que queda).
 
-## 4. ¿Qué pasa si no puedes pagar los sueldos? (sección 4)
+## 4. ¿Qué pasa si no puedes pagar los sueldos? (sección 4) — RESUELTA
 
-Provisional: se paga igualmente, el oro queda en negativo (no puedes comprar, reclutar ni pujar) y cada héroe pierde 15 de lealtad. ¿Preferimos deuda, salidas de héroes u otra cosa?
+Respuesta: si un héroe no cobra durante un tiempo, se va a otro gremio. Aplicado: quien no cobra pierde 15 de lealtad y avisa; a las 2 semanas seguidas sin cobrar se va al rival con plaza que más oro tiene. Cuando no llega para todos, cobran primero los más poderosos (provisional; ¿te parece bien ese orden o prefieres elegir tú a quién pagar?).
 
 ## 5. Reclutamiento fuera de la Prueba (sección 18, fase 1)
 
@@ -44,6 +44,10 @@ Provisional: 5 candidatos; se ve su poder y su potencial en rango; salida al 30%
 
 Provisional: los cuatro primeros de la tabla (Dragón Carmesí, Corona Dorada, Sombras Negras y Última Esperanza), sin maestros con nombre. Cada día lanzan hasta 2 misiones con sus mejores héroes si tienen al menos un 60% de éxito; el día 7 pagan sueldos, pueden mejorar instalaciones y pujan según su estrategia. Mantienen 8 héroes como máximo: si fichan a alguien mejor, dejan marchar al más flojo. ¿Quieres el Gremio del León, nombres de maestros o más rivales?
 
-## 11. Tensión económica (informe de balance)
+## 11. Tensión económica (informe de balance) — RESUELTA
 
-Con las cifras provisionales, el oro deja de apretar a partir de la segunda temporada (el jugador prudente acaba con ~89.000 de oro sin saber en qué gastarlo). Hacen falta más usos del oro (instalaciones, la pregunta 7) o sueldos más altos. ¿Qué prefieres?
+Respuesta: instalaciones más caras y sueldos más altos. Aplicado: sueldo = 100 + 25 × poder + 12 × reputación; la sede llega al nivel 7 con mejoras de 3.000 a 60.000; ojeadores por 3.000, 9.000 y 20.000. Ver `informe-balance.md`.
+
+## 12. ¿Está bien la dificultad para llegar al n.º 1?
+
+Con sueldos e instalaciones más caros, el oro aprieta toda la partida, pero subir cuesta más: el jugador automático ambicioso gana solo en el 5% de las partidas en 4 temporadas (antes, el 24%), y acaba de media 3.º. Una persona juega mejor que el bot, pero conviene que lo pruebes. Si se hace demasiado largo, las palancas son: premios de temporada más altos, rivales con menos prestigio inicial o héroes que crezcan más rápido.

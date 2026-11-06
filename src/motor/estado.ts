@@ -42,7 +42,7 @@ export interface PruebaNovatos {
 export type Fase = 'gestion' | 'prueba' | 'victoria';
 
 export interface EstadoJuego {
-  version: 3;
+  version: 4;
   semilla: number;
   /** Estado del generador aleatorio, para continuar la misma secuencia. */
   azar: number;
@@ -125,6 +125,11 @@ export function diasParaPrueba(dia: number): number {
 
 export function puesto(estado: EstadoJuego, gremioId: string): number {
   return estado.ranking.find((f) => f.gremioId === gremioId)?.puesto ?? estado.ranking.length;
+}
+
+/** Misión en la que está ahora un héroe, o null. */
+export function misionDe(estado: EstadoJuego, heroeId: string): MisionEnCurso | null {
+  return estado.enCurso.find((c) => c.equipo.includes(heroeId)) ?? null;
 }
 
 export function nuevoId(estado: EstadoJuego, prefijo: string): string {
