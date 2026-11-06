@@ -1,0 +1,24 @@
+{
+  "rivales": [
+    {
+      "id": "corona", "nombre": "Corona de Acero", "prestigio": 90, "reputacion": 50, "oro": 60000,
+      "especialidad": "Guerrero", "plantilla": { "S": 2, "A": 3, "B": 4, "C": 2 },
+      "perfil": { "agresividad": 1.25, "sesgo": "rango", "clasesPreferidas": ["Guerrero", "Tanque"] }
+    },
+    {
+      "id": "alba", "nombre": "Orden del Alba Dorada", "prestigio": 75, "reputacion": 80, "oro": 45000,
+      "especialidad": "Sanador", "plantilla": { "S": 1, "A": 3, "B": 4, "C": 3 },
+      "perfil": { "agresividad": 1.0, "sesgo": "reputacion", "clasesPreferidas": ["Sanador", "Tanque"] }
+    },
+    {
+      "id": "colmillo", "nombre": "Colmillo Carmesí", "prestigio": 65, "reputacion": 25, "oro": 35000,
+      "especialidad": "Explorador", "plantilla": { "S": 1, "A": 2, "B": 4, "C": 3 },
+      "perfil": { "agresividad": 1.35, "sesgo": "agilidad", "clasesPreferidas": ["Explorador", "Guerrero"] }
+    },
+    {
+      "id": "tejedores", "nombre": "Tejedores del Velo", "prestigio": 60, "reputacion": 40, "oro": 30000,
+      "especialidad": "Mago", "plantilla": { "S": 0, "A": 3, "B": 4, "C": 3 },
+      "perfil": { "agresividad": 1.15, "sesgo": "potencial", "clasesPreferidas": ["Mago", "Soporte"] }
+    }
+  ]
+}

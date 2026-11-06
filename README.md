@@ -31,11 +31,13 @@ Abre la dirección que aparece en la terminal (normalmente `http://localhost:517
 | `npm test` | Ejecuta los tests del motor |
 | `npm run typecheck` | Comprueba los tipos |
 | `npm run build` | Genera la versión publicable en `dist/` |
+| `npm run simular -- 1000` | Simula 1.000 temporadas y muestra el informe de balance |
 
 ## Estado
 
 - **Fase 0 (preparación):** terminada.
-- **Fase 1 (motor de reglas):** en curso. Misiones, pujas, economía, ranking y valor de los héroes ya funcionan y tienen tests.
+- **Fase 1 (motor de reglas):** temporada completa jugable por código. Faltan las acciones especiales de los rivales, cesiones y mejoras de la sede.
+- **Fase 2 (balance):** simulador listo; ver el [informe de balance](docs/informe-balance.md), con decisiones de diseño pendientes.
 - **Sede 3D:** primera versión con formas simples, movimiento y puntos de interacción.
 
 ## Estructura

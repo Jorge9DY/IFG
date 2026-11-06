@@ -1,19 +1,145 @@
 {
   "rangos": {
-    "S": { "sumaMin": 330, "sumaMax": 400, "salario": [400, 600], "valor": [15000, 30000] },
-    "A": { "sumaMin": 260, "sumaMax": 329, "salario": [200, 350], "valor": [6000, 14000] },
-    "B": { "sumaMin": 200, "sumaMax": 259, "salario": [100, 180], "valor": [2500, 5500] },
-    "C": { "sumaMin": 150, "sumaMax": 199, "salario": [50, 90], "valor": [800, 2200] },
-    "D": { "sumaMin": 100, "sumaMax": 149, "salario": [20, 45], "valor": [200, 700] },
-    "F": { "sumaMin": 50, "sumaMax": 99, "salario": [10, 15], "valor": [50, 150] }
+    "S": {
+      "sumaMin": 330,
+      "sumaMax": 400,
+      "salario": [
+        400,
+        600
+      ],
+      "valor": [
+        15000,
+        30000
+      ]
+    },
+    "A": {
+      "sumaMin": 260,
+      "sumaMax": 329,
+      "salario": [
+        200,
+        350
+      ],
+      "valor": [
+        6000,
+        14000
+      ]
+    },
+    "B": {
+      "sumaMin": 200,
+      "sumaMax": 259,
+      "salario": [
+        100,
+        180
+      ],
+      "valor": [
+        2500,
+        5500
+      ]
+    },
+    "C": {
+      "sumaMin": 150,
+      "sumaMax": 199,
+      "salario": [
+        50,
+        90
+      ],
+      "valor": [
+        800,
+        2200
+      ]
+    },
+    "D": {
+      "sumaMin": 100,
+      "sumaMax": 149,
+      "salario": [
+        20,
+        45
+      ],
+      "valor": [
+        200,
+        700
+      ]
+    },
+    "F": {
+      "sumaMin": 50,
+      "sumaMax": 99,
+      "salario": [
+        10,
+        15
+      ],
+      "valor": [
+        50,
+        150
+      ]
+    }
   },
   "misiones": {
-    "F": { "poderRecomendado": 180, "duracion": 1, "oro": [200, 400], "prestigio": 0.5, "xp": 10, "puntos": 1 },
-    "D": { "poderRecomendado": 300, "duracion": 1, "oro": [500, 900], "prestigio": 1, "xp": 20, "puntos": 2 },
-    "C": { "poderRecomendado": 500, "duracion": 2, "oro": [1200, 2000], "prestigio": 2, "xp": 40, "puntos": 4 },
-    "B": { "poderRecomendado": 800, "duracion": 2, "oro": [2500, 4000], "prestigio": 3, "xp": 70, "puntos": 7 },
-    "A": { "poderRecomendado": 1200, "duracion": 3, "oro": [5000, 8000], "prestigio": 5, "xp": 110, "puntos": 12 },
-    "S": { "poderRecomendado": 1600, "duracion": 4, "oro": [12000, 20000], "prestigio": 10, "xp": 180, "puntos": 20 }
+    "F": {
+      "poderRecomendado": 180,
+      "duracion": 1,
+      "oro": [
+        200,
+        400
+      ],
+      "prestigio": 0.5,
+      "xp": 10,
+      "puntos": 1
+    },
+    "D": {
+      "poderRecomendado": 300,
+      "duracion": 1,
+      "oro": [
+        500,
+        900
+      ],
+      "prestigio": 1,
+      "xp": 20,
+      "puntos": 2
+    },
+    "C": {
+      "poderRecomendado": 500,
+      "duracion": 2,
+      "oro": [
+        1200,
+        2000
+      ],
+      "prestigio": 2,
+      "xp": 40,
+      "puntos": 4
+    },
+    "B": {
+      "poderRecomendado": 800,
+      "duracion": 2,
+      "oro": [
+        2500,
+        4000
+      ],
+      "prestigio": 3,
+      "xp": 70,
+      "puntos": 7
+    },
+    "A": {
+      "poderRecomendado": 1200,
+      "duracion": 3,
+      "oro": [
+        5000,
+        8000
+      ],
+      "prestigio": 5,
+      "xp": 110,
+      "puntos": 12
+    },
+    "S": {
+      "poderRecomendado": 1600,
+      "duracion": 4,
+      "oro": [
+        12000,
+        20000
+      ],
+      "prestigio": 10,
+      "xp": 180,
+      "puntos": 20
+    }
   },
   "exito": {
     "base": 75,
@@ -25,9 +151,9 @@
     "penalizacionPrestigioFracaso": 2
   },
   "riesgoMuerte": {
-    "dosOMasRangosPorEncima": 25,
-    "unRangoPorEncima": 12,
-    "mismoRango": 5,
+    "dosOMasRangosPorEncima": 35,
+    "unRangoPorEncima": 18,
+    "mismoRango": 8,
     "porDebajo": 1,
     "exitoDosOMasPorEncima": 1,
     "reduccionTanque": 0.3,
@@ -36,9 +162,16 @@
     "reduccionEnfermeria": 0.1
   },
   "heridas": {
-    "leveProbabilidad": { "exito": 3, "parcial": 10, "fracaso": 20 },
+    "leveProbabilidad": {
+      "exito": 3,
+      "parcial": 10,
+      "fracaso": 20
+    },
     "semanasLeve": 1,
-    "semanasGrave": [3, 4],
+    "semanasGrave": [
+      3,
+      4
+    ],
     "semanasClemente": 4,
     "moralClemente": -10
   },
@@ -53,9 +186,19 @@
     "moralPorPunto": 0.0045
   },
   "vinculos": {
-    "fichaje": { "Romance": 20, "Familia": 15, "Amistad": 8, "Rivalidad": -15 },
+    "fichaje": {
+      "Romance": 20,
+      "Familia": 15,
+      "Amistad": 8,
+      "Rivalidad": -15
+    },
     "topeFichaje": 30,
-    "mision": { "Romance": 0.1, "Familia": 0.1, "Amistad": 0.05, "Rivalidad": -0.1 }
+    "mision": {
+      "Romance": 0.1,
+      "Familia": 0.1,
+      "Amistad": 0.05,
+      "Rivalidad": -0.1
+    }
   },
   "pujas": {
     "pesoDinero": 0.45,
@@ -83,10 +226,109 @@
     "patrocinioPorReputacion": 5,
     "cierresNegativosParaQuiebra": 3,
     "decaimientoPrestigio": 0.5,
-    "premios": [30000, 20000, 12000, 6000, 0]
+    "premios": [
+      30000,
+      20000,
+      12000,
+      6000,
+      0
+    ]
   },
   "ranking": {
     "pesoPrestigio": 3,
     "pesoReputacion": 1
+  },
+  "generacion": {
+    "edad": [
+      16,
+      40
+    ],
+    "probRasgo": 35,
+    "maxRasgos": 2,
+    "probJoya": 10,
+    "probVinculo": 30,
+    "potencialMaximo": {
+      "S": "S",
+      "A": "S",
+      "B": "A",
+      "C": "B",
+      "D": "B",
+      "F": "C"
+    },
+    "draft": {
+      "S": 1,
+      "A": 2,
+      "B": 4,
+      "C": 4,
+      "D": 3
+    },
+    "agentesLibresPorSemana": [
+      1,
+      3
+    ],
+    "rangosAgentesLibres": [
+      "F",
+      "D",
+      "D",
+      "C",
+      "C",
+      "B"
+    ]
+  },
+  "progresion": {
+    "xpPorMejora": 50,
+    "puntosPorMejora": 3,
+    "edadMaxCrecimiento": 28,
+    "edadDeclive": 36,
+    "declivePorTemporada": 0.03
+  },
+  "moral": {
+    "objetivo": 60,
+    "derivaSemanal": 2,
+    "porVenta": -2,
+    "vinculadoVendido": -25,
+    "vinculadoMuerto": -30,
+    "amistadMuerta": -15,
+    "rivalMuerto": 10,
+    "probAbandonoRomance": 30,
+    "probAbandonoFamilia": 20,
+    "semanasLuto": 2,
+    "exitoMision": 3,
+    "fracasoMision": -5
+  },
+  "ventas": {
+    "probInteres": 40,
+    "ofertaMin": 0.7,
+    "ofertaMax": 1.2,
+    "probRetiroContraoferta": 35,
+    "topeContraoferta": 1.3,
+    "puntuacionMinimaAceptar": 40,
+    "rivalDirectoExtra": 0.1
+  },
+  "ia": {
+    "misionesPorSemana": [
+      1,
+      2
+    ],
+    "probExitoMinima": 70,
+    "probMuerteFracaso": 4,
+    "interesFichaje": 0.6
+  },
+  "tablon": {
+    "misionesPorSemana": [
+      6,
+      10
+    ],
+    "rangoMaximoPorPuesto": {
+      "1": "S",
+      "2": "S",
+      "3": "A",
+      "4": "B",
+      "5": "B"
+    }
+  },
+  "temporada": {
+    "semanas": 20,
+    "misionesParaDespertarI": 5
   }
 }

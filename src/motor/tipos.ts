@@ -16,7 +16,7 @@ export type Rasgo =
   | 'Ambicioso'
   | 'Romantico'
   | 'Veterano';
-export type EstadoHeroe = 'disponible' | 'en mision' | 'herido' | 'luto';
+export type EstadoHeroe = 'disponible' | 'en mision' | 'herido' | 'luto' | 'muerto';
 
 export interface Stats {
   poder: number;

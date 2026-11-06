@@ -77,9 +77,9 @@ describe('Poder de equipo', () => {
 
 describe('Riesgo de muerte', () => {
   it('riesgo base según la diferencia de rango', () => {
-    expect(riesgoBase('B', 1)).toBe(25); // misión B, héroe D
-    expect(riesgoBase('C', 1)).toBe(12);
-    expect(riesgoBase('D', 1)).toBe(5);
+    expect(riesgoBase('B', 1)).toBe(35); // misión B, héroe D
+    expect(riesgoBase('C', 1)).toBe(18);
+    expect(riesgoBase('D', 1)).toBe(8);
     expect(riesgoBase('F', 1)).toBe(1);
   });
 

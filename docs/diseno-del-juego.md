@@ -291,9 +291,9 @@ La tirada da uno de tres resultados:
 
 | Rango de la misión respecto al héroe | Riesgo base en fracaso |
 | --- | --- |
-| 2 o más rangos por encima | 25% |
-| 1 rango por encima | 12% |
-| Mismo rango | 5% |
+| 2 o más rangos por encima | 35% |
+| 1 rango por encima | 18% |
+| Mismo rango | 8% |
 | Por debajo | 1% |
 
 Modificadores: ×(1 − Defensa ÷ 200); −30% para todos si hay un Tanque en Vanguardia; Temerario +5 puntos; Despertar II −40%. El Sanador convierte la primera muerte de la misión en herida grave. Quien no muere tira por herida: grave (3–4 semanas fuera) con la misma probabilidad que la muerte, y leve (1 semana) con un 3% en éxito, 10% en éxito parcial y 20% en fracaso.
@@ -306,7 +306,7 @@ Al volver, un informe narrativo de 3–5 líneas generado con plantillas cuenta 
 
 ## 10. Economía y balance
 
-El gremio empieza con 3.000 de oro, 40.000 de deuda y unos gastos fijos de 1.000 por semana: sin misiones exitosas quiebra en unas 4 semanas.
+El gremio empieza con 3.000 de oro, 40.000 de deuda y unos gastos fijos de 1.000 por semana: sin misiones exitosas se queda sin oro hacia la semana 4 y la Asociación le retira la licencia en la semana 7.
 
 ### Ingresos y gastos
 

@@ -71,11 +71,13 @@ IFG/
 - [x] `economia.ts`: patrocinio, gastos semanales, quiebra
 - [x] `ranking.ts`: Puntos de Gremio y clasificación
 - [x] `heroes.ts`: rango por suma de combate y valor de mercado
-- [ ] `heroes.ts`: generación aleatoria de héroes, XP y subida de rango
-- [ ] `ventas.ts`: ofertas de la IA, contraofertas y consecuencias
-- [ ] `vinculos.ts`: afinidad, moral y luto
-- [ ] `ia.ts`: los 4 perfiles rivales
-- [ ] `partida.ts`: estado completo y `terminarSemana()`
+- [x] `heroes.ts`: generación aleatoria de héroes, vínculos, XP, subida de rango y envejecimiento
+- [x] `ventas.ts`: ofertas de la IA, contraofertas y consecuencias
+- [x] `vinculos.ts`: afinidad, moral, luto y abandonos
+- [x] `ia.ts`: los 4 perfiles rivales (pujas, misiones abstractas, fichajes)
+- [x] `estado.ts` y `partida.ts`: estado completo, acciones del jugador y `terminarSemana()`
+- [ ] Acciones especiales de los rivales (Veto del Duque, rumores, robo de misiones, espionaje)
+- [ ] Cesiones, cláusulas de rescisión y mejoras de la sede como acciones del jugador
 
 **Tests con los ejemplos del diseño:**
 
@@ -88,10 +90,11 @@ IFG/
 
 ### Fase 2 — Simulador de balance
 
-- [ ] Jugador automático con estrategia simple
-- [ ] 1.000 temporadas con semillas distintas
-- [ ] Informe en Markdown con las métricas
-- [ ] Ajuste de cifras en `src/datos/` y en el diseño
+- [x] Jugador automático con dos estrategias (prudente y arriesgada)
+- [x] 1.000 temporadas con semillas distintas
+- [x] Informe en Markdown con las métricas: [informe-balance.md](informe-balance.md)
+- [x] Primer ajuste (IA de los rivales, riesgo de muerte)
+- [ ] Decisiones pendientes del informe de balance (distancia con los rivales, economía a mitad de temporada)
 
 | Métrica | Objetivo inicial |
 | --- | --- |
