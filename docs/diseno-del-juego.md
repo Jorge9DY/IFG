@@ -1,6 +1,6 @@
 # Gremio Rango D — Documento de Diseño
 
-Versión 1.0 · 6 de noviembre de 2026 · Fuente editable: [Claude Docs](https://claude.ai/artifact/FPcWSW7QnHpzhKs6YmdMyn)
+Versión 1.1 · 6 de noviembre de 2026 · Este archivo es la versión de referencia · Fuente editable: [Claude Docs](https://claude.ai/artifact/FPcWSW7QnHpzhKs6YmdMyn)
 
 ## 1. Visión y pitch
 
@@ -125,8 +125,8 @@ El **potencial oculto** puede superar el máximo de la tabla. Solo se ve con el 
 ### Rasgos (ejemplos)
 
 - **Codicioso:** +20% al peso del dinero en sus decisiones; −10 Moral si su salario baja.
-- **Leal:** no acepta ofertas de venta si su Moral es mayor que 60; +15% de éxito junto a un vínculo.
-- **Temerario:** +10% de éxito, +5% de riesgo de muerte.
+- **Leal:** no acepta ofertas de venta si su Moral es mayor que 60; +15% a su aportación si va en equipo con un vínculo positivo.
+- **Temerario:** +10% a su aportación al poder del equipo, +5 puntos de riesgo de muerte.
 - **Cobarde:** huye antes; nunca muere en misiones de su rango o inferiores.
 - **Ambicioso:** solo ficha por gremios del Top 3, salvo que el prestigio del jugador supere 60.
 - **Romántico:** su vínculo de romance cuenta doble.
@@ -274,10 +274,10 @@ Cada misión tiene un elemento enemigo y una etiqueta (Caza, Escolta, Exploraci�
 ```
 
 ```latex
-P(\text{éxito}) = \min\left(95,\ \max\left(5,\ 75 + 100 \times \left(\frac{\text{PE}}{\text{Poder recomendado}} - 1\right)\right)\right) + \text{Soporte}
+P(\text{éxito}) = \min\left(95,\ \max\left(5,\ 75 + 100 \times \left(\frac{\text{PE}}{\text{Poder recomendado}} - 1\right) + \text{Soporte}\right)\right)
 ```
 
-Con el poder recomendado exacto la probabilidad es 75%; con el 80% del poder, 55%; con el 120%, 95%. Un Soporte suma +10 puntos.
+Con el poder recomendado exacto la probabilidad es 75%; con el 80% del poder, 55%; con el 120%, 95%. Un Soporte suma +10 puntos, sin superar el tope del 95%.
 
 La tirada da uno de tres resultados:
 
@@ -296,7 +296,7 @@ La tirada da uno de tres resultados:
 | Mismo rango | 5% |
 | Por debajo | 1% |
 
-Modificadores: ×(1 − Defensa ÷ 200); −30% para todos si hay un Tanque en Vanguardia; Temerario +5 puntos; Despertar II −40%. El Sanador convierte la primera muerte de la misión en herida grave. Quien no muere tira por herida: leve (1 semana fuera) o grave (3–4 semanas).
+Modificadores: ×(1 − Defensa ÷ 200); −30% para todos si hay un Tanque en Vanguardia; Temerario +5 puntos; Despertar II −40%. El Sanador convierte la primera muerte de la misión en herida grave. Quien no muere tira por herida: grave (3–4 semanas fuera) con la misma probabilidad que la muerte, y leve (1 semana) con un 3% en éxito, 10% en éxito parcial y 20% en fracaso.
 
 **Muerte permanente:** el héroe desaparece de la plantilla. Sus vinculados pierden 30 de Moral y entran en Luto 2 semanas (×0,8 en misiones). Si murió en una misión 2 o más rangos por encima de él, el gremio pierde 3 de reputación por imprudencia. Modo Clemente (sin muertes): se elige al empezar la partida. Cada muerte pasa a ser una herida grave de 4 semanas con −10 de Moral, sin Luto ni pérdida de reputación. Es una sola comprobación en la tirada de muerte, así que entra en el prototipo sin coste de desarrollo apreciable.
 
@@ -344,9 +344,11 @@ Semana 1: el jugador ficha a 2 agentes libres de rango D (Brann, tanque, prima 4
 | Semana | Oro inicial | Fichajes | Misiones | Patrocinio | Gastos fijos + salarios | Oro final |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 3.000 | −750 | 0 | +300 | −1.055 | 1.495 |
-| 2 | 1.495 | 0 | +1.600 (éxito C) | +300 | −1.055 | 2.340 |
-| 3 | 2.340 | 0 | 0 (nueva misión C) | +300 | −1.055 | 1.585 |
-| 4 (si fracasa) | 1.585 | 0 | 0 | +300 | −1.055 | 830 |
+| 2 | 1.495 | 0 | +1.600 (éxito C, +2 prestigio) | +315 | −1.055 | 2.355 |
+| 3 | 2.355 | 0 | 0 (nueva misión C) | +315 | −1.055 | 1.615 |
+| 4 (si fracasa) | 1.615 | 0 | 0 (−2 prestigio) | +290 | −1.055 | 850 |
+
+El patrocinio varía porque el prestigio cambia: +2 por la misión con éxito, −0,5 por cada semana sin éxitos y −2 por el fracaso. Orden del cierre semanal: patrocinio, gastos, control de quiebra y, por último, decaimiento del prestigio.
 
 Un solo fracaso deja al gremio a 1 semana del primer aviso. El margen obliga a combinar misiones F/D de 1 semana con las de 2 semanas y a vender o fichar barato en las primeras semanas. Es la tensión buscada para la temporada 1.
 
@@ -450,11 +452,31 @@ Se gana terminando una temporada en el 1.º puesto (como tarde la 5.ª) y se pie
 
 ## 15. UI/UX: pantallas
 
-La interfaz es un panel de gestión con 8 pantallas, una barra superior fija (oro, deuda, prestigio, reputación, semana, puesto) y el botón "Terminar semana" siempre visible.
+La interfaz combina una **sede 3D explorable** con **paneles de gestión** en HTML superpuestos. Una barra superior fija muestra oro, deuda, prestigio, reputación, semana y puesto, y el botón "Terminar semana" está siempre visible.
+
+### Sede 3D explorable
+
+- El protagonista se mueve por la sede del gremio en 3D: teclado (WASD o flechas) o clic/toque en el suelo. Cámara en tercera persona con vista isométrica suave.
+- **Puntos de interacción:** al acercarse aparece un aviso ("E: Ver tablón") y se abre el panel correspondiente.
+
+| Lugar de la sede | Abre el panel |
+| --- | --- |
+| Tablón de anuncios | Tablón de misiones → Formación |
+| Mostrador de la entrada | Mercado y Puja |
+| Elara (junto a la chimenea) | Consejo de la semana y eventos |
+| Dormitorios | Plantilla |
+| Pizarra de la Asociación | Clasificación |
+| Puerta de la sede | Terminar semana |
+
+- **La sede refleja el progreso:** 4 estados (ruina, reparada, próspera, legendaria) según el puesto y las mejoras; cada mejora construida (enfermería, sala de entrenamiento, biblioteca...) aparece como una sala o un objeto nuevo.
+- **Los héroes de la plantilla aparecen en la sede** (paseando o sentados). Los que están en misión no están; los heridos aparecen en la enfermería.
+- Accesibilidad: todos los paneles también se abren desde un menú lateral, sin necesidad de caminar.
+
+### Paneles de gestión
 
 | Pantalla | Contenido | Acciones principales |
 | --- | --- | --- |
-| Sede | Ilustración de la sede (cambia con las mejoras), Elara con su consejo de la semana, avisos | Construir mejoras, hablar con Elara, ver eventos |
+| Sede (panel) | Mejoras disponibles, consejo de Elara, avisos de la semana | Construir mejoras, hablar con Elara, ver eventos |
 | Mercado | Pestañas Draft, Agentes libres, En venta (rivales), Tus traspasos. Cartas de héroe con rango, clase, elemento, vínculos | Pujar, poner en venta, contraofertar, pagar cláusula |
 | Puja | Carta del héroe, desglose de tu Puntuación (barras D, P, R, V, E, X), puntuación rival en las rondas 2–3 | Ajustar prima, salario y duración con controles deslizantes |
 | Plantilla | Lista de héroes: stats, Moral, estado (disponible, en misión, herido, luto), contrato | Ver ficha, renovar, despedir, ver red de vínculos |
@@ -472,10 +494,17 @@ La interfaz es un panel de gestión con 8 pantallas, una barra superior fija (or
 
 ## 16. Arte y audio
 
-Estilo anime limpio con interfaz de "pergamino moderno"; para el prototipo bastan cartas con retrato e iconos, sin animaciones de combate.
+Estilo anime limpio con interfaz de "pergamino moderno". La sede y los personajes son **3D low-poly estilizados** (tipo "toon", con sombreado plano); los paneles de gestión usan cartas 2D con retrato. No hay animaciones de combate: las misiones se cuentan en el informe.
+
+**Assets 3D**
+
+- Formato **glTF/GLB**, cargados con Three.js. Modelos en Blender; animaciones de personaje (reposo, andar, correr, saludar) desde Mixamo.
+- **Prototipo:** packs gratuitos de uso libre (CC0) de Kenney y Quaternius para muebles, salas y personajes. Primero se usan formas simples (cajas y cápsulas) mientras se integra cada asset.
+- **Presupuesto de rendimiento:** escena de la sede por debajo de 100.000 triángulos y 30 MB de assets; 60 fps en un portátil normal.
+- El protagonista puede personalizarse en el prototipo con color de pelo, ropa y piel sobre un modelo base.
 
 - **Retratos de héroes:** busto anime con un marco de color según rango (S dorado, A violeta, B azul, C verde, D gris, F marrón).
-- **Sede:** 1 ilustración con 4 estados: ruina, reparada, próspera, legendaria.
+- **Sede:** escena 3D con 4 estados: ruina, reparada, próspera, legendaria.
 - **Escenas narrativas:** estilo novela visual (fondo + personaje + caja de diálogo).
 
 | Gremio | Color principal | Emblema |
@@ -490,7 +519,7 @@ Estilo anime limpio con interfaz de "pergamino moderno"; para el prototipo basta
 
 ## 17. Alcance del prototipo, roadmap y modelo de datos
 
-El prototipo jugable cubre la temporada 1 completa (prólogo + 20 semanas) con todos los sistemas de gestión; se recomienda construirlo como juego web en HTML/JavaScript con los datos en JSON.
+El prototipo jugable cubre la temporada 1 completa (prólogo + 20 semanas) con todos los sistemas de gestión; se construye como juego web con TypeScript, Vite y Three.js (sede 3D), con los datos en JSON. Detalle en `docs/plan-de-desarrollo.md`.
 
 ### Qué entra en el prototipo
 
@@ -503,6 +532,7 @@ El prototipo jugable cubre la temporada 1 completa (prólogo + 20 semanas) con t
 - [ ] Prestigio, reputación y ranking semanal
 - [ ] Despertar I y afinidad con Elara hasta 40
 - [ ] 10 eventos cortos de vínculos
+- [ ] Sede 3D explorable con el protagonista, puntos de interacción y héroes de la plantilla
 - [ ] Guardado automático en el navegador
 
 ### Después del prototipo
@@ -552,3 +582,4 @@ La semilla aleatoria guardada en la partida permite repetir tiradas al depurar e
 - El jugador elige el nombre y el aspecto del protagonista.
 - La Llama Menguante no tiene especialidad: ficha héroes de cualquier clase y raza.
 - El Modo Clemente (sin muertes) entra en el prototipo.
+- Stack: TypeScript + Vite + Three.js. La sede del gremio es un espacio 3D por el que se mueve el protagonista.

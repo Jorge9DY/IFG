@@ -1,3 +1,3 @@
 # Tests
 
-Tests automáticos del motor. Cada fórmula del documento de diseño tiene al menos un test con su ejemplo resuelto (por ejemplo, la puja de Mira Solenne de la sección 7).
+Tests automáticos del motor (`npm test`). Cada fórmula del documento de diseño tiene al menos un test con su ejemplo resuelto. `fabrica.ts` crea héroes y misiones de prueba.
