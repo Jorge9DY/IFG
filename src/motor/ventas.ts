@@ -22,6 +22,7 @@ const V = balance.ventas;
 export function ponerEnVenta(estado: EstadoJuego, heroeId: string, precio: number): void {
   if (!jugador(estado).plantilla.includes(heroeId)) throw new Error('El héroe no es de tu gremio');
   if (heroeId === 'h_000_elara') throw new Error('Elara no se puede vender');
+  if ((estado.cesiones ?? []).some((c) => c.heroeId === heroeId)) throw new Error('No puedes vender a un héroe cedido');
   estado.enVenta = estado.enVenta.filter((t) => t.heroeId !== heroeId);
   estado.enVenta.push({ heroeId, precio });
 }

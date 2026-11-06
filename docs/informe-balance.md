@@ -35,7 +35,7 @@ Con las acciones especiales de los rivales (veto, espionaje, rumores, robo de mi
     - que los Puntos de Gremio se basen solo en la temporada en curso (puntos de misión y prestigio ganado en la temporada);
     - que el prestigio de los rivales decaiga más deprisa o tenga un tope por debajo de 100;
     - que el jugador acceda antes a misiones de rango alto (con Elara, el equipo ya podría hacer misiones A).
-2. **La economía se relaja a mitad de temporada.** Los sabotajes la tensan algo (unos 9.000 de oro al final, antes 11.000), pero sigue creciendo en la segunda mitad. Opciones: subir los salarios, añadir gastos por héroe (equipo y comida) o reducir el oro de las misiones C y B.
+2. **La economía se relaja a mitad de temporada.** Los sabotajes la tensan algo (unos 9.000 de oro al final, antes 11.000), pero sigue creciendo en la segunda mitad. Las mejoras de la sede (3.000–8.000 de oro cada una, 33.000 en total) ya existen como sumidero de oro, pero el jugador automático todavía no las compra, así que el simulador no lo refleja. Opciones: subir los salarios, añadir gastos por héroe (equipo y comida) o reducir el oro de las misiones C y B.
 3. **Pocas muertes con un juego sensato.** El jugador automático casi siempre manda misiones por debajo del rango de sus héroes. Es un comportamiento legítimo; quizá el objetivo de 1–3 muertes por temporada sea demasiado alto, o las misiones que más pagan deberían exigir más riesgo.
 
 Hasta que se decidan estos puntos, el balance se considera **provisional**.

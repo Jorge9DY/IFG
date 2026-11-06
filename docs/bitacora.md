@@ -2,6 +2,14 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Mejoras de la sede, cláusulas y cesiones (motor)
+
+- `src/motor/sede.ts`: construir las 6 mejoras con sus efectos (plantilla 10/15, enfermería, +20% XP, biblioteca, banquetes). Costes y efectos en `balance.json`.
+- `src/motor/traspasos.ts`: pagar la cláusula de rescisión de un héroe rival y pedir héroes cedidos 4–8 semanas (20% del oro de sus misiones para su gremio; vuelven al terminar).
+- Los cedidos no se pueden vender ni sobornar. 13 tests nuevos (78 en total). Balance sin cambios: el bot no usa estas acciones.
+- Nota para la pregunta 2: las mejoras son un sumidero de oro para la segunda mitad de la temporada.
+- Falta la interfaz de estas acciones (bloque C).
+
 ## 2026-11-06 — Soborno y modo amenaza
 
 - Soborno del Colmillo: tienta a un héroe Codicioso; si no se le sube el salario un 30% antes del cierre siguiente, se va al Colmillo (`retenerHeroe`, `resolverSobornos`).

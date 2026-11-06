@@ -204,8 +204,8 @@ En la ronda 1 la diferencia es de solo 3 puntos, así que se pasa a la ronda 2. 
 ### Otras vías de fichaje
 
 - **Agentes libres:** héroes sin gremio en el mercado abierto. Misma fórmula, pero solo pujan los gremios interesados (1–3 IA).
-- **Cesiones:** un gremio presta un héroe 4–8 semanas a cambio del 30% de su valor; el gremio prestador recibe el 20% del oro de sus misiones.
-- **Cláusula de rescisión:** cada contrato tiene una (por defecto el 150% del valor). Pagarla ficha al héroe de inmediato si su Puntuación con tu gremio es al menos 60.
+- **Cesiones:** un gremio presta un héroe 4–8 semanas a cambio del 30% de su valor; el gremio prestador recibe el 20% del oro de sus misiones. Mientras dura, el jugador paga su salario y no puede venderlo. Ningún gremio cede héroes de rango A o S, salvo el Alba Dorada si tu reputación es 70 o más. Si el plazo vence con el héroe de misión, vuelve al terminarla.
+- **Cláusula de rescisión:** cada contrato tiene una (por defecto el 150% del valor). Pagarla ficha al héroe de inmediato si su Puntuación con tu gremio (con la cláusula como oferta) es al menos 60; si no, se niega y no se cobra nada. Solo se puede pagar con oro libre (oro menos 4 semanas de salarios).
 - **Fichaje por misión:** algunas misiones rescatan a un héroe que se une gratis si la reputación supera 50.
 
 ## 8. Ventas y mercado secundario
@@ -328,6 +328,8 @@ El gremio empieza con 3.000 de oro, 40.000 de deuda y unos gastos fijos de 1.000
 - Saldar la deuda entera da +10 de reputación, +20 de afinidad con Elara y elimina la cuota semanal de 500.
 
 ### Mejoras de la sede
+
+Se construyen una sola vez desde el panel de la sede. Dormitorios II exige Dormitorios I. La Enfermería acorta las bajas una semana (mínimo 1) y la Biblioteca revela el potencial de los héroes que entren en la plantilla.
 
 | Mejora | Coste (oro) | Efecto |
 | --- | --- | --- |

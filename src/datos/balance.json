@@ -347,5 +347,55 @@
     "sobornoSubidaMinima": 10,
     "amenazaPuestos": 2,
     "amenazaAgresividad": 1.1
+  },
+  "mejoras": {
+    "Dormitorios I": {
+      "coste": 3000,
+      "requiere": null,
+      "efecto": "Plantilla máxima de 6 a 10"
+    },
+    "Dormitorios II": {
+      "coste": 8000,
+      "requiere": "Dormitorios I",
+      "efecto": "Plantilla máxima de 10 a 15"
+    },
+    "Enfermeria": {
+      "coste": 5000,
+      "requiere": null,
+      "efecto": "Heridas 1 semana más cortas; −10% de riesgo de muerte"
+    },
+    "Sala de entrenamiento": {
+      "coste": 4000,
+      "requiere": null,
+      "efecto": "+20% de XP"
+    },
+    "Biblioteca arcana": {
+      "coste": 6000,
+      "requiere": null,
+      "efecto": "Muestra el potencial real de los héroes de tu plantilla"
+    },
+    "Salon de banquetes": {
+      "coste": 7000,
+      "requiere": null,
+      "efecto": "+5 de Moral semanal a toda la plantilla; +5 de prestigio"
+    }
+  },
+  "efectosMejoras": {
+    "plantillaDormitoriosI": 10,
+    "plantillaDormitoriosII": 15,
+    "xpEntrenamiento": 1.2,
+    "prestigioBanquetes": 5,
+    "semanasMenosEnfermeria": 1
+  },
+  "traspasos": {
+    "puntuacionMinimaClausula": 60,
+    "costeCesion": 0.3,
+    "oroCesion": 0.2,
+    "semanasCesion": [
+      4,
+      8
+    ],
+    "rangoMaximoCesion": "B",
+    "reputacionCesionAlba": 70
   }
 }

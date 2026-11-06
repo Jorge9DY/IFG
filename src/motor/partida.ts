@@ -24,6 +24,8 @@ import { resolverMision, type InformeMision, type MiembroEquipo } from './mision
 import { ofertaTotal, resolverSubasta, type Oferta, type Pujador, type ResultadoSubasta } from './pujas';
 import { puntosMision } from './ranking';
 import { ofertaAnualCorona, pujadoresRivales, reiniciarAccionesTemporada, resolverSobornos, sabotajesColmillo } from './rivales';
+import { aplicarEfectosPermanentes, multiplicadorXp, semanasDeBaja } from './sede';
+import { devolverCesiones, repartirOroCesiones } from './traspasos';
 import { generarOfertas, liberarHeroe } from './ventas';
 import { aplicarPerdida, cambiarMoral, derivaMoral, sumarAfinidadEquipo } from './vinculos';
 import {
@@ -335,6 +337,10 @@ export function terminarSemana(estado: EstadoJuego): ResumenSemana {
       }
     }
 
+    // Fin de cesiones y efectos de las mejoras de la sede.
+    devolverCesiones(estado);
+    aplicarEfectosPermanentes(estado);
+
     // 5. Despertar I: 5 misiones con éxito en la temporada 1.
     if (estado.partida.despertares === 0 && estado.exitosTemporada >= balance.temporada.misionesParaDespertarI) {
       estado.partida.despertares = 1;
@@ -381,6 +387,7 @@ function resolverMisionesDelJugador(estado: EstadoJuego, azar: Azar): InformeMis
     informes.push(informe);
 
     j.oro += informe.oro;
+    repartirOroCesiones(estado, enCurso.equipo.map((p) => p.heroeId), informe.oro);
     j.prestigio = Math.max(0, Math.min(100, j.prestigio + informe.prestigio));
     if (informe.resultado === 'exito') {
       j.puntosMisionTemporada += puntosMision(enCurso.mision.rango);
@@ -401,13 +408,13 @@ function resolverMisionesDelJugador(estado: EstadoJuego, azar: Azar): InformeMis
         continue;
       }
       supervivientes.push(h);
-      ganarXp(azar, h, informe.xp);
+      ganarXp(azar, h, Math.round(informe.xp * multiplicadorXp(estado)));
       if (informe.resultado === 'exito') h.misionesExito += 1;
       cambiarMoral(h, informe.resultado === 'fracaso' ? balance.moral.fracasoMision : balance.moral.exitoMision);
       if (parte.salvado && estado.partida.modoClemente) cambiarMoral(h, balance.heridas.moralClemente);
       if (parte.consecuencia === 'heridaLeve' || parte.consecuencia === 'heridaGrave') {
         h.estado = 'herido';
-        h.semanasFuera = parte.semanasFuera;
+        h.semanasFuera = semanasDeBaja(estado, parte.semanasFuera);
       } else {
         h.estado = 'disponible';
       }
