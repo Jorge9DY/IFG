@@ -115,7 +115,9 @@ IFG/
 - [x] Mercado y Puja (con desglose de la puntuación)
 - [x] Clasificación
 - [x] Panel de Elara con consejos según la situación
-- [ ] Construir mejoras de la sede desde el panel
+- [x] Construir mejoras de la sede desde el panel
+- [x] Mercado: héroes de otros gremios con pago de cláusula y cesiones
+- [x] Plantilla: aviso de soborno con botón para retener y cedidos marcados
 - [x] Guardado y carga automáticos
 - [x] Nueva partida: nombre del protagonista y Modo Clemente
 - [ ] Elección del aspecto del protagonista

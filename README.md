@@ -36,9 +36,9 @@ Abre la dirección que aparece en la terminal (normalmente `http://localhost:517
 ## Estado
 
 - **Fase 0 (preparación):** terminada.
-- **Fase 1 (motor de reglas):** temporada completa jugable por código. Faltan las acciones especiales de los rivales, cesiones y mejoras de la sede.
+- **Fase 1 (motor de reglas):** completa para la temporada 1, incluidas las acciones especiales de los rivales, cesiones, cláusulas y mejoras de la sede.
 - **Fase 2 (balance):** simulador listo; ver el [informe de balance](docs/informe-balance.md), con decisiones de diseño pendientes.
-- **Fase 3 (paneles):** la temporada 1 se juega entera en el navegador. Faltan las mejoras de la sede y el aspecto del protagonista.
+- **Fase 3 (paneles):** la temporada 1 se juega entera en el navegador. Falta elegir el aspecto del protagonista.
 - **Sede 3D:** formas simples, movimiento y puntos de interacción que abren los paneles.
 
 ## Estructura

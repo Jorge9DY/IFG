@@ -23,6 +23,10 @@ import {
 import { ofertaTotal, puntuacionOferta } from '../motor/pujas';
 import type { Heroe, Posicion } from '../motor/tipos';
 import { aceptarOferta, contraofertar, ponerEnVenta, quitarDeVenta } from '../motor/ventas';
+import { retenerHeroe } from '../motor/rivales';
+import { construirMejora, infoMejoras } from '../motor/sede';
+import { condicionesCesion, pagarClausula, pedirCesion } from '../motor/traspasos';
+import type { Mejora } from '../motor/tipos';
 import { Azar } from '../motor/azar';
 import { pintarBarra } from './barra';
 import { borrar, cargar, guardar } from './guardado';
@@ -62,6 +66,7 @@ export class Interfaz {
   private misionId: string | null = null;
   private equipo = new Map<string, Posicion>();
   private heroeMercado: string | null = null;
+  private gremioRival = 'alba';
   private mensaje = '';
 
   constructor(private readonly el: ElementosInterfaz) {
@@ -186,7 +191,14 @@ export class Interfaz {
     if (j.cierresNegativos > 0) consejos.push(`Llevamos ${j.cierresNegativos} cierre(s) en negativo. Vende a alguien o arriesga con una misión que pague bien.`);
     if (consejos.length === 0) consejos.push('Vamos bien. Sigue así y el resto de gremios empezará a tomarnos en serio.');
     return `<blockquote class="elara">${consejos.map((c) => `<p>${esc(c)}</p>`).join('')}</blockquote>
-      <p class="tenue">Afinidad con Elara: ${estado.partida.afinidadElara} · Despertares: ${estado.partida.despertares}/5</p>`;
+      <p class="tenue">Afinidad con Elara: ${estado.partida.afinidadElara} · Despertares: ${estado.partida.despertares}/5</p>
+      <h3>Mejoras de la sede</h3>
+      <table><thead><tr><th>Mejora</th><th>Efecto</th><th class="num">Coste</th><th></th></tr></thead><tbody>${infoMejoras(estado)
+        .map(
+          (m) => `<tr><td><strong>${esc(m.mejora)}</strong></td><td>${esc(m.efecto)}</td><td class="num">${num(m.coste)}</td>
+            <td>${m.construida ? '<span class="tenue">Construida</span>' : `<button data-accion="construir" data-id="${esc(m.mejora)}" ${m.bloqueo ? `disabled title="${esc(m.bloqueo)}"` : ''}>Construir</button>`}</td></tr>`,
+        )
+        .join('')}</tbody></table>`;
   }
 
   private filaHeroe(estado: EstadoJuego, h: Heroe, extra = ''): string {
@@ -215,10 +227,13 @@ export class Interfaz {
     const filas = heroesDe(estado, j.id)
       .map((h) => {
         const enVenta = estado.enVenta.some((t) => t.heroeId === h.id);
+        const cesion = (estado.cesiones ?? []).find((c) => c.heroeId === h.id);
         const accion =
           h.id === 'h_000_elara'
             ? '<td></td>'
-            : `<td>${num(h.contrato?.salario ?? 0)}<div>${
+            : cesion
+              ? `<td>${num(h.contrato?.salario ?? 0)}<div class="tenue">Cedido por ${esc(estado.gremios[cesion.origenId]?.nombre ?? '')} hasta la semana ${cesion.semanaFin}</div></td>`
+              : `<td>${num(h.contrato?.salario ?? 0)}<div>${
                 enVenta
                   ? `<button data-accion="quitar-venta" data-id="${h.id}">Quitar de venta</button>`
                   : `<button data-accion="vender" data-id="${h.id}">Poner en venta (${num(valorMercado(h))})</button>`
@@ -235,7 +250,16 @@ export class Interfaz {
           <button data-accion="contraofertar" data-id="${o.id}" data-precio="${Math.round(o.precio * 1.15)}">Pedir ${num(Math.round(o.precio * 1.15))}</button></li>`;
       })
       .join('');
-    return `<p class="tenue">${j.plantilla.length}/${j.plantillaMax} héroes · salarios ${num(salariosDe(estado, j.id))} por semana · stats Poder/Defensa/Magia/Agilidad</p>
+    const sobornos = (estado.sobornos ?? [])
+      .map((s) => {
+        const h = estado.heroes[s.heroeId];
+        if (!h) return '';
+        return `<li><strong>${esc(h.nombre)}</strong> se irá al Colmillo Carmesí al cierre de la semana ${s.semanaLimite} si no le subes el salario de ${num(h.contrato?.salario ?? 0)} a ${num(s.salarioPedido)}.
+          <button data-accion="retener" data-id="${h.id}">Retener</button></li>`;
+      })
+      .join('');
+    return `${sobornos ? `<div class="alerta"><h3>Intento de soborno</h3><ul class="lista">${sobornos}</ul></div>` : ''}
+      <p class="tenue">${j.plantilla.length}/${j.plantillaMax} héroes · salarios ${num(salariosDe(estado, j.id))} por semana · stats Poder/Defensa/Magia/Agilidad</p>
       <table><thead><tr><th>Héroe</th><th>Rango</th><th>Clase</th><th>Stats</th><th>Moral</th><th>Estado</th><th>Salario</th></tr></thead><tbody>${filas}</tbody></table>
       <h3>Ofertas recibidas</h3>${ofertas ? `<ul class="lista">${ofertas}</ul>` : '<p class="tenue">Ninguna. Pon héroes en venta y los gremios harán ofertas al cerrar la semana.</p>'}`;
   }
@@ -305,7 +329,29 @@ export class Interfaz {
       .join('');
     return `<p class="tenue">Puedes ofrecer hasta <strong>${num(disponible)}</strong> de oro de prima (tu oro menos 4 semanas de salarios).</p>
       ${this.formularioPuja(estado)}
-      <table><thead><tr><th>Héroe</th><th>Rango</th><th>Clase</th><th>Stats</th><th>Moral</th><th>Estado</th><th>Valor</th><th></th></tr></thead><tbody>${filas}</tbody></table>`;
+      <table><thead><tr><th>Héroe</th><th>Rango</th><th>Clase</th><th>Stats</th><th>Moral</th><th>Estado</th><th>Valor</th><th></th></tr></thead><tbody>${filas}</tbody></table>
+      ${this.otrosGremios(estado)}`;
+  }
+
+  private otrosGremios(estado: EstadoJuego): string {
+    const rivales = Object.values(estado.gremios).filter((g) => !g.esJugador);
+    const pestañas = rivales
+      .map((g) => `<button data-accion="ver-gremio" data-id="${g.id}" class="${this.gremioRival === g.id ? 'activo' : ''}">${esc(g.nombre)}</button>`)
+      .join(' ');
+    const filas = heroesDe(estado, this.gremioRival)
+      .sort((a, b) => sumaCombate(b) - sumaCombate(a))
+      .map((h) => {
+        const cesion = condicionesCesion(estado, h.id);
+        const extra = `<td>${num(h.contrato?.clausula ?? 0)}<div class="tenue">cláusula</div></td>
+          <td><button data-accion="clausula" data-id="${h.id}">Pagar cláusula</button>
+          ${cesion.bloqueo ? '' : `<button data-accion="cesion" data-id="${h.id}">Cesión 4 sem. (${num(cesion.coste)})</button>`}</td>`;
+        return this.filaHeroe(estado, h, extra);
+      })
+      .join('');
+    return `<h3>Héroes de otros gremios</h3>
+      <p class="tenue">Pagar la cláusula ficha al héroe si su puntuación con tu gremio llega a 60. En una cesión pagas su salario y su gremio se queda el 20% del oro de sus misiones. Nadie cede héroes de rango A o S (salvo el Alba si tu reputación es 70 o más).</p>
+      <div class="fila">${pestañas}</div>
+      <table><thead><tr><th>Héroe</th><th>Rango</th><th>Clase</th><th>Stats</th><th>Moral</th><th>Estado</th><th>Cláusula</th><th></th></tr></thead><tbody>${filas}</tbody></table>`;
   }
 
   private formularioPuja(estado: EstadoJuego): string {
@@ -466,6 +512,30 @@ export class Interfaz {
         const r = conAzar(estado, (azar) => contraofertar(estado, azar, id, precio));
         this.mensaje = r === 'aceptada' ? `Aceptan pagar ${num(precio)}. Ahora puedes cerrar la venta.` : r === 'retirada' ? 'El gremio se ha retirado.' : 'Rechazan la contraoferta.';
         return this.tras('plantilla', false);
+      }
+      case 'construir':
+        construirMejora(estado, id as Mejora);
+        this.mensaje = `Construida: ${id}.`;
+        return this.tras('sede', false);
+      case 'retener': {
+        retenerHeroe(estado, id);
+        this.mensaje = `${obtenerHeroe(estado, id).nombre} se queda en el gremio.`;
+        return this.tras('plantilla', false);
+      }
+      case 'ver-gremio':
+        this.gremioRival = id;
+        return this.repintar();
+      case 'clausula': {
+        const h = obtenerHeroe(estado, id);
+        const r = pagarClausula(estado, id);
+        this.mensaje = r === 'fichado' ? `${h.nombre} se une a la Llama Menguante.` : `${h.nombre} rechaza venir aunque pagues su cláusula. No se ha cobrado nada.`;
+        return this.tras('mercado', false);
+      }
+      case 'cesion': {
+        const h = obtenerHeroe(estado, id);
+        pedirCesion(estado, id, 4);
+        this.mensaje = `${h.nombre} juega cedido con el gremio durante 4 semanas.`;
+        return this.tras('mercado', false);
       }
       case 'terminar': {
         const resumen = terminarSemana(estado);

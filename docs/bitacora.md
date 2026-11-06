@@ -2,6 +2,14 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Interfaz de mejoras, cláusulas, cesiones y sobornos
+
+- Panel de Elara: tabla de mejoras de la sede con coste, efecto y botón Construir.
+- Mercado: sección "Héroes de otros gremios" con pestañas por gremio, pago de cláusula y cesión de 4 semanas.
+- Plantilla: aviso de soborno con botón Retener; los cedidos muestran hasta qué semana se quedan.
+- Probado con Playwright (mejora, retener, cláusula, cesión y cierre de semana) sin errores.
+- Queda: aspecto del protagonista, movimiento con clic, assets 3D, narrativa; preguntas 1–3 de balance.
+
 ## 2026-11-06 — Mejoras de la sede, cláusulas y cesiones (motor)
 
 - `src/motor/sede.ts`: construir las 6 mejoras con sus efectos (plantilla 10/15, enfermería, +20% XP, biblioteca, banquetes). Costes y efectos en `balance.json`.
