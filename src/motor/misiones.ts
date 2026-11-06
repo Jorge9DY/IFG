@@ -3,7 +3,7 @@
 import balance from '../datos/balance.json';
 import datosGremios from '../datos/gremios.json';
 import type { Azar } from './azar';
-import { ganarExperiencia } from './heroes';
+import { ganarExperiencia, type Progreso } from './heroes';
 import { RANGOS_MISION, type Heroe, type Mision, type RangoMision } from './tipos';
 
 const M = balance.misiones;
@@ -47,7 +47,8 @@ export function probabilidadExito(poder: number, dificultad: number): number {
 export interface ParteHeroe {
   heroeId: string;
   diasLesion: number;
-  poderGanado: number;
+  /** Experiencia, subidas de poder, ascenso de rango y techo. */
+  progreso: Progreso;
 }
 
 export interface InformeMision {
@@ -77,11 +78,11 @@ export function resolverMision(
   const partes = equipo.map((h) => {
     const lesion = azar.probabilidad(exito ? d.lesionExito : d.lesionFracaso);
     const diasLesion = lesion ? azar.entero(d.diasLesion[0] ?? 1, d.diasLesion[1] ?? 1) : 0;
-    const poderGanado = ganarExperiencia(h, xp);
+    const progreso = ganarExperiencia(h, xp);
     if (exito) h.reputacion = Math.min(100, h.reputacion + d.reputacion);
     h.estado = lesion ? 'lesionado' : 'libre';
     h.diasLesion = diasLesion;
-    return { heroeId: h.id, diasLesion, poderGanado };
+    return { heroeId: h.id, diasLesion, progreso };
   });
   return {
     mision,

@@ -2,6 +2,13 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Experiencia, subidas de poder y rangos
+
+- Diseñado con el propietario y aceptado (biblia, sección 9): barra de experiencia visible; al llenarse (21 puntos) el poder sube +3 de golpe, al mismo ritmo que antes (+1 cada 7), así que el balance no cambia; rangos F–S según el poder, y ascender solo sube el sueldo; techo al llegar al potencial, que revela el potencial real.
+- Interfaz: rango y barra en el inventario y en las cartas. El resumen del día muestra el regreso de cada misión héroe a héroe, con la barra animada (respeta «reducir movimiento»), «¡Sube de poder!», «¡Asciende a rango C!» con el sueldo nuevo, «Ha llegado a su límite» y las lesiones.
+- Arreglado el signo «−» que pisaba el texto del botón Gestionar gremio.
+- 44 tests; probado en navegador sin errores.
+
 ## 2026-11-06 — Sin reclutamiento y sin aviso flotante en la sede
 
 - Decisión del propietario: se elimina el reclutamiento. Fuera de la Prueba de los Novatos solo se ficha comprando a otros gremios en el mercado. Quitados la pestaña Reclutar, los reclutas del motor y sus cifras. La recepción de la sede 3D abre ahora las instalaciones.

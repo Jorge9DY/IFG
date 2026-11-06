@@ -48,6 +48,7 @@ No se pasa a la siguiente fase sin superar su puerta (biblia, sección 17). El r
 - [x] Impagos: el héroe avisa, pierde lealtad y se va a otro gremio tras 2 semanas sin cobrar
 - [x] Inventario de héroes en Gestionar gremio: libres, de misión y lesionados
 - [x] Sueldos e instalaciones más caros para mantener la tensión económica
+- [x] Experiencia visible, subidas de poder de golpe, rangos F–S, techo y regreso de la misión en el resumen del día
 - [ ] Puerta 1: prueba con jugadores de la economía sin narrativa
 
 ## Fase 2 — Competencia

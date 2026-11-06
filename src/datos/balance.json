@@ -20,7 +20,9 @@
     "fraccionExperienciaFracaso": 0.5
   },
   "heroes": {
-    "experienciaPorPunto": 7,
+    "_notaExperiencia": "Decisión del propietario: barra de experiencia visible; al llenarse, el poder sube de golpe. 21 puntos por +3 de poder (mismo ritmo que +1 cada 7).",
+    "experienciaPorBarra": 21,
+    "poderPorBarra": 3,
     "lealtadInicial": 60,
     "_notaPotencial": "Probabilidad (%) de cada letra de potencial en los novatos.",
     "potencialPorLetra": {

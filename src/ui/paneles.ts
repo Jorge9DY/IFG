@@ -4,7 +4,7 @@
 
 import { condicionesCuracion, curar, sueldosDe } from '../motor/economia';
 import { diasParaPrueba, esDia7, heroe as obtenerHeroe, heroesDe, jugador, misionDe, puesto, rivales, type EstadoJuego } from '../motor/estado';
-import { esDestacado, letraDe, rangoPotencial, sueldo, textoPotencial } from '../motor/heroes';
+import { alLimite, esDestacado, letraDe, rango, rangoPotencial, sueldo, textoPotencial } from '../motor/heroes';
 import { NOMBRE_INSTALACION, infoInstalacion, mejorar, plazas, type Instalacion } from '../motor/instalaciones';
 import { comprar, condicionesCompra, ofertaVenta, vender } from '../motor/mercado';
 import { poderEquipo, probabilidadExito } from '../motor/misiones';
@@ -214,6 +214,17 @@ export class Interfaz {
     return `<span class="rango potencial r${max}" title="Potencial: hasta dónde puede crecer. La instalación de ojeadores estrecha el rango.">${esc(textoPotencial(h, jugador(estado).nivelOjeadores))}</span>`;
   }
 
+  private rangoChip(letra: string): string {
+    return `<span class="rango-chip r${letra}" title="Rango según su poder: F, D, C, B, A, S">Rango ${letra}</span>`;
+  }
+
+  /** Barra de experiencia hacia la siguiente subida de poder (o «Al límite» si ya no crece). */
+  private barraXp(h: Heroe): string {
+    if (alLimite(h)) return '<span class="al-limite" title="Ha llegado a su potencial: ya no gana poder">Al límite</span>';
+    const total = balance.heroes.experienciaPorBarra;
+    return `<span class="xp" title="Experiencia: al llenar la barra, +${balance.heroes.poderPorBarra} de poder"><span class="barra-xp"><i style="--hasta:${Math.round((100 * h.experiencia) / total)}%"></i></span><small>${h.experiencia}/${total} exp</small></span>`;
+  }
+
   private carta(estado: EstadoJuego, h: Heroe, pie: string, extraClase = ''): string {
     const estadoTexto =
       h.estado === 'libre'
@@ -225,7 +236,8 @@ export class Interfaz {
         <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">Reputación ${h.reputacion} · Lealtad ${h.lealtad}</span></div>
         ${estadoTexto}
       </header>
-      <div class="poder"><b>${num(h.poder)}</b><span>Poder</span><p>Sueldo ${num(sueldo(h))} de oro por semana</p></div>
+      <div class="poder"><b>${num(h.poder)}</b><span>Poder · ${this.rangoChip(rango(h))}</span><p>Sueldo ${num(sueldo(h))} de oro por semana</p></div>
+      ${this.barraXp(h)}
       <footer>${pie}</footer>
     </article>`;
   }
@@ -398,7 +410,7 @@ export class Interfaz {
         : '';
       return `<div class="fila-heroe e-${h.estado.replace(' ', '-')}">
         ${this.potencial(estado, h)}
-        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">Poder ${h.poder} · sueldo ${num(sueldo(h))} · lealtad ${h.lealtad}</span>${aviso}</div>
+        <div class="quien"><strong>${esc(h.nombre)} ${this.rangoChip(rango(h))}</strong><span class="tenue">Poder ${h.poder} · sueldo ${num(sueldo(h))} · lealtad ${h.lealtad}</span>${this.barraXp(h)}${aviso}</div>
         <div class="situacion"><span class="estado-chip e-${h.estado.replace(' ', '-')}">${h.estado === 'en mision' ? 'de misión' : h.estado}</span><span class="tenue">${detalle}</span></div>
         <div class="accion-fila">${accion}</div>
       </div>`;
@@ -490,13 +502,37 @@ export class Interfaz {
   private panelDia(estado: EstadoJuego): string {
     const r = this.resumenDia;
     if (!r) return '';
+    const total = balance.heroes.experienciaPorBarra;
     const misiones = r.informes
       .map((i) => {
-        const lesionados = i.partes.filter((p) => p.diasLesion > 0).map((p) => (estado.heroes[p.heroeId]?.nombre ?? '').split(' ')[0]);
-        const mejoran = i.partes.filter((p) => p.poderGanado > 0).map((p) => `${(estado.heroes[p.heroeId]?.nombre ?? '').split(' ')[0]} +${p.poderGanado}`);
+        const heroes = i.partes
+          .map((parte) => {
+            const g = parte.progreso;
+            const nombre = (estado.heroes[parte.heroeId]?.nombre ?? '').split(' ')[0] ?? '';
+            // La barra se llena desde donde estaba; si se completa, llega al final y celebra la subida.
+            const desde = Math.round((100 * g.experienciaAntes) / total);
+            const hasta = g.barras > 0 ? 100 : Math.round((100 * g.experienciaDespues) / total);
+            const hitos = [
+              g.barras > 0 ? `<span class="hito subida">¡Sube de poder! ${g.poderAntes} → ${g.poderDespues}</span>` : '',
+              g.rangoDespues !== g.rangoAntes
+                ? `<span class="hito ascenso">¡Asciende a rango ${g.rangoDespues}! Su sueldo pasa de ${num(g.sueldoAntes)} a ${num(g.sueldoDespues)}</span>`
+                : '',
+              g.llegaAlLimite ? `<span class="hito limite">Ha llegado a su límite: potencial ${g.rangoDespues}</span>` : '',
+              parte.diasLesion > 0 ? `<span class="hito lesion">Lesionado ${parte.diasLesion} ${parte.diasLesion === 1 ? 'día' : 'días'}</span>` : '',
+            ].join('');
+            const barra = g.experienciaGanada > 0
+              ? `<span class="barra-xp grande ${g.barras > 0 ? 'llena' : ''}"><i style="--desde:${desde}%;--hasta:${hasta}%"></i></span>
+                 <small class="tenue">+${g.experienciaGanada} exp · ${g.llegaAlLimite ? 'al límite' : `${g.experienciaDespues}/${total}${g.barras > 0 ? ' hacia la siguiente subida' : ''}`}</small>`
+              : '<small class="tenue">Ya está al límite: no gana experiencia</small>';
+            return `<div class="regreso">
+              <div class="quien"><strong>${esc(nombre)}</strong>${this.rangoChip(g.rangoDespues)}</div>
+              <div class="progreso">${barra}</div>
+              <div class="hitos">${hitos}</div>
+            </div>`;
+          })
+          .join('');
         return `<div class="resultado r-${i.exito ? 'exito' : 'fracaso'}"><b>${i.exito ? '¡Misión cumplida!' : 'La misión ha fracasado'}</b><span>«${esc(i.mision.titulo)}» · +${num(i.oro)} oro</span>
-          ${mejoran.length ? `<p class="tenue">Mejoran: ${esc(mejoran.join(', '))} de poder</p>` : ''}
-          ${lesionados.length ? `<p class="caidos">Lesionados: ${esc(lesionados.join(', '))}</p>` : ''}</div>`;
+          <div class="regresos">${heroes}</div></div>`;
       })
       .join('');
     const nombre = (id: string): string => estado.heroes[id]?.nombre ?? '';

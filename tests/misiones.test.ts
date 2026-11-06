@@ -52,6 +52,7 @@ describe('misiones', () => {
         expect(h.estado === 'lesionado').toBe(h.diasLesion > 0);
       }
       expect(informe.partes).toHaveLength(3);
+      for (const parte of informe.partes) expect(parte.progreso.experienciaGanada).toBe(informe.exito ? 35 : 18);
     }
   });
 });

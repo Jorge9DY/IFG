@@ -73,6 +73,8 @@ export function rangoPotencial(h: Heroe, nivelOjeadores: number): [Letra, Letra]
   const anchuras = balance.instalaciones.ojeadores.anchura;
   const ancho = anchuras[Math.min(nivelOjeadores, anchuras.length - 1)] ?? 1;
   const real = indiceLetra(letraDe(h.potencial));
+  // Al llegar a su límite se revela su potencial real.
+  if (h.poder >= h.potencial) return [letraDe(h.potencial), letraDe(h.potencial)];
   let inicio = Math.min(Math.max(real - Math.floor(h.sesgoOjeo * ancho), 0), LETRAS.length - ancho);
   const fin = Math.min(inicio + ancho - 1, LETRAS.length - 1);
   inicio = Math.max(inicio, indiceLetra(letraDe(h.poder)));
@@ -103,18 +105,61 @@ export function valor(h: Heroe): number {
   return Math.max(v.minimo, Math.round(bruto / 50) * 50);
 }
 
-/** Suma experiencia y convierte cada tramo en un punto de poder, sin pasar del potencial. Devuelve los puntos ganados. */
-export function ganarExperiencia(h: Heroe, experiencia: number): number {
-  const porPunto = balance.heroes.experienciaPorPunto;
-  h.experiencia += experiencia;
-  let puntos = 0;
-  while (h.experiencia >= porPunto) {
-    h.experiencia -= porPunto;
-    if (h.poder < h.potencial) {
-      h.poder += 1;
-      puntos += 1;
+/** Rango del héroe según su poder actual (F, D, C, B, A, S): las mismas letras que el potencial. */
+export function rango(h: Heroe): Letra {
+  return letraDe(h.poder);
+}
+
+/** true si el héroe ya no puede crecer más: ha llegado a su potencial. */
+export function alLimite(h: Heroe): boolean {
+  return h.poder >= h.potencial;
+}
+
+/** Lo que pasa al sumar experiencia: para enseñar el progreso al volver de una misión. */
+export interface Progreso {
+  experienciaGanada: number;
+  experienciaAntes: number;
+  experienciaDespues: number;
+  /** Barras de experiencia completadas (cada una sube el poder de golpe). */
+  barras: number;
+  poderAntes: number;
+  poderDespues: number;
+  rangoAntes: Letra;
+  rangoDespues: Letra;
+  sueldoAntes: number;
+  sueldoDespues: number;
+  /** true si en esta misión ha llegado a su potencial. */
+  llegaAlLimite: boolean;
+}
+
+/**
+ * Suma experiencia a la barra. Cada vez que se llena, el poder sube de golpe (+3), sin pasar del
+ * potencial. Al llegar al potencial, la barra se vacía y deja de llenarse.
+ */
+export function ganarExperiencia(h: Heroe, experiencia: number): Progreso {
+  const H = balance.heroes;
+  const antes = { experiencia: h.experiencia, poder: h.poder, rango: rango(h), sueldo: sueldo(h), limite: alLimite(h) };
+  let barras = 0;
+  if (!antes.limite) {
+    h.experiencia += experiencia;
+    while (h.experiencia >= H.experienciaPorBarra && !alLimite(h)) {
+      h.experiencia -= H.experienciaPorBarra;
+      h.poder = Math.min(h.potencial, h.poder + H.poderPorBarra);
+      barras += 1;
     }
+    if (alLimite(h)) h.experiencia = 0;
   }
-  if (h.poder >= h.potencial) h.experiencia = 0;
-  return puntos;
+  return {
+    experienciaGanada: antes.limite ? 0 : experiencia,
+    experienciaAntes: antes.experiencia,
+    experienciaDespues: h.experiencia,
+    barras,
+    poderAntes: antes.poder,
+    poderDespues: h.poder,
+    rangoAntes: antes.rango,
+    rangoDespues: rango(h),
+    sueldoAntes: antes.sueldo,
+    sueldoDespues: sueldo(h),
+    llegaAlLimite: !antes.limite && alLimite(h),
+  };
 }

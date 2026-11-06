@@ -52,16 +52,6 @@ Respuesta: instalaciones más caras y sueldos más altos. Aplicado: sueldo = 100
 
 Con sueldos e instalaciones más caros, el oro aprieta toda la partida, pero subir cuesta más: el jugador automático ambicioso gana solo en el 5% de las partidas en 4 temporadas (antes, el 24%), y acaba de media 3.º. Una persona juega mejor que el bot, pero conviene que lo pruebes. Si se hace demasiado largo, las palancas son: premios de temporada más altos, rivales con menos prestigio inicial o héroes que crezcan más rápido.
 
-## 13. Experiencia, subidas de poder y feedback al volver de misión (en diseño con el propietario)
+## 13. Experiencia, subidas de poder y feedback al volver de misión — RESUELTA
 
-Hoy cada misión da experiencia (bajo 10, medio 20, alto 35; la mitad si fracasa) y cada 7 puntos suben +1 de poder en silencio. El resumen del día solo dice «Mejoran: Ana +2».
-
-Propuesta (sin estadísticas nuevas: usa Poder y Experiencia de la sección 9 y cierra los «rangos», hoy [Abierto]):
-
-1. **Barra de experiencia visible** en el inventario y en el regreso de la misión.
-2. **Subida por barra llena:** al completarla, «¡Sube de poder!» +3 de golpe (en vez de +1 poco a poco). Barra de 21 puntos: mismo ritmo que ahora, no cambia el balance.
-3. **Rangos F–S por poder** (las mismas letras del potencial): al cruzar un umbral, «¡Asciende a rango C!» y se muestra que su sueldo sube.
-4. **Techo:** al llegar a su potencial, «Ha llegado a su límite»: deja de ganar poder y se revela su potencial real.
-5. **Regreso de la misión** dentro del resumen del día (sin pantallas ni botones nuevos): por héroe, barra que se llena, +poder, ascenso, lesión.
-
-Descartado: un «nivel» aparte del poder (dos números para lo mismo), árboles de habilidades o reparto de puntos (trabajo administrativo, va contra los pilares).
+Respuesta: el propietario acepta la propuesta completa. Barra de experiencia visible; al llenarse (21 puntos) el poder sube +3 de golpe; rangos F–S según el poder, y ascender solo sube el sueldo; techo al llegar al potencial; regreso de la misión en el resumen del día; sin experiencia extra. Recogido en la sección 9 de la biblia.

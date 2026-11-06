@@ -423,3 +423,39 @@ td.tenue { color: var(--tenue); }
   .fila-heroe .situacion, .fila-heroe .accion-fila { grid-column: 2; }
 }
 .fila-heroe.e-libre, .fila-heroe.e-en-mision, .fila-heroe.e-lesionado { color: var(--texto); border-top-color: var(--linea-suave); border-right-color: var(--linea-suave); border-bottom-color: var(--linea-suave); }
+
+/* ---------- Experiencia, rangos y regreso de la misión ---------- */
+.rango-chip {
+  display: inline-block; margin-left: 6px; padding: 0 6px; font-family: var(--titulo); font-weight: 700; font-size: 11px;
+  letter-spacing: 0.08em; color: #111; vertical-align: middle; text-transform: uppercase;
+}
+.xp { display: flex; align-items: center; gap: 8px; }
+.xp small { font-size: 11px; color: var(--tenue); font-variant-numeric: tabular-nums; }
+.barra-xp { position: relative; flex: 1; min-width: 70px; max-width: 160px; height: 6px; background: #34373a; overflow: hidden; }
+.barra-xp i { display: block; height: 100%; width: var(--hasta); background: var(--cian); }
+.barra-xp.grande { display: block; max-width: none; height: 9px; }
+.barra-xp.grande i { animation: llenar-xp 1.1s ease-out 0.2s both; }
+.barra-xp.llena i { background: linear-gradient(90deg, var(--cian), #8fd98a); }
+@keyframes llenar-xp { from { width: var(--desde); } to { width: var(--hasta); } }
+.al-limite { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #e9c46a; }
+.regresos { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; width: 100%; }
+.regreso {
+  display: grid; grid-template-columns: minmax(90px, auto) minmax(0, 1fr); grid-template-areas: 'q p' 'h h'; gap: 4px 12px; align-items: center;
+  padding: 6px 8px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--linea-suave);
+}
+.regreso .quien { grid-area: q; display: flex; align-items: center; }
+.regreso .progreso { grid-area: p; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.regreso .hitos { grid-area: h; display: flex; flex-wrap: wrap; gap: 6px; }
+.regreso .hitos:empty { display: none; }
+.hito { font-size: 12px; padding: 2px 8px; border: 1px solid; animation: aparecer-hito 0.4s ease-out 1.2s both; }
+.hito.subida { color: var(--cian); border-color: var(--cian); font-weight: 600; }
+.hito.ascenso { color: #111; background: #e9c46a; border-color: #e9c46a; font-weight: 600; }
+.hito.limite { color: #e9c46a; border-color: #e9c46a; }
+.hito.lesion { color: var(--alerta); border-color: var(--alerta); animation: none; }
+@keyframes aparecer-hito { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .barra-xp.grande i { animation: none; width: var(--hasta); }
+  .hito { animation: none; }
+}
+.regreso .barra-xp { flex: none; width: 100%; max-width: none; }
+.boton-grande.gastar, .boton-grande.ganar { padding-right: 44px; }

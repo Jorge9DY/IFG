@@ -255,11 +255,22 @@ Motivo: con la IA, el tiempo real es difícil de programar y de equilibrar, y co
 | --- | --- |
 | Poder | Capacidad de combate actual. |
 | Potencial | Techo de crecimiento futuro. |
-| Experiencia | Progreso acumulado. |
+| Experiencia | Progreso acumulado: una barra visible que, al llenarse, sube el poder. |
 | Reputación | Reconocimiento público. |
 | Lealtad | Compromiso con el gremio (ver sección 11). |
 
-Especializaciones, habilidades, rarezas y rangos (en el diseño aparece «rango C»): \[Abierto\].
+### Experiencia, subidas y rangos \[Aceptado\]
+
+Los héroes mejoran misión a misión y el jugador lo ve. No se añade ninguna estadística nueva: solo se hacen visibles el Poder y la Experiencia.
+
+- **Experiencia:** cada misión llena la barra del héroe (más cuanto más alto es el rango de la misión; la mitad si fracasa). No hay experiencia extra por otros motivos.
+- **Subidas de poder:** al llenarse la barra, el poder sube de golpe (*ilustrativo:* +3 por barra de 21 puntos).
+- **Rangos F, D, C, B, A, S** según el poder, con las mismas letras que el potencial. Ascender de rango solo sube el sueldo, y se muestra cuánto.
+- **Techo:** al llegar a su potencial, el héroe deja de crecer, se avisa («Ha llegado a su límite») y se revela su potencial real.
+- **Regreso de la misión:** en el resumen del día, cada héroe enseña su barra llenándose, la subida de poder, el ascenso y la lesión. Sin pantallas ni botones nuevos.
+- **Descartado:** un «nivel» aparte del poder (dos números para lo mismo) y árboles de habilidades o reparto de puntos (trabajo administrativo).
+
+Especializaciones, habilidades y rarezas: \[Abierto\].
 
 ### Rasgos de personalidad \[Aceptado\]
 
@@ -591,6 +602,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-06 | Decisión del propietario: experiencia visible en barra, subidas de poder de golpe al llenarla, rangos F–S según el poder (ascender solo sube el sueldo), techo al llegar al potencial y regreso de la misión en el resumen del día. Sin experiencia extra. |
 | 2026-11-06 | Decisiones del propietario: se elimina el reclutamiento; fuera de la Prueba de los Novatos solo se ficha comprando a otros gremios en el mercado. Confirmado el orden de pago de sueldos (los más poderosos primero). |
 | 2026-11-06 | Decisiones del propietario tras probar el prototipo: victoria al cerrar una temporada en el n.º 1; un héroe que no cobra varias semanas seguidas se va a otro gremio; sueldos e instalaciones más caros para que el oro siga apretando; inventario de héroes con su estado en Gestionar gremio; curar lesionados con oro; la fórmula de éxito y lesiones vale de momento. |
 | 2026-11-06 | Aprobadas y pasadas a \[Aceptado\]: sueldos semanales el día 7, varias misiones al día con equipos de 1/2/3 héroes y tablón diario, ranking Fuerza (top 5) + Prestigio, ranking semanal, temporadas de 4 semanas con premio, subasta por turnos con límite oculto de los rivales, potencial en rango con ojeadores, regla de no castigar lo inevitable, hoja de ruta por fases, consecuencias de fracasar misiones (menos recompensa y lesiones) y marcha voluntaria de un héroe ignorado reiteradamente. |

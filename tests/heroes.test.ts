@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { esDestacado, ganarExperiencia, letraDe, rangoPotencial, sueldo, textoPotencial, valor } from '../src/motor/heroes';
+import { alLimite, esDestacado, ganarExperiencia, letraDe, rango, rangoPotencial, sueldo, textoPotencial, valor } from '../src/motor/heroes';
 import { heroe } from './fabrica';
 
 describe('héroes', () => {
@@ -43,13 +43,34 @@ describe('héroes', () => {
     expect(valor(heroe({ id: 'd', poder: 30, potencial: 90 }))).toBeGreaterThan(v);
   });
 
-  it('la experiencia sube el poder sin pasar del potencial', () => {
-    const h = heroe({ id: 'a', poder: 30, potencial: 32 });
-    expect(ganarExperiencia(h, 10)).toBe(1);
-    expect(h.poder).toBe(31);
-    ganarExperiencia(h, 100);
-    expect(h.poder).toBe(32);
-    expect(h.experiencia).toBe(0);
+  it('la experiencia llena una barra y, al completarla, el poder sube de golpe +3', () => {
+    const h = heroe({ id: 'a', poder: 30, potencial: 60 });
+    const p1 = ganarExperiencia(h, 20);
+    expect(p1).toMatchObject({ barras: 0, poderAntes: 30, poderDespues: 30, experienciaAntes: 0, experienciaDespues: 20 });
+    const p2 = ganarExperiencia(h, 10);
+    expect(p2).toMatchObject({ barras: 1, poderDespues: 33, experienciaDespues: 9 });
+    const p3 = ganarExperiencia(h, 45);
+    expect(p3.barras).toBe(2);
+    expect(h.poder).toBe(39);
+  });
+
+  it('cruzar un umbral de letra es un ascenso de rango y sube el sueldo', () => {
+    const h = heroe({ id: 'a', poder: 33, potencial: 60 });
+    expect(rango(h)).toBe('D');
+    const p = ganarExperiencia(h, 21);
+    expect(p.rangoAntes).toBe('D');
+    expect(p.rangoDespues).toBe('C');
+    expect(p.sueldoDespues).toBeGreaterThan(p.sueldoAntes);
+  });
+
+  it('al llegar al potencial se detiene, avisa una vez y revela su potencial real', () => {
+    const h = heroe({ id: 'a', poder: 30, potencial: 32, sesgoOjeo: 0 });
+    const p = ganarExperiencia(h, 100);
+    expect(p).toMatchObject({ poderDespues: 32, llegaAlLimite: true, experienciaDespues: 0 });
+    expect(alLimite(h)).toBe(true);
+    expect(rangoPotencial(h, 0)).toEqual(['D', 'D']);
+    const otra = ganarExperiencia(h, 50);
+    expect(otra).toMatchObject({ experienciaGanada: 0, barras: 0, llegaAlLimite: false });
   });
 
   it('un novato destacado tiene potencial A o S', () => {
