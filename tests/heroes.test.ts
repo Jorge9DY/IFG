@@ -1,65 +1,59 @@
 import { describe, expect, it } from 'vitest';
-import { Azar } from '../src/motor/azar';
-import { ganarXp, generarHeroe, generarVinculos } from '../src/motor/heroes';
-import { sumaCombate } from '../src/motor/misiones';
-import { RANGOS, indiceRango } from '../src/motor/tipos';
-import balance from '../src/datos/balance.json';
+import { esDestacado, ganarExperiencia, letraDe, rangoPotencial, sueldo, textoPotencial, valor } from '../src/motor/heroes';
+import { heroe } from './fabrica';
 
-describe('Generación de héroes', () => {
-  it('la suma de combate cae dentro del rango pedido', () => {
-    const azar = new Azar(9);
-    for (const rango of RANGOS) {
-      for (let i = 0; i < 50; i++) {
-        const h = generarHeroe(azar, `h${i}`, rango);
-        const suma = sumaCombate(h);
-        expect(suma).toBeGreaterThanOrEqual(balance.rangos[rango].sumaMin);
-        expect(suma).toBeLessThanOrEqual(balance.rangos[rango].sumaMax);
-        expect(indiceRango(h.potencial)).toBeGreaterThanOrEqual(indiceRango(rango));
-        expect(h.rasgos.includes('Temerario') && h.rasgos.includes('Cobarde')).toBe(false);
-      }
+describe('héroes', () => {
+  it('convierte poder y potencial en letras', () => {
+    expect(letraDe(0)).toBe('F');
+    expect(letraDe(20)).toBe('D');
+    expect(letraDe(49)).toBe('C');
+    expect(letraDe(65)).toBe('A');
+    expect(letraDe(100)).toBe('S');
+  });
+
+  it('muestra el potencial como un rango que contiene la letra real y se estrecha con los ojeadores', () => {
+    for (const sesgoOjeo of [0, 0.3, 0.7, 0.99]) {
+      const h = heroe({ id: 'a', poder: 22, potencial: 70, sesgoOjeo }); // potencial real A
+      const anchos = [0, 1, 2, 3].map((nivel) => {
+        const [min, max] = rangoPotencial(h, nivel);
+        expect(['F', 'D', 'C', 'B', 'A', 'S'].indexOf(min)).toBeLessThanOrEqual(4);
+        expect(['F', 'D', 'C', 'B', 'A', 'S'].indexOf(max)).toBeGreaterThanOrEqual(4);
+        return ['F', 'D', 'C', 'B', 'A', 'S'].indexOf(max) - ['F', 'D', 'C', 'B', 'A', 'S'].indexOf(min);
+      });
+      expect(anchos[3]).toBe(0);
+      for (let i = 1; i < anchos.length; i++) expect(anchos[i]!).toBeLessThanOrEqual(anchos[i - 1]!);
     }
+    expect(textoPotencial(heroe({ id: 'b', poder: 22, potencial: 70 }), 3)).toBe('A');
   });
 
-  it('el stat principal de la clase suele ser el más alto', () => {
-    const azar = new Azar(2);
-    let aciertos = 0;
-    for (let i = 0; i < 100; i++) {
-      const h = generarHeroe(azar, `t${i}`, 'B', { clase: 'Tanque' });
-      if (h.stats.defensa >= Math.max(h.stats.poder, h.stats.magia, h.stats.agilidad)) aciertos++;
-    }
-    expect(aciertos).toBeGreaterThan(80);
+  it('el rango nunca baja de la letra del poder actual', () => {
+    const h = heroe({ id: 'a', poder: 60, potencial: 62, sesgoOjeo: 0.99 });
+    expect(rangoPotencial(h, 0)[0]).toBe('B');
   });
 
-  it('los vínculos son simétricos y Familia solo entre la misma raza', () => {
-    const azar = new Azar(4);
-    const heroes = Array.from({ length: 60 }, (_, i) => generarHeroe(azar, `v${i}`, 'C'));
-    generarVinculos(azar, heroes);
-    const porId = new Map(heroes.map((h) => [h.id, h]));
-    for (const h of heroes) {
-      for (const v of h.vinculos) {
-        const otro = porId.get(v.con)!;
-        expect(otro.vinculos.some((w) => w.con === h.id && w.tipo === v.tipo)).toBe(true);
-        if (v.tipo === 'Familia') expect(otro.raza).toBe(h.raza);
-      }
-    }
-  });
-});
-
-describe('Progresión', () => {
-  it('la XP sube stats y puede subir de rango sin superar el potencial', () => {
-    const azar = new Azar(5);
-    const h = generarHeroe(azar, 'x', 'D', { edad: 18 });
-    h.potencial = 'C';
-    for (let i = 0; i < 60; i++) ganarXp(azar, h, 50);
-    expect(h.rango).toBe('C');
-    expect(sumaCombate(h)).toBeLessThanOrEqual(balance.rangos.C.sumaMax);
+  it('el sueldo crece con el poder y la reputación', () => {
+    const base = sueldo(heroe({ id: 'a', poder: 30, reputacion: 0 }));
+    expect(sueldo(heroe({ id: 'b', poder: 50, reputacion: 0 }))).toBeGreaterThan(base);
+    expect(sueldo(heroe({ id: 'c', poder: 30, reputacion: 40 }))).toBeGreaterThan(base);
   });
 
-  it('los mayores de 28 años no mejoran con la XP', () => {
-    const azar = new Azar(5);
-    const h = generarHeroe(azar, 'y', 'D', { edad: 30 });
-    const antes = sumaCombate(h);
-    ganarXp(azar, h, 500);
-    expect(sumaCombate(h)).toBe(antes);
+  it('vale más quien rinde más hoy o tiene más margen de crecimiento', () => {
+    const v = valor(heroe({ id: 'a', poder: 30, potencial: 40 }));
+    expect(valor(heroe({ id: 'b', poder: 40, potencial: 40 }))).toBeGreaterThan(valor(heroe({ id: 'c', poder: 30, potencial: 30 })));
+    expect(valor(heroe({ id: 'd', poder: 30, potencial: 90 }))).toBeGreaterThan(v);
+  });
+
+  it('la experiencia sube el poder sin pasar del potencial', () => {
+    const h = heroe({ id: 'a', poder: 30, potencial: 32 });
+    expect(ganarExperiencia(h, 10)).toBe(1);
+    expect(h.poder).toBe(31);
+    ganarExperiencia(h, 100);
+    expect(h.poder).toBe(32);
+    expect(h.experiencia).toBe(0);
+  });
+
+  it('un novato destacado tiene potencial A o S', () => {
+    expect(esDestacado(heroe({ id: 'a', potencial: 70 }))).toBe(true);
+    expect(esDestacado(heroe({ id: 'b', potencial: 60 }))).toBe(false);
   });
 });

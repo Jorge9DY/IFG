@@ -1,74 +1,120 @@
-// Jugador automático con una estrategia sencilla, para medir el balance del juego por días.
+// Jugador automático con una estrategia sencilla, para medir el balance del juego.
 
-import { Azar } from '../../src/motor/azar';
-import { esDiaDeNovatos, heroe, jugador, type EstadoJuego } from '../../src/motor/estado';
-import { valorMercado } from '../../src/motor/heroes';
-import { vistaPreviaMision } from '../../src/motor/misiones';
-import { enviarMision } from '../../src/motor/partida';
-import { infoSede, mejorarSede } from '../../src/motor/sede';
-import { avanzar, cerrarSubasta, crearSubasta, puedePujar, pujar, siguientePujaJugador } from '../../src/motor/subasta';
+import { sueldosDe } from '../../src/motor/economia';
+import { heroe, heroesDe, jugador, rivales, type EstadoJuego } from '../../src/motor/estado';
+import { valor } from '../../src/motor/heroes';
+import { infoInstalacion, mejorar, plazasLibres } from '../../src/motor/instalaciones';
+import { comprar, condicionesCompra, condicionesRecluta, ofertaVenta, reclutar, vender } from '../../src/motor/mercado';
+import { poderEquipo, probabilidadExito } from '../../src/motor/misiones';
+import { lanzarMision, pujarNovato, siguienteCandidato } from '../../src/motor/partida';
+import { motivoNoPujar, siguientePrecio } from '../../src/motor/subasta';
 import { equipoRecomendado } from '../../src/ui/ayudas';
 
 export interface Estrategia {
-  /** P(éxito) mínima para lanzar una misión. */
+  nombre: string;
+  /** Probabilidad de éxito mínima para lanzar una misión. */
   probMinima: number;
-  /** Lo máximo que paga en una subasta, como fracción del valor del novato. */
+  /** Lo máximo que paga por un novato, como fracción de su valor. */
   pujaMaxima: number;
-  /** Tamaño objetivo de la plantilla. */
-  plantillaObjetivo: number;
-  /** Oro que guarda antes de mejorar la sede. */
-  reservaSede: number;
+  /** Semanas de sueldos que guarda antes de invertir en instalaciones o reclutas. */
+  reservaSemanas: number;
+  /** Vende al más flojo cuando la plantilla está llena y llega un novato mejor. */
+  rota: boolean;
 }
 
-export const ESTRATEGIA_BASE: Estrategia = { probMinima: 70, pujaMaxima: 1.1, plantillaObjetivo: 6, reservaSede: 2500 };
-/** Jugador que acepta más riesgo: más parecido a una persona que quiere subir rápido. */
-export const ESTRATEGIA_ARRIESGADA: Estrategia = { probMinima: 50, pujaMaxima: 1.3, plantillaObjetivo: 6, reservaSede: 1500 };
+export const PRUDENTE: Estrategia = { nombre: 'Prudente', probMinima: 70, pujaMaxima: 1.0, reservaSemanas: 2, rota: false };
+export const AMBICIOSA: Estrategia = { nombre: 'Ambiciosa', probMinima: 55, pujaMaxima: 2.0, reservaSemanas: 1, rota: true };
 
 export interface MetricasBot {
-  pujas: number;
-  fichajes: number;
+  misiones: number;
+  exitos: number;
+  fichajesNovatos: number;
+  reclutas: number;
   ventas: number;
+  mejoras: number;
+  compras: number;
 }
 
+export function metricasVacias(): MetricasBot {
+  return { misiones: 0, exitos: 0, fichajesNovatos: 0, reclutas: 0, ventas: 0, mejoras: 0, compras: 0 };
+}
+
+/** Decisiones del día: invertir y lanzar misiones (de la más alta a la más baja). */
 export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): void {
-  if (esDiaDeNovatos(estado.partida.dia)) subastas(estado, e, m);
-  mejorar(estado, e);
-  mision(estado, e);
+  const reserva = (): number => e.reservaSemanas * sueldosDe(estado, estado.jugadorId);
+  const j = jugador(estado);
+  for (const tipo of ['sede', 'ojeadores'] as const) {
+    const info = infoInstalacion(estado, j.id, tipo);
+    const necesita = tipo === 'ojeadores' || plazasLibres(estado, j.id) <= 1;
+    if (necesita && !info.bloqueo && info.coste !== null && j.oro - info.coste >= reserva() + 1500) {
+      mejorar(estado, j.id, tipo);
+      m.mejoras++;
+    }
+  }
+  if (j.plantilla.length < 4) {
+    for (const id of [...estado.reclutas]) {
+      const c = condicionesRecluta(estado, id);
+      if (!c.bloqueo && j.oro - c.precio >= reserva()) {
+        reclutar(estado, id);
+        m.reclutas++;
+        break;
+      }
+    }
+  }
+  if (e.rota) comprarRefuerzo(estado, reserva(), m);
+  for (const mision of [...estado.tablon].sort((a, b) => b.recompensa - a.recompensa)) {
+    const equipo = equipoRecomendado(estado, mision);
+    if (equipo.length === 0) continue;
+    if (probabilidadExito(poderEquipo(equipo), mision.dificultad) >= e.probMinima) {
+      lanzarMision(estado, mision.id, equipo.map((h) => h.id));
+      m.misiones++;
+    }
+  }
 }
 
-/** Elige la misión que más paga entre las que superan la probabilidad mínima. */
-function mision(estado: EstadoJuego, e: Estrategia): void {
-  const opciones = [...estado.tablon].sort((a, b) => b.recompensa.oro - a.recompensa.oro);
-  for (const m of opciones) {
-    const equipo = equipoRecomendado(estado, m);
-    if (equipo.length === 0) continue;
-    if (vistaPreviaMision(m, equipo).probabilidad >= e.probMinima) {
-      enviarMision(estado, m.id, equipo.map((x) => ({ heroeId: x.heroe.id, posicion: x.posicion })));
+/** Prueba de los Novatos: puja hasta su tope por cada candidato si tiene plaza (o puede hacerla). */
+export function jugarPrueba(estado: EstadoJuego, e: Estrategia, m: MetricasBot): void {
+  while (siguienteCandidato(estado)) {
+    const s = estado.prueba!.subasta!;
+    const novato = heroe(estado, s.heroeId);
+    const tope = valor(novato) * e.pujaMaxima;
+    if (e.rota && plazasLibres(estado, estado.jugadorId) <= 0) {
+      const flojo = jugador(estado).plantilla.map((id) => heroe(estado, id)).sort((a, b) => a.potencial - b.potencial)[0];
+      if (flojo && flojo.potencial + 10 < novato.potencial && ofertaVenta(estado, flojo.id)) {
+        vender(estado, flojo.id);
+        m.ventas++;
+      }
+    }
+    while (!s.terminada) {
+      const quiere = siguientePrecio(s) <= tope && motivoNoPujar(estado, s) === null;
+      pujarNovato(estado, quiere ? 'pujar' : 'retirarse');
+    }
+    if (s.lider === estado.jugadorId) m.fichajesNovatos++;
+  }
+}
+
+/** Compra en el mercado al rival que más subiría su fuerza (top 5), si le sobra el oro. Libera plaza vendiendo al más flojo. */
+function comprarRefuerzo(estado: EstadoJuego, reserva: number, m: MetricasBot): void {
+  const j = jugador(estado);
+  const quinto = heroesDe(estado, j.id).map((h) => h.poder).sort((a, b) => b - a)[4] ?? 0;
+  const candidatos = rivales(estado)
+    .flatMap((g) => heroesDe(estado, g.id))
+    .filter((h) => h.poder > quinto + 5)
+    .sort((a, b) => b.poder - a.poder);
+  for (const h of candidatos) {
+    if (plazasLibres(estado, j.id) <= 0) {
+      const flojo = heroesDe(estado, j.id).filter((x) => x.estado === 'libre').sort((a, b) => a.potencial - b.potencial)[0];
+      if (!flojo || !ofertaVenta(estado, flojo.id)) return;
+      const c = condicionesCompra(estado, h.id);
+      if (j.oro - c.precio < reserva) continue;
+      vender(estado, flojo.id);
+      m.ventas++;
+    }
+    const c = condicionesCompra(estado, h.id);
+    if (!c.bloqueo && j.oro - c.precio >= reserva) {
+      comprar(estado, h.id);
+      m.compras++;
       return;
     }
   }
-}
-
-function subastas(estado: EstadoJuego, e: Estrategia, m: MetricasBot): void {
-  const azar = new Azar(estado.azar + 31);
-  for (const id of [...estado.novatos]) {
-    const s = crearSubasta(estado, azar, id);
-    const tope = valorMercado(heroe(estado, id)) * e.pujaMaxima;
-    let pujo = false;
-    while (!s.terminada) {
-      const quiere = jugador(estado).plantilla.length < e.plantillaObjetivo && siguientePujaJugador(estado, s) <= tope;
-      if (quiere && !puedePujar(estado, s)) {
-        pujar(estado, s);
-        pujo = true;
-      }
-      avanzar(estado, azar, s, 1);
-    }
-    if (pujo) m.pujas++;
-    if (cerrarSubasta(estado, s) === estado.jugadorId) m.fichajes++;
-  }
-}
-
-function mejorar(estado: EstadoJuego, e: Estrategia): void {
-  const info = infoSede(estado);
-  if (info.siguiente && !info.bloqueo && jugador(estado).oro - info.siguiente.coste >= e.reservaSede) mejorarSede(estado);
 }

@@ -1,7 +1,7 @@
 // Guardado de la partida en el navegador. Si localStorage no está disponible, el juego sigue sin guardar.
 import type { EstadoJuego } from '../motor/estado';
 
-const CLAVE = 'gremio-rango-d:partida';
+const CLAVE = 'gremio-de-heroes:partida';
 
 export function guardar(estado: EstadoJuego): void {
   try {
@@ -16,7 +16,7 @@ export function cargar(): EstadoJuego | null {
     const texto = localStorage.getItem(CLAVE);
     if (!texto) return null;
     const estado = JSON.parse(texto) as EstadoJuego;
-    return estado.version === 2 ? estado : null;
+    return estado.version === 3 ? estado : null;
   } catch {
     return null;
   }

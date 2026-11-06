@@ -1,11 +1,12 @@
-# Gremio Rango D
+# Gremio de héroes
 
-Juego de gestión de fantasía isekai. El sistema te clasificó como rango D, pero tienes un poder de nivel dios. Te unes al peor gremio de la ciudad, con una sola maga y una montaña de deudas, y prometes llevarlo a lo más alto: pujando por héroes, vendiéndolos y enviándolos a misiones donde pueden morir. La sede del gremio es un espacio 3D por el que se mueve tu personaje.
+Juego de gestión de fantasía isekai. Diriges el peor gremio de héroes del reino, último del ranking, y tienes que convertirlo en el número uno: ganas oro con misiones, pujas por novatos, compras y vendes héroes y mejoras tu sede. La sede del gremio es un espacio 3D por el que se mueve tu personaje.
 
 ## Documentación
 
-- [Documento de diseño](docs/diseno-del-juego.md): historia, mundo, sistemas, fórmulas y balance.
-- [Plan de desarrollo](docs/plan-de-desarrollo.md): stack, fases, tareas e hitos.
+- [Biblia del proyecto](docs/biblia.md): fuente única de verdad del diseño.
+- [Plan de desarrollo](docs/plan-de-desarrollo.md): hoja de ruta por fases y tareas.
+- [Preguntas abiertas](docs/preguntas.md) e [informe de balance](docs/informe-balance.md).
 
 ## Stack
 
@@ -23,7 +24,7 @@ npm install
 npm run dev
 ```
 
-Abre la dirección que aparece en la terminal (normalmente `http://localhost:5173`). Cada día lanzas una misión para ganar oro, compras o vendes héroes en el mercado y mejoras tu sede; el día 7 de cada semana pujas en directo por los novatos. La partida se guarda sola en el navegador.
+Abre la dirección que aparece en la terminal (normalmente `http://localhost:5173`). Cada día lanzas misiones para ganar oro, compras o vendes héroes, reclutas y mejoras tus instalaciones; el día 7 de cada semana pagas los sueldos y pujas por turnos por los novatos. La partida se guarda sola en el navegador.
 
 | Comando | Qué hace |
 | --- | --- |
@@ -31,14 +32,13 @@ Abre la dirección que aparece en la terminal (normalmente `http://localhost:517
 | `npm test` | Ejecuta los tests del motor |
 | `npm run typecheck` | Comprueba los tipos |
 | `npm run build` | Genera la versión publicable en `dist/` |
-| `npm run simular -- 1000` | Simula 1.000 temporadas y muestra el informe de balance |
+| `npm run simular -- 300` | Simula 300 partidas por estrategia y muestra el informe de balance |
 
 ## Estado
 
-- **Fase 0 (preparación):** terminada.
-- **Fase 1 (motor de reglas):** completa para la temporada 1, incluidas las acciones especiales de los rivales, cesiones, cláusulas y mejoras de la sede.
-- **Fase 2 (balance):** simulador listo; ver el [informe de balance](docs/informe-balance.md), con decisiones de diseño pendientes.
-- **Fase 3 (paneles):** la temporada 1 se juega entera en el navegador. Falta elegir el aspecto del protagonista.
+- **Fase 1 (núcleo económico):** jugable de principio a fin con cifras provisionales.
+- **Fase 2 (competencia):** Prueba de los Novatos por turnos, mercado, rivales e instalaciones en una primera versión.
+- **Fases 3 y 4 (héroes con voluntad y narrativa):** pendientes, como marca la biblia.
 - **Sede 3D:** formas simples, movimiento y puntos de interacción que abren los paneles.
 
 ## Estructura
@@ -50,7 +50,7 @@ Abre la dirección que aparece en la terminal (normalmente `http://localhost:517
 | `src/datos/` | Contenido y balance en JSON |
 | `src/ui/` | Paneles de gestión |
 | `src/escena3d/` | Sede 3D |
-| `src/narrativa/` | Prólogo, eventos y textos |
+| `src/narrativa/` | Acontecimientos y textos (fases 3 y 4) |
 | `herramientas/simulador/` | Simulación automática para ajustar el balance |
 | `tests/` | Tests del motor |
 | `public/modelos/` | Modelos 3D (.glb) |

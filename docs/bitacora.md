@@ -2,6 +2,17 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — El juego rehecho según la biblia del proyecto
+
+- Petición del propietario: rehacer el juego con la nueva biblia (`docs/biblia.md`) manteniendo la interfaz. El diseño anterior pasa a `docs/archivo/`.
+- Motor reescrito: «Finalizar día», tablón diario de tres misiones (bajo, medio, alto) con duraciones 1/2/3 y equipos de 1/2/3 héroes, varias misiones por día, lesiones en lugar de muertes, sueldos el día 7 antes de la Prueba, ranking Fuerza (top 5) + Prestigio actualizado cada semana, temporadas de 28 días con premio y varias temporadas por partida.
+- Prueba de los Novatos con subasta ascendente por turnos y límite oculto de los rivales; potencial en rango que estrechan los ojeadores; mercado de compra y venta; cuatro rivales con estrategia propia.
+- Eliminado: Elara, deuda y quiebra, muertes, clases, razas, rasgos y vínculos antiguos, moral, patrocinio, Modo Clemente. Rasgos, relaciones y lealtad con efectos llegan en la fase 3, como dice la biblia.
+- Interfaz: los cinco elementos de la sección 3; Gestionar gremio con pestañas Plantilla, Reclutar, Instalaciones y Ranking.
+- Lo que la biblia deja [Abierto] tiene una versión provisional y una pregunta en `docs/preguntas.md` (11 preguntas).
+- 36 tests; simulador nuevo (varias temporadas); probado en navegador con Playwright sin errores.
+- Queda: respuestas del propietario, más tensión económica a medio plazo (pregunta 11), puerta de la fase 1.
+
 ## 2026-11-06 — El juego rehecho por días, con extrema sencillez
 
 - Petición del propietario: reducir el juego a "tienes oro, ¿cómo lo gestionas para hacer más fuerte a tu gremio?" con una interfaz de juego infantil.

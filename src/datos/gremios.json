@@ -1,24 +1,74 @@
 {
+  "_nota": "Sección 14 de la biblia. Nombres, número y cifras provisionales (pendiente de decisión).",
   "rivales": [
     {
-      "id": "corona", "nombre": "Corona de Acero", "prestigio": 90, "reputacion": 50, "oro": 60000,
-      "especialidad": "Guerrero", "plantilla": { "S": 2, "A": 3, "B": 4, "C": 2 },
-      "perfil": { "agresividad": 1.25, "sesgo": "rango", "clasesPreferidas": ["Guerrero", "Tanque"] }
+      "id": "dragon",
+      "nombre": "Dragón Carmesí",
+      "personalidad": "Arrogante",
+      "estrategia": "Héroes muy poderosos, instalaciones mediocres.",
+      "oro": 15000,
+      "heroes": 6,
+      "poder": [45, 64],
+      "potencial": ["B", "A", "A", "S"],
+      "reputacion": [20, 50],
+      "nivelSede": 2,
+      "nivelOjeadores": 0,
+      "misionesAltas": 4,
+      "novatosDestacados": 1,
+      "perfil": { "prioridad": "poder", "agresividad": 1.2, "mejora": 0.3, "vende": true }
     },
     {
-      "id": "alba", "nombre": "Orden del Alba Dorada", "prestigio": 75, "reputacion": 80, "oro": 45000,
-      "especialidad": "Sanador", "plantilla": { "S": 1, "A": 3, "B": 4, "C": 3 },
-      "perfil": { "agresividad": 1.0, "sesgo": "reputacion", "clasesPreferidas": ["Sanador", "Tanque"] }
+      "id": "corona",
+      "nombre": "Corona Dorada",
+      "personalidad": "Ambiciosa",
+      "estrategia": "Invierte en prestigio e instalaciones.",
+      "oro": 18000,
+      "heroes": 5,
+      "poder": [36, 54],
+      "potencial": ["B", "A", "A"],
+      "reputacion": [30, 60],
+      "nivelSede": 4,
+      "nivelOjeadores": 2,
+      "misionesAltas": 3,
+      "novatosDestacados": 3,
+      "perfil": { "prioridad": "destacado", "agresividad": 1.1, "mejora": 1.0, "vende": true }
     },
     {
-      "id": "colmillo", "nombre": "Colmillo Carmesí", "prestigio": 65, "reputacion": 25, "oro": 35000,
-      "especialidad": "Explorador", "plantilla": { "S": 1, "A": 2, "B": 4, "C": 3 },
-      "perfil": { "agresividad": 1.35, "sesgo": "agilidad", "clasesPreferidas": ["Explorador", "Guerrero"] }
+      "id": "sombras",
+      "nombre": "Sombras Negras",
+      "personalidad": "Calculadora",
+      "estrategia": "Compra talento barato antes que nadie.",
+      "oro": 12000,
+      "heroes": 6,
+      "poder": [28, 48],
+      "potencial": ["A", "A", "S"],
+      "reputacion": [10, 35],
+      "nivelSede": 3,
+      "nivelOjeadores": 3,
+      "misionesAltas": 2,
+      "novatosDestacados": 4,
+      "perfil": { "prioridad": "potencial", "agresividad": 1.0, "mejora": 0.5, "vende": true }
     },
     {
-      "id": "tejedores", "nombre": "Tejedores del Velo", "prestigio": 60, "reputacion": 40, "oro": 30000,
-      "especialidad": "Mago", "plantilla": { "S": 0, "A": 3, "B": 4, "C": 3 },
-      "perfil": { "agresividad": 1.15, "sesgo": "potencial", "clasesPreferidas": ["Mago", "Soporte"] }
+      "id": "esperanza",
+      "nombre": "Última Esperanza",
+      "personalidad": "Tradicional",
+      "estrategia": "Conserva a sus veteranos.",
+      "oro": 10000,
+      "heroes": 5,
+      "poder": [42, 58],
+      "potencial": ["B", "B", "A"],
+      "reputacion": [45, 75],
+      "nivelSede": 2,
+      "nivelOjeadores": 1,
+      "misionesAltas": 6,
+      "novatosDestacados": 0,
+      "perfil": { "prioridad": "barato", "agresividad": 0.7, "mejora": 0.4, "vende": false }
     }
-  ]
+  ],
+  "titulosMisiones": {
+    "bajo": ["Limpiar ratas gigantes del granero", "Escoltar al panadero hasta el pueblo", "Recuperar un collar en el pantano", "Ahuyentar a unos goblins del camino"],
+    "medio": ["Cazar al lobo de dos cabezas", "Proteger una caravana de especias", "Explorar la cripta del molino", "Rescatar a un mercader secuestrado"],
+    "alto": ["Derrotar al ogro de la colina negra", "Sellar la grieta del bosque maldito", "Recuperar la reliquia del templo hundido", "Expulsar a la banda del barón sin tierra"]
+  }
 }

@@ -1,3 +1,3 @@
 # Narrativa
 
-Textos y escenas: prólogo (invocación, Prueba del Despertar, Draft, Promesa), eventos de vínculos, consejos de Elara y plantillas de los informes de misión.
+Reservado para las fases 3 y 4 de la biblia: acontecimientos con decisión, historias por capítulos, noticias breves y textos de la ficha del héroe y del registro del gremio.

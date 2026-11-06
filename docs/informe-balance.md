@@ -1,43 +1,32 @@
-# Informe de balance — temporada 1
+# Informe de balance
 
-Resultado: con el juego rehecho por días (una misión al día y una subasta de novatos cada semana), hay una decisión de oro cada día y cualquier puesto final es posible. Antes, con las decisiones del propietario aplicadas, la temporada 1 es superable para un jugador prudente (12,9% de quiebras), castiga al arriesgado (28,2%) y la distancia con los rivales en la clasificación se ha reducido a la mitad. El jugador sigue terminando 5.º la temporada 1, que es lo esperado al empezar desde cero.
+Simulación con `npm run simular -- 300 1`: 300 partidas por estrategia (semillas 1–300), hasta 4 temporadas (112 días) o la victoria. Cifras provisionales de `src/datos/balance.json` y `src/datos/gremios.json` (ver `preguntas.md`).
 
-Generado con `npm run simular -- 1000 1` (1.000 temporadas por estrategia, semillas 1–1.000). Versión del balance: `src/datos/balance.json` a 6 de noviembre de 2026.
+## Estrategias del jugador automático
 
-## Resultados (juego por días)
+- **Prudente:** solo lanza misiones con al menos un 70% de éxito, puja hasta el valor del novato y no vende ni compra en el mercado.
+- **Ambiciosa:** acepta un 55% de éxito, puja hasta el doble del valor, vende al más flojo para hacer sitio y compra en el mercado a quien mejore su top 5.
 
-| Métrica | Prudente (≥ 70% de éxito) | Arriesgado (≥ 50% de éxito) | Objetivo |
-| --- | --- | --- | --- |
-| Quiebras en la temporada | 3,0% | 15,7% | 10–25% (más bajo con juego prudente) |
-| Muertes por temporada | 0,3 | 0,6 | 0,3–1 |
-| Misiones por temporada | 26,0 | 24,8 | — |
-| Tasa de éxito en misiones | 78,7% | 68,1% | 70–80% |
-| Novatos fichados por temporada | 4,4 | 4,1 | 3–6 |
-| Puestos finales (sin quiebra) | 1.º 316 · 2.º 155 · 3.º 172 · 4.º 161 · 5.º 166 | 1.º 237 · 2.º 96 · 3.º 119 · 4.º 149 · 5.º 242 | Cualquier puesto posible |
+## Resultados
 
-El oro va ajustado en la segunda mitad (mediana de unas 900 piezas de oro en el cierre de la semana 4 antes del premio), así que gastar en novatos y en la sede es una decisión de verdad.
+| Métrica | Prudente | Ambiciosa |
+| --- | --: | --: |
+| Puesto medio al cerrar la temporada 1 | 5,0 | 5,0 |
+| Puesto medio al cerrar la temporada 2 | 5,0 | 4,6 |
+| Puesto medio al cerrar la temporada 3 | 4,9 | 3,3 |
+| Puesto medio al cerrar la temporada 4 | 4,9 | 2,2 |
+| Victoria en 4 temporadas o menos | 0% | 24% |
+| Semanas con sueldos impagados (de 16) | 0,0 | 0,1 |
+| Semanas con menos de 1.000 de oro tras sueldos | 0,0 | 0,3 |
+| Tasa de éxito en misiones | 85% | 85% |
+| Novatos fichados | 11,0 | 21,1 |
+| Ventas / compras en el mercado | 0 / 0 | 19,5 / 8,7 |
+| Oro al final | 89.132 | 22.487 |
+| Fuerza final (top 5) | 268 | 422 |
 
-## Decisiones del propietario aplicadas
+## Lectura
 
-| Pregunta | Decisión | Cómo se aplicó |
-| --- | --- | --- |
-| 1. Distancia con los rivales | A: clasificación por temporada | Puntos de Gremio = 3 × prestigio ganado en la temporada + puntos de misión. La reputación ya no suma puntos. |
-| 2. Tensión económica | A: gasto por héroe | Manutención semanal según rango (F/D 20 · C 25 · B 30 · A 35 · S 40; Elara no cuenta). |
-| 3. Muertes | Están bien como están | Objetivo nuevo: 0,3–1 por temporada. |
-
-## Ajustes aplicados
-
-| Cambio | Antes | Ahora | Motivo |
-| --- | --- | --- | --- |
-| Misiones de los rivales por semana | 1–3, sin ocupar a sus héroes | 1–2; el equipo queda ocupado lo que dura la misión | Llegaban a prestigio 100 en 5 semanas |
-| Fichajes de los rivales | Fichaban cualquier agente libre | Ignoran héroes muy por debajo de su nivel; máximo 13 héroes | Vaciaban el mercado del jugador |
-| Riesgo base de muerte (2+ / 1 / mismo rango) | 25% / 12% / 5% | 35% / 18% / 8% | Casi no había muertes |
-| Sabotajes del Colmillo | Desde la semana 1 | Desde la semana 5 | Las quiebras subían al 20% / 32% |
-| Manutención de Elara | 40 por semana | 0 | Es la dueña del gremio; con ella las quiebras subían al 28% / 41% |
-| Oro inicial | 3.000 | 3.500 | Compensa la manutención en las primeras semanas (quiebras 21% / 36% sin el cambio) |
-
-## Observaciones
-
-1. **El jugador arriesgado quiebra algo por encima del objetivo (28,2%).** Se considera aceptable: arriesgar debe tener coste. Si las pruebas con jugadores lo confirman como frustrante, la palanca es el oro inicial.
-2. **La tensión económica sigue concentrada al principio.** A mitad de temporada el oro crece (unos 8.900 al final). Las mejoras de la sede (33.000 en total) son el sumidero previsto; el jugador automático todavía no las compra, así que el simulador no lo refleja.
-3. **El ascenso es cosa de varias temporadas.** En la temporada 1 los rivales hacen misiones A (12 puntos) y el jugador C (4 puntos). Cuando haya más temporadas (v0.2), el simulador deberá medir si el jugador puede llegar al 1.º en 5.
+- **El arco funciona:** se empieza último y solo se sube invirtiendo en héroes (pujas fuertes, compras y ventas). Quien acumula oro sin arriesgar no sale del 5.º puesto.
+- **La partida dura varias temporadas,** como pide la biblia: con un juego activo, el 1.º puesto llega entre la temporada 3 y la 4.
+- **Falta tensión económica a medio plazo:** el oro solo aprieta las primeras semanas. Con 16 semanas casi nunca se baja de 1.000 de oro tras pagar sueldos. Hacen falta más usos del oro o sueldos más altos (pregunta 11).
+- **Las lesiones** apartan a los héroes unos días, pero sin muertes el riesgo es moderado; encaja con «Fracasar puede reducir la recompensa y causar lesiones».

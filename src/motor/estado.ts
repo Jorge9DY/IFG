@@ -1,58 +1,73 @@
 // Estado completo de una partida y consultas sobre él. Es un objeto plano: se guarda con JSON.stringify.
 
 import balance from '../datos/balance.json';
-import type { InformeMision } from './misiones';
-import { clasificacion, type FilaClasificacion } from './ranking';
-import type { Gremio, Heroe, Mision, Partida, Posicion } from './tipos';
+import type { Subasta } from './subasta';
+import type { Gremio, Heroe, Mision } from './tipos';
 
 export interface MisionEnCurso {
   mision: Mision;
   gremioId: string;
-  equipo: { heroeId: string; posicion: Posicion }[];
-  /** Día en cuyo cierre se resuelve. */
-  diaFin: number;
-  /** Día en que se envió. */
-  diaInicio: number;
+  equipo: string[];
+  /** Día (global) en cuyo cierre vuelve el equipo. */
+  diaVuelta: number;
 }
 
 export interface Evento {
   dia: number;
-  tipo: 'mision' | 'fichaje' | 'venta' | 'muerte' | 'abandono' | 'despertar' | 'economia' | 'rival' | 'sede' | 'novatos' | 'temporada';
+  tipo: 'mision' | 'fichaje' | 'venta' | 'sueldos' | 'novatos' | 'instalacion' | 'rival' | 'ranking' | 'temporada';
   texto: string;
 }
 
-export type FinPartida = null | 'quiebra' | 'fin-temporada';
+export interface FilaRanking {
+  puesto: number;
+  gremioId: string;
+  fuerza: number;
+  prestigio: number;
+  puntos: number;
+}
+
+export interface PruebaNovatos {
+  /** Novatos que aún no se han subastado, en orden de presentación. */
+  pendientes: string[];
+  /** Subasta en curso (por turnos), o null entre candidato y candidato. */
+  subasta: Subasta | null;
+  /** Resultado de cada novato ya subastado. */
+  resultados: { heroeId: string; ganador: string | null; precio: number }[];
+}
+
+/**
+ * Fase del día: «gestion» (el jugador decide), «prueba» (día 7, tras pagar sueldos: subastas de novatos)
+ * y «victoria» (fin de la partida).
+ */
+export type Fase = 'gestion' | 'prueba' | 'victoria';
 
 export interface EstadoJuego {
-  version: 2;
-  partida: Partida;
+  version: 3;
+  semilla: number;
   /** Estado del generador aleatorio, para continuar la misma secuencia. */
   azar: number;
+  /** Día global, empezando en 1. La temporada y la semana se derivan de él. */
+  dia: number;
+  fase: Fase;
   heroes: Record<string, Heroe>;
   gremios: Record<string, Gremio>;
   jugadorId: string;
-  /** Las tres misiones del día (fácil, media y difícil). */
+  /** Tablón del día: una misión de cada rango (las lanzadas desaparecen hasta el día siguiente). */
   tablon: Mision[];
   enCurso: MisionEnCurso[];
-  /** Novatos de la próxima Prueba de Novatos (día 7 de cada semana). */
-  novatos: string[];
-  /** Afinidad entre pares de héroes (clave "idA|idB" ordenada). */
-  afinidades: Record<string, number>;
-  exitosTemporada: number;
-  /** Misiones con éxito en la semana en curso (si es 0 al cierre, el prestigio decae). */
-  exitosSemana: number;
-  muertesTemporada: Record<string, number>;
-  /** Informes de las misiones del jugador resueltas en el último cierre de día. */
-  informes: InformeMision[];
+  /** Candidatos que se pueden reclutar esta semana fuera de la Prueba. */
+  reclutas: string[];
+  prueba: PruebaNovatos | null;
+  /** Ranking oficial: se actualiza al terminar el día 7 de cada semana. */
+  ranking: FilaRanking[];
   registro: Evento[];
-  fin: FinPartida;
   contadorIds: number;
 }
 
+const C = balance.calendario;
+
 export function jugador(estado: EstadoJuego): Gremio {
-  const g = estado.gremios[estado.jugadorId];
-  if (!g) throw new Error('No existe el gremio del jugador');
-  return g;
+  return gremio(estado, estado.jugadorId);
 }
 
 export function gremio(estado: EstadoJuego, id: string): Gremio {
@@ -71,46 +86,45 @@ export function heroesDe(estado: EstadoJuego, gremioId: string): Heroe[] {
   return gremio(estado, gremioId).plantilla.map((id) => heroe(estado, id));
 }
 
-/** Comida y equipo de la plantilla: un gasto semanal por héroe según su rango. */
-export function manutencionDe(estado: EstadoJuego, gremioId: string): number {
-  const tabla = balance.economia.manutencionPorRango;
-  // Elara es la dueña del gremio: ni cobra salario ni cuenta como gasto de manutención.
-  return heroesDe(estado, gremioId).reduce((t, h) => t + (h.id === 'h_000_elara' ? 0 : tabla[h.rango]), 0);
-}
-
-export function salariosDe(estado: EstadoJuego, gremioId: string): number {
-  return heroesDe(estado, gremioId).reduce((t, h) => t + (h.contrato?.salario ?? 0), 0);
-}
-
 export function rivales(estado: EstadoJuego): Gremio[] {
   return Object.values(estado.gremios).filter((g) => !g.esJugador);
 }
 
-export function tabla(estado: EstadoJuego): FilaClasificacion[] {
-  return clasificacion(Object.values(estado.gremios));
+/** Gremio al que pertenece un héroe, o null si no tiene (novato o recluta). */
+export function dueño(estado: EstadoJuego, heroeId: string): Gremio | null {
+  return Object.values(estado.gremios).find((g) => g.plantilla.includes(heroeId)) ?? null;
+}
+
+export function temporadaDe(dia: number): number {
+  return Math.floor((dia - 1) / C.diasPorTemporada) + 1;
+}
+
+/** Día dentro de la temporada (1–28). */
+export function diaDeTemporada(dia: number): number {
+  return ((dia - 1) % C.diasPorTemporada) + 1;
+}
+
+/** Semana dentro de la temporada (1–4). */
+export function semanaDe(dia: number): number {
+  return Math.ceil(diaDeTemporada(dia) / C.diasPorSemana);
+}
+
+/** Día 7 de cada semana: sueldos y Prueba de los Novatos. */
+export function esDia7(dia: number): boolean {
+  return dia % C.diasPorSemana === 0;
+}
+
+export function esFinDeTemporada(dia: number): boolean {
+  return dia % C.diasPorTemporada === 0;
+}
+
+/** Días que faltan para el próximo día 7 (0 si es hoy). */
+export function diasParaPrueba(dia: number): number {
+  return (C.diasPorSemana - (dia % C.diasPorSemana)) % C.diasPorSemana;
 }
 
 export function puesto(estado: EstadoJuego, gremioId: string): number {
-  return tabla(estado).find((f) => f.gremioId === gremioId)?.puesto ?? 5;
-}
-
-/** Semana (1–4) a la que pertenece un día (1–28). */
-export function semanaDeDia(dia: number): number {
-  return Math.ceil(dia / balance.temporada.diasPorSemana);
-}
-
-/** true el último día de cada semana: el día de la Prueba de Novatos. */
-export function esDiaDeNovatos(dia: number): boolean {
-  return dia % balance.temporada.diasPorSemana === 0;
-}
-
-export function claveAfinidad(a: string, b: string): string {
-  return a < b ? `${a}|${b}` : `${b}|${a}`;
-}
-
-/** Límite de deuda: la inicial más el préstamo extra máximo. */
-export function limiteDeuda(): number {
-  return balance.economia.deudaInicial + 20000;
+  return estado.ranking.find((f) => f.gremioId === gremioId)?.puesto ?? estado.ranking.length;
 }
 
 export function nuevoId(estado: EstadoJuego, prefijo: string): string {
@@ -119,5 +133,5 @@ export function nuevoId(estado: EstadoJuego, prefijo: string): string {
 }
 
 export function registrar(estado: EstadoJuego, tipo: Evento['tipo'], texto: string): void {
-  estado.registro.push({ dia: estado.partida.dia, tipo, texto });
+  estado.registro.push({ dia: estado.dia, tipo, texto });
 }

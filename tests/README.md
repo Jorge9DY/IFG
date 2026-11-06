@@ -1,3 +1,3 @@
 # Tests
 
-Tests automáticos del motor (`npm test`). Cada fórmula del documento de diseño tiene al menos un test con su ejemplo resuelto. `fabrica.ts` crea héroes y misiones de prueba.
+Tests automáticos del motor (`npm test`), uno o más por cada regla de la biblia. `fabrica.ts` crea héroes y partidas de prueba.

@@ -1,206 +1,119 @@
-// Héroes: generación, rango por suma de combate, valor de mercado y progresión (secciones 5 y 8).
+// Héroes (biblia, sección 9): generación, potencial visible como rango, sueldo, valor y progresión.
 
 import balance from '../datos/balance.json';
 import nombres from '../datos/nombres.json';
 import type { Azar } from './azar';
-import { sumaCombate } from './misiones';
-import {
-  RANGOS,
-  indiceRango,
-  type Clase,
-  type Heroe,
-  type Rango,
-  type Rasgo,
-  type Raza,
-  type Stats,
-} from './tipos';
+import { LETRAS, type Heroe, type Letra } from './tipos';
 
-export const CLASES: readonly Clase[] = ['Tanque', 'Guerrero', 'Mago', 'Sanador', 'Explorador', 'Soporte'];
-export const RAZAS: readonly Raza[] = ['Humano', 'Elfo', 'Enano', 'Bestiahombre', 'Draconido', 'Demonio menor'];
-export const RASGOS: readonly Rasgo[] = ['Codicioso', 'Leal', 'Temerario', 'Cobarde', 'Ambicioso', 'Romantico', 'Veterano'];
+const L = balance.letras;
 
-type StatCombate = 'poder' | 'defensa' | 'magia' | 'agilidad';
-const STAT_PRINCIPAL: Record<Clase, StatCombate> = {
-  Tanque: 'defensa',
-  Guerrero: 'poder',
-  Mago: 'magia',
-  Sanador: 'magia',
-  Explorador: 'agilidad',
-  Soporte: 'magia',
-};
-const STATS_COMBATE: readonly StatCombate[] = ['poder', 'defensa', 'magia', 'agilidad'];
-
-export function rangoPorSuma(suma: number): Rango {
-  for (const rango of [...RANGOS].reverse()) {
-    if (suma >= balance.rangos[rango].sumaMin) return rango;
-  }
-  return 'F';
+/** Letra de un valor de poder (o de potencial) según la escala de balance.json. */
+export function letraDe(valor: number): Letra {
+  let letra: Letra = 'F';
+  L.umbral.forEach((u, i) => {
+    if (valor >= u) letra = LETRAS[i] ?? letra;
+  });
+  return letra;
 }
 
-export function multiplicadorEdad(edad: number): number {
-  if (edad < 22) return 1.2;
-  if (edad <= 32) return 1;
-  return 0.7;
+export function indiceLetra(letra: Letra): number {
+  return LETRAS.indexOf(letra);
 }
 
-/** Base del rango: punto medio de su rango de valor de mercado. */
-export function valorBase(rango: Rango): number {
-  const [min, max] = balance.rangos[rango].valor as [number, number];
-  return (min + max) / 2;
+/** Valor numérico de potencial al azar dentro de la franja de una letra. */
+function potencialEnLetra(azar: Azar, letra: Letra): number {
+  const i = indiceLetra(letra);
+  const min = L.umbral[i] ?? 0;
+  const max = (L.umbral[i + 1] ?? 101) - 1;
+  return azar.entero(min, max);
 }
 
-export function valorMercado(heroe: Heroe): number {
-  const extraPotencial = heroe.potencialVisible
-    ? Math.max(0, indiceRango(heroe.potencial) - indiceRango(heroe.rango)) * 0.15
-    : 0;
-  const valor =
-    valorBase(heroe.rango) *
-    (1 + 0.02 * heroe.misionesExito) *
-    multiplicadorEdad(heroe.edad) *
-    (1 + extraPotencial);
-  return Math.round(valor);
+export interface OpcionesHeroe {
+  poder: [number, number];
+  /** Letras posibles del potencial (se elige una al azar). */
+  potencial: readonly Letra[];
+  reputacion?: [number, number];
 }
 
-/** Salario semanal que pide un héroe de su rango (punto medio de la tabla). */
-export function salarioPedido(rango: Rango): number {
-  const [min, max] = balance.rangos[rango].salario as [number, number];
-  return Math.round((min + max) / 2);
-}
-
-/** Rango que corresponde a sus stats actuales, sin superar su potencial. */
-export function rangoActualizado(heroe: Heroe): Rango {
-  const porStats = rangoPorSuma(sumaCombate(heroe));
-  return indiceRango(porStats) > indiceRango(heroe.potencial) ? heroe.potencial : porStats;
-}
-
-function repartirStats(azar: Azar, clase: Clase, suma: number): Stats {
-  const principal = STAT_PRINCIPAL[clase];
-  const pesos = STATS_COMBATE.map((s) => (s === principal ? 2 : 1) * (0.75 + azar.siguiente() * 0.5));
-  const totalPesos = pesos.reduce((a, b) => a + b, 0);
-  const valores = pesos.map((p) => Math.min(100, Math.max(1, Math.round((suma * p) / totalPesos))));
-  // Reparte el sobrante si algún stat chocó con el tope de 100.
-  let diferencia = suma - valores.reduce((a, b) => a + b, 0);
-  for (let i = 0; diferencia !== 0 && i < 400; i++) {
-    const idx = i % 4;
-    const actual = valores[idx] ?? 0;
-    if (diferencia > 0 && actual < 100) {
-      valores[idx] = actual + 1;
-      diferencia--;
-    } else if (diferencia < 0 && actual > 1) {
-      valores[idx] = actual - 1;
-      diferencia++;
-    }
-  }
-  return {
-    poder: valores[0] ?? 1,
-    defensa: valores[1] ?? 1,
-    magia: valores[2] ?? 1,
-    agilidad: valores[3] ?? 1,
-    moral: azar.entero(50, 70),
-  };
-}
-
-function generarPotencial(azar: Azar, rango: Rango): Rango {
-  const g = balance.generacion;
-  const maximo = g.potencialMaximo[rango] as Rango;
-  if (azar.probabilidad(g.probJoya)) return 'S';
-  const desde = indiceRango(rango);
-  const hasta = Math.max(desde, indiceRango(maximo));
-  return RANGOS[azar.entero(desde, hasta)] ?? rango;
-}
-
-function generarRasgos(azar: Azar): Rasgo[] {
-  const g = balance.generacion;
-  const rasgos: Rasgo[] = [];
-  for (let i = 0; i < g.maxRasgos; i++) {
-    if (!azar.probabilidad(g.probRasgo)) break;
-    const r = azar.elegir(RASGOS);
-    if (!rasgos.includes(r) && !(r === 'Temerario' && rasgos.includes('Cobarde')) && !(r === 'Cobarde' && rasgos.includes('Temerario'))) {
-      rasgos.push(r);
-    }
-  }
-  return rasgos;
-}
-
-export interface OpcionesGeneracion {
-  clase?: Clase;
-  edad?: number;
-}
-
-export function generarHeroe(azar: Azar, id: string, rango: Rango, opciones: OpcionesGeneracion = {}): Heroe {
-  const clase = opciones.clase ?? azar.elegir(CLASES);
-  const r = balance.rangos[rango];
-  const suma = azar.entero(r.sumaMin, r.sumaMax);
-  const [edadMin, edadMax] = balance.generacion.edad as [number, number];
-  const rasgos = generarRasgos(azar);
+export function generarHeroe(azar: Azar, id: string, o: OpcionesHeroe): Heroe {
+  const poder = azar.entero(o.poder[0], o.poder[1]);
+  const potencial = Math.max(poder, potencialEnLetra(azar, azar.elegir(o.potencial)));
   return {
     id,
     nombre: `${azar.elegir(nombres.nombres)} ${azar.elegir(nombres.apellidos)}`,
-    edad: opciones.edad ?? (rasgos.includes('Veterano') ? azar.entero(30, edadMax) : azar.entero(edadMin, edadMax)),
-    raza: azar.elegir(RAZAS),
-    rango,
-    potencial: generarPotencial(azar, rango),
-    potencialVisible: false,
-    clase,
-    stats: repartirStats(azar, clase, suma),
-    rasgos,
-    vinculos: [],
-    contrato: null,
-    estado: 'disponible',
-    diasFuera: 0,
-    xp: 0,
-    misionesExito: 0,
+    poder,
+    potencial,
+    sesgoOjeo: azar.siguiente(),
+    experiencia: 0,
+    reputacion: o.reputacion ? azar.entero(o.reputacion[0], o.reputacion[1]) : 0,
+    lealtad: balance.heroes.lealtadInicial,
+    estado: 'libre',
+    diasLesion: 0,
   };
 }
 
-/**
- * Crea vínculos al azar entre héroes del mundo (simétricos).
- * Familia solo entre héroes de la misma raza; Romance entre adultos con menos de 12 años de diferencia.
- */
-export function generarVinculos(azar: Azar, heroes: readonly Heroe[]): void {
-  const prob = balance.generacion.probVinculo;
-  for (const a of heroes) {
-    if (a.vinculos.length >= 3 || !azar.probabilidad(prob)) continue;
-    const candidatos = heroes.filter(
-      (b) => b !== a && b.vinculos.length < 3 && !a.vinculos.some((v) => v.con === b.id),
-    );
-    if (candidatos.length === 0) continue;
-    const b = azar.elegir(candidatos);
-    const tipos: Heroe['vinculos'][number]['tipo'][] = ['Amistad', 'Amistad', 'Rivalidad'];
-    if (a.raza === b.raza) tipos.push('Familia', 'Familia');
-    if (a.edad >= 18 && b.edad >= 18 && Math.abs(a.edad - b.edad) < 12) tipos.push('Romance');
-    const tipo = azar.elegir(tipos);
-    const oculto = azar.probabilidad(30);
-    a.vinculos.push({ con: b.id, tipo, oculto });
-    b.vinculos.push({ con: a.id, tipo, oculto });
+/** Letra de potencial de un novato, según las probabilidades de balance.json. */
+export function letraPotencialNovato(azar: Azar): Letra {
+  const tabla = balance.heroes.potencialPorLetra as Record<string, number>;
+  let tirada = azar.siguiente() * 100;
+  for (const letra of LETRAS) {
+    const p = tabla[letra] ?? 0;
+    if (tirada < p) return letra;
+    tirada -= p;
   }
+  return 'C';
 }
 
-/** Suma XP y aplica mejoras de stats y subida de rango. Devuelve true si subió de rango. */
-export function ganarXp(azar: Azar, heroe: Heroe, xp: number): boolean {
-  const p = balance.progresion;
-  heroe.xp += xp;
-  const rangoAntes = heroe.rango;
-  while (heroe.xp >= p.xpPorMejora) {
-    heroe.xp -= p.xpPorMejora;
-    if (heroe.edad > p.edadMaxCrecimiento) continue;
-    // El techo de stats lo marca el potencial: no se crece por encima del máximo de ese rango.
-    const techo = balance.rangos[heroe.potencial].sumaMax;
-    for (let i = 0; i < p.puntosPorMejora && sumaCombate(heroe) < techo; i++) {
-      const stat = i === 0 ? STAT_PRINCIPAL[heroe.clase] : azar.elegir(STATS_COMBATE);
-      heroe.stats[stat] = Math.min(100, heroe.stats[stat] + 1);
+/**
+ * Rango de potencial que ve el jugador (p. ej. B–S). La instalación de ojeadores lo estrecha.
+ * Siempre contiene la letra real y nunca baja de la letra del poder actual.
+ */
+export function rangoPotencial(h: Heroe, nivelOjeadores: number): [Letra, Letra] {
+  const anchuras = balance.instalaciones.ojeadores.anchura;
+  const ancho = anchuras[Math.min(nivelOjeadores, anchuras.length - 1)] ?? 1;
+  const real = indiceLetra(letraDe(h.potencial));
+  let inicio = Math.min(Math.max(real - Math.floor(h.sesgoOjeo * ancho), 0), LETRAS.length - ancho);
+  const fin = Math.min(inicio + ancho - 1, LETRAS.length - 1);
+  inicio = Math.max(inicio, indiceLetra(letraDe(h.poder)));
+  return [LETRAS[inicio] ?? 'F', LETRAS[fin] ?? 'S'];
+}
+
+export function textoPotencial(h: Heroe, nivelOjeadores: number): string {
+  const [a, b] = rangoPotencial(h, nivelOjeadores);
+  return a === b ? a : `${a}–${b}`;
+}
+
+/** Novato destacado (prestigio del ranking): potencial real A o S. */
+export function esDestacado(h: Heroe): boolean {
+  return (balance.heroes.letrasDestacado as string[]).includes(letraDe(h.potencial));
+}
+
+/** Sueldo semanal: crece con el poder y la reputación (sección 4). */
+export function sueldo(h: Heroe): number {
+  const s = balance.sueldos;
+  const bruto = s.base + s.porPoder * h.poder + s.porReputacion * h.reputacion;
+  return Math.round(bruto / s.redondeo) * s.redondeo;
+}
+
+/** Valor de referencia de un héroe: lo que rinde hoy, su margen de crecimiento y su reputación. */
+export function valor(h: Heroe): number {
+  const v = balance.valor;
+  const bruto = v.porPoder * h.poder + v.porMargen * (h.potencial - h.poder) + v.porReputacion * h.reputacion;
+  return Math.max(v.minimo, Math.round(bruto / 50) * 50);
+}
+
+/** Suma experiencia y convierte cada tramo en un punto de poder, sin pasar del potencial. Devuelve los puntos ganados. */
+export function ganarExperiencia(h: Heroe, experiencia: number): number {
+  const porPunto = balance.heroes.experienciaPorPunto;
+  h.experiencia += experiencia;
+  let puntos = 0;
+  while (h.experiencia >= porPunto) {
+    h.experiencia -= porPunto;
+    if (h.poder < h.potencial) {
+      h.poder += 1;
+      puntos += 1;
     }
   }
-  heroe.rango = rangoActualizado(heroe);
-  return heroe.rango !== rangoAntes;
-}
-
-/** Envejecimiento al final de la temporada: +1 año y declive de stats desde los 36. */
-export function envejecer(heroe: Heroe): void {
-  const p = balance.progresion;
-  heroe.edad += 1;
-  if (heroe.edad >= p.edadDeclive) {
-    for (const s of STATS_COMBATE) heroe.stats[s] = Math.max(1, Math.round(heroe.stats[s] * (1 - p.declivePorTemporada)));
-    heroe.rango = rangoPorSuma(sumaCombate(heroe));
-  }
+  if (h.poder >= h.potencial) h.experiencia = 0;
+  return puntos;
 }

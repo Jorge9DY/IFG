@@ -1,136 +1,136 @@
-// Prueba de Novatos: subasta en tiempo real con cuenta atrás.
-// Es lógica pura: la interfaz llama a `avanzar` con el tiempo transcurrido y a `pujar` cuando el jugador sube.
+// Prueba de los Novatos (biblia, sección 8): subasta ascendente por turnos.
+// En cada ronda, cada gremio que sigue en la puja la sube o se retira. Los rivales tienen un límite oculto.
 
 import balance from '../datos/balance.json';
 import type { Azar } from './azar';
-import { gremio, heroe as obtenerHeroe, jugador, registrar, salariosDe, type EstadoJuego } from './estado';
-import { salarioPedido, valorMercado } from './heroes';
-import { interes, perfil } from './ia';
+import { gremio, heroe as obtenerHeroe, registrar, rivales, type EstadoJuego } from './estado';
+import { esDestacado, valor } from './heroes';
+import { plazasLibres } from './instalaciones';
+import { limitePuja } from './rivales';
 
 const N = balance.novatos;
 
 export interface Subasta {
   heroeId: string;
+  /** Puja actual (o precio de salida si nadie ha pujado). */
   precio: number;
+  incremento: number;
   /** Gremio que va ganando, o null si nadie ha pujado. */
   lider: string | null;
-  /** Segundos que quedan. */
-  tiempo: number;
-  /** Lo máximo que pagaría cada rival interesado (oculto al jugador). */
-  maximos: Record<string, number>;
-  /** El novato tiene un vínculo con alguien de tu gremio: prefiere tu oferta. */
-  prefiereJugador: boolean;
+  /** Gremios que siguen en la puja (orden fijo: el jugador primero). */
+  activos: string[];
+  /** Límite oculto de cada rival. El jugador no debe verlo. */
+  limites: Record<string, number>;
+  ronda: number;
   terminada: boolean;
-  historial: { gremioId: string; precio: number }[];
+  historial: { gremioId: string; accion: 'puja' | 'retirada'; precio: number }[];
 }
 
-export function incremento(subasta: Subasta, estado: EstadoJuego): number {
-  const valor = valorMercado(obtenerHeroe(estado, subasta.heroeId));
-  const relativo = Math.round((valor * N.incrementoRelativo) / 50) * 50;
-  return Math.max(N.incrementoMinimo, relativo);
+function redondear(n: number): number {
+  return Math.round(n / N.redondeo) * N.redondeo;
+}
+
+export function precioSalida(estado: EstadoJuego, heroeId: string): number {
+  return Math.max(N.incrementoMinimo, redondear(valor(obtenerHeroe(estado, heroeId)) * N.precioSalida));
 }
 
 export function crearSubasta(estado: EstadoJuego, azar: Azar, heroeId: string): Subasta {
   const h = obtenerHeroe(estado, heroeId);
-  const valor = valorMercado(h);
-  const maximos: Record<string, number> = {};
-  for (const g of Object.values(estado.gremios)) {
-    if (g.esJugador || interes(estado, g.id, h) <= 0) continue;
-    const factor = N.maximoRivalMin + azar.siguiente() * (N.maximoRivalMax - N.maximoRivalMin);
-    maximos[g.id] = Math.round(Math.min(g.oro * 0.4, valor * factor * perfil(g.id).agresividad));
-  }
-  const plantilla = new Set(jugador(estado).plantilla);
+  const salida = precioSalida(estado, heroeId);
+  const limites: Record<string, number> = {};
+  for (const g of rivales(estado)) limites[g.id] = limitePuja(estado, azar, g, h);
+  const activos = [estado.jugadorId, ...rivales(estado).filter((g) => (limites[g.id] ?? 0) >= salida).map((g) => g.id)];
   return {
     heroeId,
-    precio: Math.max(N.incrementoMinimo, Math.round((valor * N.precioInicial) / 50) * 50),
+    precio: salida,
+    incremento: Math.max(N.incrementoMinimo, redondear(valor(h) * N.incremento)),
     lider: null,
-    tiempo: N.duracionSegundos,
-    maximos,
-    prefiereJugador: h.vinculos.some((v) => v.tipo !== 'Rivalidad' && plantilla.has(v.con)),
+    activos,
+    limites,
+    ronda: 1,
     terminada: false,
     historial: [],
   };
 }
 
-/** Oro que el jugador puede comprometer en una puja (su oro menos una semana de salarios). */
-export function oroParaSubasta(estado: EstadoJuego): number {
-  return Math.max(0, jugador(estado).oro - salariosDe(estado, estado.jugadorId));
+/** Lo que costaría ponerse en cabeza ahora. */
+export function siguientePrecio(s: Subasta): number {
+  return s.lider === null ? s.precio : s.precio + s.incremento;
 }
 
-/** Precio que tendría que pagar el jugador para ponerse en cabeza. */
-export function siguientePujaJugador(estado: EstadoJuego, subasta: Subasta): number {
-  return subasta.lider === null ? subasta.precio : subasta.precio + incremento(subasta, estado);
+/** Rivales que siguen interesados (para las reacciones de los maestros, sin revelar sus límites). */
+export function interesados(estado: EstadoJuego, s: Subasta): string[] {
+  return s.activos.filter((id) => id !== estado.jugadorId);
 }
 
-function puja(subasta: Subasta, gremioId: string, precio: number): void {
-  subasta.precio = precio;
-  subasta.lider = gremioId;
-  subasta.historial.push({ gremioId, precio });
-  subasta.tiempo = Math.max(subasta.tiempo, N.tiempoTrasPuja);
-}
-
-export function puedePujar(estado: EstadoJuego, subasta: Subasta): string | null {
-  if (subasta.terminada) return 'La subasta ha terminado';
-  if (subasta.lider === estado.jugadorId) return 'Vas ganando';
-  const j = jugador(estado);
-  if (j.plantilla.length >= j.plantillaMax) return 'No te quedan plazas: mejora la sede';
-  if (siguientePujaJugador(estado, subasta) > oroParaSubasta(estado)) return 'No tienes oro suficiente';
+/** Por qué el jugador no puede subir la puja ahora, o null si puede. */
+export function motivoNoPujar(estado: EstadoJuego, s: Subasta): string | null {
+  if (s.terminada) return 'La subasta ha terminado';
+  if (!s.activos.includes(estado.jugadorId)) return 'Te has retirado';
+  if (s.lider === estado.jugadorId) return 'Vas ganando';
+  if (plazasLibres(estado, estado.jugadorId) <= 0) return 'No te quedan plazas: mejora la sede';
+  // Los sueldos ya se han pagado este día 7: se puede pujar con todo el oro que queda.
+  if (siguientePrecio(s) > gremio(estado, estado.jugadorId).oro) return 'No tienes oro suficiente';
   return null;
 }
 
-export function pujar(estado: EstadoJuego, subasta: Subasta): void {
-  const motivo = puedePujar(estado, subasta);
-  if (motivo) throw new Error(motivo);
-  puja(subasta, estado.jugadorId, siguientePujaJugador(estado, subasta));
+function pujar(s: Subasta, gremioId: string): void {
+  s.precio = siguientePrecio(s);
+  s.lider = gremioId;
+  s.historial.push({ gremioId, accion: 'puja', precio: s.precio });
 }
 
-/**
- * Avanza el reloj `segundos`. Cada segundo, cada rival que no va ganando y aún puede pagar más
- * sube la puja con cierta probabilidad. Si el novato prefiere al jugador, un rival tiene que
- * superar su puja en un 20% para quitársela.
- */
-export function avanzar(estado: EstadoJuego, azar: Azar, subasta: Subasta, segundos: number): void {
-  if (subasta.terminada) return;
-  let restante = segundos;
-  while (restante > 0 && !subasta.terminada) {
-    const paso = Math.min(1, restante);
-    restante -= paso;
-    subasta.tiempo -= paso;
-    for (const [id, maximo] of Object.entries(subasta.maximos)) {
-      if (subasta.lider === id) continue;
-      let objetivo = subasta.lider === null ? subasta.precio : subasta.precio + incremento(subasta, estado);
-      if (subasta.lider === estado.jugadorId && subasta.prefiereJugador) objetivo = Math.round(objetivo * N.preferenciaVinculo);
-      if (objetivo <= maximo && azar.probabilidad(N.probPujaRivalPorSegundo * paso)) {
-        puja(subasta, id, objetivo);
-        break;
-      }
-    }
-    if (subasta.tiempo <= 0) subasta.terminada = true;
+function retirar(s: Subasta, gremioId: string): void {
+  s.activos = s.activos.filter((id) => id !== gremioId);
+  s.historial.push({ gremioId, accion: 'retirada', precio: s.precio });
+}
+
+function comprobarFin(s: Subasta): void {
+  const quedanRetadores = s.activos.some((id) => id !== s.lider);
+  if (s.activos.length === 0 || (s.lider !== null && !quedanRetadores)) s.terminada = true;
+}
+
+/** Turno de los rivales en la ronda: cada uno que no va ganando sube si no pasa de su límite; si no, se retira. */
+function turnoRivales(estado: EstadoJuego, s: Subasta): void {
+  for (const id of [...s.activos]) {
+    if (s.terminada) return;
+    if (id === estado.jugadorId || id === s.lider) continue;
+    if (siguientePrecio(s) <= (s.limites[id] ?? 0)) pujar(s, id);
+    else retirar(s, id);
+    comprobarFin(s);
   }
+  s.ronda += 1;
 }
 
-/** Cierra la subasta: el ganador paga y el novato se une a su gremio. Devuelve el ganador. */
-export function cerrarSubasta(estado: EstadoJuego, subasta: Subasta): string | null {
-  subasta.terminada = true;
-  estado.novatos = estado.novatos.filter((id) => id !== subasta.heroeId);
-  const h = obtenerHeroe(estado, subasta.heroeId);
-  if (!subasta.lider) {
-    registrar(estado, 'novatos', `Nadie pujó por ${h.nombre}: vuelve a su aldea.`);
+/** El jugador sube la puja (o se retira) y responden los rivales. */
+export function accionJugador(estado: EstadoJuego, s: Subasta, accion: 'pujar' | 'retirarse'): void {
+  if (s.terminada) throw new Error('La subasta ha terminado');
+  if (accion === 'pujar') {
+    const motivo = motivoNoPujar(estado, s);
+    if (motivo) throw new Error(motivo);
+    pujar(s, estado.jugadorId);
+  } else if (s.activos.includes(estado.jugadorId)) {
+    if (s.lider === estado.jugadorId) throw new Error('Vas ganando: no puedes retirarte');
+    retirar(s, estado.jugadorId);
+  }
+  comprobarFin(s);
+  if (!s.terminada) turnoRivales(estado, s);
+  // Si el jugador ya no puja, la subasta sigue sola hasta el final.
+  while (!s.terminada && !s.activos.includes(estado.jugadorId)) turnoRivales(estado, s);
+}
+
+/** Cierra la subasta: el ganador paga y el novato se une a su gremio. Devuelve el ganador o null. */
+export function cerrarSubasta(estado: EstadoJuego, s: Subasta): string | null {
+  if (!s.terminada) throw new Error('La subasta no ha terminado');
+  const h = obtenerHeroe(estado, s.heroeId);
+  if (!s.lider) {
+    registrar(estado, 'novatos', `Nadie se queda con ${h.nombre}: vuelve a su aldea.`);
     return null;
   }
-  const g = gremio(estado, subasta.lider);
-  g.oro -= subasta.precio;
+  const g = gremio(estado, s.lider);
+  g.oro -= s.precio;
   g.plantilla.push(h.id);
-  h.contrato = { gremio: g.id, salario: salarioPedido(h.rango), temporadasRestantes: 2, clausula: Math.round(valorMercado(h) * 1.5) };
-  registrar(estado, 'novatos', `${h.nombre} (${h.rango}, ${h.clase}) se une a ${g.nombre} por ${subasta.precio} de oro.`);
+  if (esDestacado(h)) g.novatosDestacados += 1;
+  registrar(estado, g.esJugador ? 'fichaje' : 'novatos', `${h.nombre} (poder ${h.poder}) se une a ${g.nombre} por ${s.precio} de oro.`);
   return g.id;
-}
-
-/** Resuelve sin el jugador las subastas que queden (si termina el día sin pujar). */
-export function resolverNovatosPendientes(estado: EstadoJuego, azar: Azar): void {
-  for (const id of [...estado.novatos]) {
-    const s = crearSubasta(estado, azar, id);
-    avanzar(estado, azar, s, 60);
-    cerrarSubasta(estado, s);
-  }
 }

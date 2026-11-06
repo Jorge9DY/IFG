@@ -1,119 +1,68 @@
-// Modelo de datos del juego (sección 17 del documento de diseño).
+// Modelo de datos del juego (biblia: secciones 4–9 y 14). Todo es serializable con JSON.
 
-export const RANGOS = ['F', 'D', 'C', 'B', 'A', 'S'] as const;
-export type Rango = (typeof RANGOS)[number];
+export const LETRAS = ['F', 'D', 'C', 'B', 'A', 'S'] as const;
+export type Letra = (typeof LETRAS)[number];
 
-export type Clase = 'Tanque' | 'Guerrero' | 'Mago' | 'Sanador' | 'Explorador' | 'Soporte';
-export type Raza = 'Humano' | 'Elfo' | 'Enano' | 'Bestiahombre' | 'Draconido' | 'Demonio menor';
-export type Posicion = 'vanguardia' | 'centro' | 'retaguardia';
-export type TipoVinculo = 'Romance' | 'Familia' | 'Amistad' | 'Rivalidad';
-export type Rasgo =
-  | 'Codicioso'
-  | 'Leal'
-  | 'Temerario'
-  | 'Cobarde'
-  | 'Ambicioso'
-  | 'Romantico'
-  | 'Veterano';
-export type EstadoHeroe = 'disponible' | 'en mision' | 'herido' | 'luto' | 'muerto';
+export type EstadoHeroe = 'libre' | 'en mision' | 'lesionado';
 
-export interface Stats {
-  poder: number;
-  defensa: number;
-  magia: number;
-  agilidad: number;
-  moral: number;
-}
-
-export interface Vinculo {
-  con: string;
-  tipo: TipoVinculo;
-  oculto: boolean;
-}
-
-export interface Contrato {
-  gremio: string;
-  salario: number;
-  temporadasRestantes: number;
-  clausula: number;
-}
-
+/** Sección 9: estadísticas de un héroe. Personalidad, relaciones e historia llegan en las fases 3 y 4. */
 export interface Heroe {
   id: string;
   nombre: string;
-  edad: number;
-  raza: Raza;
-  rango: Rango;
-  potencial: Rango;
-  potencialVisible: boolean;
-  clase: Clase;
-  stats: Stats;
-  rasgos: Rasgo[];
-  vinculos: Vinculo[];
-  contrato: Contrato | null;
+  /** Capacidad de combate actual. */
+  poder: number;
+  /** Techo de crecimiento (poder máximo). Oculto: el jugador ve un rango de letras. */
+  potencial: number;
+  /** Desplazamiento fijo (0–1) que coloca la ventana del rango de potencial que ve el jugador. */
+  sesgoOjeo: number;
+  /** Progreso acumulado hacia el siguiente punto de poder. */
+  experiencia: number;
+  /** Reconocimiento público (0–100). */
+  reputacion: number;
+  /** Compromiso con el gremio (0–100). */
+  lealtad: number;
   estado: EstadoHeroe;
-  diasFuera: number;
-  xp: number;
-  misionesExito: number;
+  /** Días que faltan para recuperarse de una lesión. */
+  diasLesion: number;
 }
 
-export type TipoMision = 'segura' | 'justa' | 'arriesgada';
-
-export type EtiquetaMision = 'Caza' | 'Escolta' | 'Exploracion' | 'Rescate' | 'Mazmorra';
+export type RangoMision = 'bajo' | 'medio' | 'alto';
+export const RANGOS_MISION: readonly RangoMision[] = ['bajo', 'medio', 'alto'];
 
 export interface Mision {
   id: string;
-  rango: Rango;
-  etiqueta: EtiquetaMision;
-  /** Riesgo de la misión según la fuerza del gremio. */
-  tipo?: TipoMision;
-  poderRecomendado: number;
+  rango: RangoMision;
+  titulo: string;
+  dificultad: number;
   duracion: number;
-  recompensa: { oro: number; prestigio: number; xp: number };
-  heroeRescatable: string | null;
+  recompensa: number;
+  equipo: number;
 }
 
-export type Mejora =
-  | 'Dormitorios I'
-  | 'Dormitorios II'
-  | 'Enfermeria'
-  | 'Sala de entrenamiento'
-  | 'Biblioteca arcana'
-  | 'Salon de banquetes';
+export interface PerfilRival {
+  /** Qué valora al pujar por un novato. */
+  prioridad: 'poder' | 'potencial' | 'destacado' | 'barato';
+  agresividad: number;
+  /** Probabilidad relativa de invertir en instalaciones. */
+  mejora: number;
+  /** Si acepta vender a sus héroes en el mercado. */
+  vende: boolean;
+}
 
 export interface Gremio {
   id: string;
   nombre: string;
   esJugador: boolean;
   oro: number;
-  deuda: number;
-  prestigio: number;
-  reputacion: number;
-  especialidad: Clase | null;
   plantilla: string[];
-  plantillaMax: number;
-  mejoras: Mejora[];
-  /** Nivel de la sede (1–5): más plazas de héroe y más prestigio. */
-  nivelSede?: number;
-  puntosMisionTemporada: number;
-  /** Prestigio al empezar la temporada: la clasificación cuenta solo el ganado desde entonces. */
-  prestigioInicioTemporada?: number;
-  cierresNegativos: number;
-  muertesTemporadaPasada: number;
-}
-
-export interface Partida {
-  protagonista: { nombre: string; aspecto: number };
-  modoClemente: boolean;
-  temporada: number;
-  /** Día de la temporada (1–28). La semana se deriva de él. */
-  dia: number;
-  despertares: number;
-  sospecha: number;
-  afinidadElara: number;
-  semilla: number;
-}
-
-export function indiceRango(rango: Rango): number {
-  return RANGOS.indexOf(rango);
+  nivelSede: number;
+  nivelOjeadores: number;
+  /** Misiones de rango alto completadas (prestigio). */
+  misionesAltas: number;
+  /** Novatos destacados fichados en la Prueba (prestigio). */
+  novatosDestacados: number;
+  /** Solo los rivales. */
+  personalidad?: string;
+  estrategia?: string;
+  perfil?: PerfilRival;
 }

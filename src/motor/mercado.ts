@@ -1,76 +1,118 @@
-// Mercado: comprar héroes de otros gremios (pagando su cláusula) y vender los tuyos al instante.
+// Mercado de héroes (biblia, sección 7) y reclutamiento básico (sección 4).
+// Precios, frecuencia de ofertas y reclutamiento fuera de la Prueba están [Abierto]: versión provisional.
 
 import balance from '../datos/balance.json';
 import type { Azar } from './azar';
-import { gremio, heroe as obtenerHeroe, jugador, registrar, salariosDe, type EstadoJuego } from './estado';
-import { valorMercado } from './heroes';
-import { contextoGremio, interes } from './ia';
-import { puntuacionOferta } from './pujas';
-import { dueñoRival, pagarClausula } from './traspasos';
-import { aplicarPerdida } from './vinculos';
+import { dueño, gremio, heroe as obtenerHeroe, jugador, nuevoId, registrar, type EstadoJuego } from './estado';
+import { generarHeroe, valor } from './heroes';
+import { plazasLibres } from './instalaciones';
+import { comprador } from './rivales';
+import type { Letra } from './tipos';
 
-/** Oro que se puede gastar sin quedarse sin sueldos: el oro menos los salarios de una semana. */
-export function oroLibre(estado: EstadoJuego): number {
-  return Math.max(0, jugador(estado).oro - salariosDe(estado, estado.jugadorId));
+const V = balance.valor;
+
+function redondear(n: number): number {
+  return Math.round(n / 50) * 50;
 }
 
-export interface Compra {
+export interface Condiciones {
   precio: number;
-  /** Por qué no se puede comprar, o null si se puede. */
+  /** Por qué no se puede hacer ahora, o null si se puede. */
   bloqueo: string | null;
 }
 
-/** Precio y condiciones para comprar un héroe de otro gremio. */
-export function condicionesCompra(estado: EstadoJuego, heroeId: string): Compra {
+export function precioCompra(estado: EstadoJuego, heroeId: string): number {
+  return redondear(valor(obtenerHeroe(estado, heroeId)) * V.factorCompra);
+}
+
+/** Comprar un héroe de otro gremio. */
+export function condicionesCompra(estado: EstadoJuego, heroeId: string): Condiciones {
+  const precio = precioCompra(estado, heroeId);
+  const g = dueño(estado, heroeId);
   const h = obtenerHeroe(estado, heroeId);
-  const precio = h.contrato?.clausula ?? Math.round(valorMercado(h) * 1.5);
-  const j = jugador(estado);
-  if (!dueñoRival(estado, heroeId)) return { precio, bloqueo: 'No es de otro gremio' };
-  if (j.plantilla.length >= j.plantillaMax) return { precio, bloqueo: 'No te quedan plazas: mejora la sede' };
-  if (precio > oroLibre(estado)) return { precio, bloqueo: 'No tienes oro suficiente' };
-  const p = puntuacionOferta(precio, valorMercado(h), contextoGremio(estado, j.id, h), h.rasgos);
-  if (!p.elegible || p.total < balance.traspasos.puntuacionMinimaClausula) return { precio, bloqueo: 'No quiere venir a tu gremio' };
+  if (!g || g.esJugador) return { precio, bloqueo: 'No es de otro gremio' };
+  if (g.perfil && !g.perfil.vende) return { precio, bloqueo: `${g.nombre} no vende a los suyos` };
+  if (h.estado === 'en mision') return { precio, bloqueo: 'Está de misión' };
+  if (plazasLibres(estado, estado.jugadorId) <= 0) return { precio, bloqueo: 'No te quedan plazas: mejora la sede' };
+  if (jugador(estado).oro < precio) return { precio, bloqueo: 'No tienes oro suficiente' };
   return { precio, bloqueo: null };
 }
 
 export function comprar(estado: EstadoJuego, heroeId: string): void {
   const c = condicionesCompra(estado, heroeId);
   if (c.bloqueo) throw new Error(c.bloqueo);
-  pagarClausula(estado, heroeId);
+  const vendedor = dueño(estado, heroeId)!;
+  const j = jugador(estado);
+  const h = obtenerHeroe(estado, heroeId);
+  vendedor.plantilla = vendedor.plantilla.filter((id) => id !== heroeId);
+  j.plantilla.push(heroeId);
+  vendedor.oro += c.precio;
+  j.oro -= c.precio;
+  registrar(estado, 'fichaje', `Compras a ${h.nombre} a ${vendedor.nombre} por ${c.precio} de oro.`);
 }
 
-export interface Venta {
+export interface Oferta {
   compradorId: string;
   precio: number;
 }
 
-/** Mejor oferta inmediata de los rivales por un héroe del jugador, o null si nadie lo quiere. */
-export function ofertaVenta(estado: EstadoJuego, heroeId: string): Venta | null {
-  if (heroeId === 'h_000_elara') return null;
+/** Mejor oferta inmediata de los rivales por un héroe del jugador, o null si nadie lo quiere ahora. */
+export function ofertaVenta(estado: EstadoJuego, heroeId: string): Oferta | null {
   const h = obtenerHeroe(estado, heroeId);
-  if (h.estado === 'en mision') return null;
-  const precio = Math.round(valorMercado(h) * balance.venta.factorPrecio);
-  const compradores = Object.values(estado.gremios)
-    .filter((g) => !g.esJugador && g.plantilla.length < g.plantillaMax && g.oro >= precio)
-    .sort((a, b) => interes(estado, b.id, h) - interes(estado, a.id, h) || b.oro - a.oro);
-  const comprador = compradores[0];
-  return comprador ? { compradorId: comprador.id, precio } : null;
+  if (!jugador(estado).plantilla.includes(heroeId) || h.estado === 'en mision') return null;
+  const precio = redondear(valor(h) * V.factorVenta);
+  const g = comprador(estado, h, precio);
+  return g ? { compradorId: g.id, precio } : null;
 }
 
-/** Vende al instante. Devuelve los ids de héroes que abandonan el gremio por perder un vínculo. */
-export function vender(estado: EstadoJuego, azar: Azar, heroeId: string): string[] {
+export function vender(estado: EstadoJuego, heroeId: string): Oferta {
   const oferta = ofertaVenta(estado, heroeId);
   if (!oferta) throw new Error('Nadie quiere comprar a este héroe ahora');
-  const h = obtenerHeroe(estado, heroeId);
   const j = jugador(estado);
-  const comprador = gremio(estado, oferta.compradorId);
-  const abandonan = aplicarPerdida(estado, azar, h, j.id, 'venta');
-  j.plantilla = j.plantilla.filter((id) => id !== h.id);
-  comprador.plantilla.push(h.id);
+  const g = gremio(estado, oferta.compradorId);
+  const h = obtenerHeroe(estado, heroeId);
+  j.plantilla = j.plantilla.filter((id) => id !== heroeId);
+  g.plantilla.push(heroeId);
   j.oro += oferta.precio;
-  comprador.oro -= oferta.precio;
-  h.contrato = { gremio: comprador.id, salario: h.contrato?.salario ?? 0, temporadasRestantes: 2, clausula: Math.round(valorMercado(h) * 1.5) };
-  h.estado = h.estado === 'luto' ? 'disponible' : h.estado;
-  registrar(estado, 'venta', `${h.nombre} se va a ${comprador.nombre} por ${oferta.precio} de oro.`);
-  return abandonan;
+  g.oro -= oferta.precio;
+  registrar(estado, 'venta', `${h.nombre} se va a ${g.nombre} por ${oferta.precio} de oro.`);
+  return oferta;
+}
+
+// ---------------------------------------------------------------------------
+// Reclutamiento básico
+// ---------------------------------------------------------------------------
+
+/** Candidatos modestos que se pueden reclutar esta semana. Sustituye a los de la semana anterior. */
+export function generarReclutas(estado: EstadoJuego, azar: Azar): void {
+  const r = balance.reclutas;
+  for (const id of estado.reclutas) delete estado.heroes[id];
+  estado.reclutas = [];
+  for (let i = 0; i < r.porSemana; i++) {
+    const h = generarHeroe(azar, nuevoId(estado, 'h'), { poder: r.poder as [number, number], potencial: r.potencial as Letra[] });
+    estado.heroes[h.id] = h;
+    estado.reclutas.push(h.id);
+  }
+}
+
+export function costeRecluta(estado: EstadoJuego, heroeId: string): number {
+  return redondear(valor(obtenerHeroe(estado, heroeId)) * balance.reclutas.factorCoste);
+}
+
+export function condicionesRecluta(estado: EstadoJuego, heroeId: string): Condiciones {
+  const precio = costeRecluta(estado, heroeId);
+  if (!estado.reclutas.includes(heroeId)) return { precio, bloqueo: 'Ya no está disponible' };
+  if (plazasLibres(estado, estado.jugadorId) <= 0) return { precio, bloqueo: 'No te quedan plazas: mejora la sede' };
+  if (jugador(estado).oro < precio) return { precio, bloqueo: 'No tienes oro suficiente' };
+  return { precio, bloqueo: null };
+}
+
+export function reclutar(estado: EstadoJuego, heroeId: string): void {
+  const c = condicionesRecluta(estado, heroeId);
+  if (c.bloqueo) throw new Error(c.bloqueo);
+  const j = jugador(estado);
+  j.oro -= c.precio;
+  j.plantilla.push(heroeId);
+  estado.reclutas = estado.reclutas.filter((id) => id !== heroeId);
+  registrar(estado, 'fichaje', `Reclutas a ${obtenerHeroe(estado, heroeId).nombre} por ${c.precio} de oro.`);
 }

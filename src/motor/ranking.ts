@@ -1,36 +1,42 @@
-// Puntos de Gremio y clasificación (sección 11).
+// Ranking y puntos de gremio (biblia, sección 6): Puntos = Fuerza + Prestigio.
 
 import balance from '../datos/balance.json';
-import type { Gremio, Rango } from './tipos';
+import { heroesDe, type EstadoJuego, type FilaRanking } from './estado';
+import type { Gremio } from './tipos';
 
-export function puntosMision(rango: Rango): number {
-  return balance.misiones[rango].puntos;
+const R = balance.ranking;
+
+/** Fuerza: suma del poder de los 5 mejores héroes. El banquillo no resta. */
+export function fuerza(estado: EstadoJuego, gremioId: string): number {
+  return heroesDe(estado, gremioId)
+    .map((h) => h.poder)
+    .sort((a, b) => b - a)
+    .slice(0, R.heroesFuerza)
+    .reduce((t, p) => t + p, 0);
 }
 
-/** Prestigio ganado (o perdido) desde el inicio de la temporada. */
-export function prestigioGanado(gremio: Gremio): number {
-  return gremio.prestigio - (gremio.prestigioInicioTemporada ?? gremio.prestigio);
+/** Prestigio: nivel de instalaciones + misiones de rango alto completadas + novatos destacados fichados. */
+export function prestigio(g: Gremio): number {
+  return (
+    R.prestigioPorNivelInstalacion * (g.nivelSede + g.nivelOjeadores) +
+    R.prestigioPorMisionAlta * g.misionesAltas +
+    R.prestigioPorNovatoDestacado * g.novatosDestacados
+  );
 }
 
-/**
- * Puntos de Gremio de la temporada en curso: cada temporada es una carrera nueva.
- * Puntos = 3 × prestigio ganado en la temporada + puntos de misión de la temporada.
- */
-export function puntosGremio(gremio: Gremio): number {
-  const r = balance.ranking;
-  return r.pesoPrestigioGanado * prestigioGanado(gremio) + r.pesoReputacion * gremio.reputacion + gremio.puntosMisionTemporada;
+/** Clasificación con los valores de ahora (el ranking oficial solo se guarda el día 7). */
+export function calcularRanking(estado: EstadoJuego): FilaRanking[] {
+  return Object.values(estado.gremios)
+    .map((g) => {
+      const f = fuerza(estado, g.id);
+      const p = prestigio(g);
+      return { gremioId: g.id, fuerza: f, prestigio: p, puntos: f + p, puesto: 0 };
+    })
+    .sort((a, b) => b.puntos - a.puntos || b.fuerza - a.fuerza)
+    .map((fila, i) => ({ ...fila, puesto: i + 1 }));
 }
 
-export interface FilaClasificacion {
-  puesto: number;
-  gremioId: string;
-  nombre: string;
-  puntos: number;
-}
-
-/** Ordena por Puntos de Gremio; en empate, más prestigio total va antes. */
-export function clasificacion(gremios: readonly Gremio[]): FilaClasificacion[] {
-  return [...gremios]
-    .sort((a, b) => puntosGremio(b) - puntosGremio(a) || b.prestigio - a.prestigio)
-    .map((g, i) => ({ puesto: i + 1, gremioId: g.id, nombre: g.nombre, puntos: puntosGremio(g) }));
+/** Premio en oro al cerrar la temporada según la posición. */
+export function premioTemporada(puesto: number): number {
+  return balance.temporada.premios[puesto - 1] ?? 0;
 }

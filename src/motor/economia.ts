@@ -1,63 +1,36 @@
-// Economía semanal: patrocinio, gastos, deuda y quiebra (sección 10).
+// Economía (biblia, sección 4): sueldos semanales pagados el día 7, antes de la Prueba de los Novatos.
 
 import balance from '../datos/balance.json';
-import type { Gremio } from './tipos';
+import { gremio, heroesDe, registrar, type EstadoJuego } from './estado';
+import { sueldo } from './heroes';
 
-const E = balance.economia;
-
-export function patrocinio(prestigio: number, reputacion: number): number {
-  return Math.round(E.patrocinioPorPrestigio * prestigio + E.patrocinioPorReputacion * reputacion);
+export function sueldosDe(estado: EstadoJuego, gremioId: string): number {
+  return heroesDe(estado, gremioId).reduce((t, h) => t + sueldo(h), 0);
 }
 
-export interface Gastos {
-  licencia: number;
-  mantenimiento: number;
-  cuotaDeuda: number;
-  salarios: number;
-  /** Comida y equipo de los héroes. */
-  manutencion: number;
+export interface PagoSueldos {
   total: number;
-}
-
-export function gastosSemanales(gremio: Gremio, salarios: number, manutencion = 0): Gastos {
-  const mantenimiento = E.mantenimiento + E.mantenimientoPorMejora * gremio.mejoras.length;
-  const cuotaDeuda = Math.min(E.cuotaDeuda, gremio.deuda);
-  const total = E.licencia + mantenimiento + cuotaDeuda + salarios + manutencion;
-  return { licencia: E.licencia, mantenimiento, cuotaDeuda, salarios, manutencion, total };
-}
-
-export interface ResultadoCierre {
-  ingresoPatrocinio: number;
-  gastos: Gastos;
-  oroFinal: number;
-  aviso: boolean;
-  quiebra: boolean;
+  /** false si no había oro suficiente. */
+  completo: boolean;
 }
 
 /**
- * Cierre semanal (fase 5 del bucle). Orden:
- * 1. patrocinio con el prestigio actual (ya incluye lo ganado en misiones esta semana);
- * 2. gastos fijos, cuota de deuda, salarios y manutención de los héroes;
- * 3. control de quiebra (3 cierres seguidos con oro negativo);
- * 4. decaimiento de prestigio si no hubo ninguna misión con éxito esta semana.
- * Modifica el gremio y devuelve el resumen.
+ * Paga los sueldos de la semana. Si no hay oro suficiente, el oro queda en negativo y cada héroe pierde
+ * lealtad. Consecuencia provisional: la biblia la deja [Abierto] (ver docs/preguntas.md).
  */
-export function cierreSemanal(gremio: Gremio, salarios: number, huboExito: boolean, manutencion = 0): ResultadoCierre {
-  const ingresoPatrocinio = patrocinio(gremio.prestigio, gremio.reputacion);
-  const gastos = gastosSemanales(gremio, salarios, manutencion);
-
-  gremio.oro += ingresoPatrocinio - gastos.total;
-  gremio.deuda -= gastos.cuotaDeuda;
-
-  const aviso = gremio.oro < 0;
-  gremio.cierresNegativos = aviso ? gremio.cierresNegativos + 1 : 0;
-  const quiebra = gremio.cierresNegativos >= E.cierresNegativosParaQuiebra;
-
-  if (!huboExito) gremio.prestigio = Math.max(0, gremio.prestigio - E.decaimientoPrestigio);
-
-  return { ingresoPatrocinio, gastos, oroFinal: gremio.oro, aviso, quiebra };
+export function pagarSueldos(estado: EstadoJuego, gremioId: string): PagoSueldos {
+  const g = gremio(estado, gremioId);
+  const total = sueldosDe(estado, gremioId);
+  const completo = g.oro >= total;
+  g.oro -= total;
+  if (!completo) {
+    for (const h of heroesDe(estado, gremioId)) h.lealtad = Math.max(0, h.lealtad - balance.sueldos.lealtadSiNoCobra);
+    if (g.esJugador) registrar(estado, 'sueldos', `No llega el oro para los sueldos (${total}). Tus héroes cobran tarde y pierden lealtad.`);
+  }
+  return { total, completo };
 }
 
-export function premioFinTemporada(puesto: number): number {
-  return E.premios[puesto - 1] ?? 0;
+/** Oro que se puede gastar sin dejar de cubrir los próximos sueldos. */
+export function oroLibre(estado: EstadoJuego, gremioId: string): number {
+  return Math.max(0, gremio(estado, gremioId).oro - sueldosDe(estado, gremioId));
 }

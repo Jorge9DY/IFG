@@ -134,25 +134,25 @@ export function iniciarSede(canvas: HTMLCanvasElement, eventos: EventosSede): ()
   };
 
   caja('#e9e4d6', [2.2, 1.6, 0.2], -3, -5.75); // tablón de anuncios
-  punto('tablon', 'Tablón de anuncios', 'Lanzar misión', -3, -5.2);
+  punto('tablon', 'Tablón de misiones', 'Lanzar misiones', -3, -5.2);
   caja('#3b3e41', [3.5, 1, 0.9], 0, 3.2); // mostrador
-  punto('mostrador', 'Mostrador', 'Abrir mercado', 0, 2.2);
+  punto('mostrador', 'Mostrador', 'Mercado de héroes', 0, 2.2);
   caja('#3b3f3d', [1.8, 1.4, 0.8], 5.5, -5.4); // chimenea
-  const elara = new THREE.Mesh(
+  const recepcionista = new THREE.Mesh(
     new THREE.CapsuleGeometry(0.32, 1, 4, 12),
     toon('#f2a33a'),
   );
-  elara.position.set(4.2, 0.82, -4.2);
-  elara.castShadow = true;
-  contorno(elara, 0.08);
-  escena.add(elara);
+  recepcionista.position.set(4.2, 0.82, -4.2);
+  recepcionista.castShadow = true;
+  contorno(recepcionista, 0.08);
+  escena.add(recepcionista);
   obstaculos.push({ min: new THREE.Vector2(3.85, -4.55), max: new THREE.Vector2(4.55, -3.85) });
-  punto('elara', 'Elara', 'Gestionar gremio', 4.2, -3.4);
+  punto('recepcion', 'Recepción', 'Reclutar héroes', 4.2, -3.4);
   caja('#2b2b2b', [0.2, 2.2, 1.4], -7.75, -2); // puerta de los dormitorios
   punto('dormitorios', 'Dormitorios', 'Ver tus héroes', -7, -2);
   caja('#4e6b5a', [0.2, 1.4, 1.8], 7.75, 1); // pizarra de la Asociación
   punto('pizarra', 'Pizarra de la Asociación', 'Ver clasificación', 7, 1);
-  punto('puerta', 'Puerta de la sede', 'Terminar día', 0, 5.4);
+  punto('puerta', 'Puerta de la sede', 'Finalizar día', 0, 5.4);
   caja('#9aa5a0', [1.6, 0.8, 1.6], -4, 1.5); // mesa vacía
   caja('#9aa5a0', [1.6, 0.8, 1.6], 3.5, 0); // mesa vacía
 

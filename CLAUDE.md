@@ -1,6 +1,6 @@
-# Instrucciones para Claude — Gremio Rango D
+# Instrucciones para Claude — Gremio de héroes
 
-Juego de gestión isekai en el navegador (TypeScript + Three.js + Vite). Lee primero `docs/plan-de-desarrollo.md` y, cuando haga falta, `docs/diseno-del-juego.md`. Todo el texto del juego, los comentarios y los documentos están en español.
+Juego de gestión isekai en el navegador (TypeScript + Three.js + Vite). La fuente única de verdad del diseño es `docs/biblia.md`: si algo no está ahí, no está decidido. Lee también `docs/plan-de-desarrollo.md`. El diseño anterior (`docs/archivo/`) es solo referencia histórica. Todo el texto del juego, los comentarios y los documentos están en español.
 
 ## Seguridad: el repositorio es PÚBLICO
 
@@ -16,7 +16,7 @@ Todo lo que se sube a este repositorio (archivos, commits, mensajes de commit, r
 
 ## Diseño de la experiencia
 
-- La esencia del juego: tienes oro, ¿cómo lo gestionas para hacer más fuerte a tu gremio? Ganar (misiones, vender), gastar en héroes (Prueba de Novatos, comprar) o gastar en el gremio (mejorar la sede). La interfaz debe ser tan sencilla como un juego infantil. No añadas sistemas ni botones nuevos sin que el propietario lo pida (ver la sección 0 del diseño).
+- La esencia del juego: tienes oro, ¿cómo lo gestionas para hacer más fuerte a tu gremio? Ganar (misiones, vender), gastar en héroes (Prueba de Novatos, comprar) o gastar en el gremio (mejorar la sede). La interfaz debe ser tan sencilla como un juego infantil. No añadas sistemas ni botones nuevos sin que el propietario lo pida (pilares de diseño y sección 3 de la biblia).
 - El juego debe ser intuitivo y fácil de usar, al estilo Nintendo, sin perder profundidad: cada pantalla propone una opción razonable por defecto (equipo recomendado, ofertas sugeridas, objetivo del momento) y deja el detalle plegado para quien lo quiera.
 - Disposición fija: fondo negro, la habitación del gremio pequeña en el centro, menús a los lados. Estética táctica sobria: grises, líneas finas, cajas translúcidas y acentos cian, oliva y naranja.
 
@@ -50,7 +50,7 @@ Cuando trabajes sin supervisión (por ejemplo, desde una tarea programada):
 4. Impleméntala con sus tests. Mantén los cambios pequeños y coherentes con el estilo existente.
 5. Ejecuta `npm run typecheck`, `npm test` y `npm run build`. Si algo falla y no lo puedes arreglar, deshaz tus cambios y anota el problema en la bitácora; nunca subas código roto.
 6. Si tocas el balance, ejecuta el simulador y actualiza `docs/informe-balance.md`.
-7. Marca la casilla en el plan, actualiza el diseño si cambió alguna regla o cifra y añade una entrada al principio de `docs/bitacora.md` (fecha, qué hiciste, qué queda, problemas).
+7. Marca la casilla en el plan, actualiza la biblia (y su registro de cambios) solo si el propietario cambió una decisión y añade una entrada al principio de `docs/bitacora.md` (fecha, qué hiciste, qué queda, problemas).
 8. Revisa `git diff --staged` según la sección de seguridad. Commit en español, descriptivo, y `git push origin main`.
 9. Si la interfaz o la escena 3D cambiaron, comprueba con Playwright que la página carga sin errores en la consola.
 
@@ -58,6 +58,6 @@ Límites:
 
 - Una tarea del plan por ejecución (o varias pequeñas relacionadas).
 - No borres historial, ramas ni archivos del propietario; no hagas `push --force`.
-- No cambies las decisiones de `docs/diseno-del-juego.md` ("Decisiones tomadas") ni las del informe de balance marcadas como pendientes sin respuesta en `docs/preguntas.md`.
+- No cambies las decisiones marcadas **[Aceptado]** en `docs/biblia.md`, ni implementes lo **[Abierto]** sin anotarlo antes en `docs/preguntas.md`. Lo provisional se marca como tal en el código y en los datos.
 - Assets de terceros solo con licencia CC0 o compatible, anotados en `assets/CREDITOS.md`.
 - Nada de secretos, claves ni datos personales en el repositorio.
