@@ -28,12 +28,6 @@ Con un juego sensato hay unas 0,4–0,6 muertes por temporada. ¿Está bien así
 
 Respuesta:
 
-## 4. ¿Dónde publicamos el juego?
+## 4. ¿Dónde publicamos el juego? — RESUELTA
 
-GitHub Pages solo es gratis en repositorios públicos. Opciones:
-
-- A. Netlify o Cloudflare Pages: gratis con el repositorio privado. El propietario conecta su cuenta de GitHub una vez desde la web del servicio; después se publica solo en cada push a `main` (comando `npm run build`, carpeta `dist`). **Recomendada.**
-- B. Hacer público el repositorio y usar GitHub Pages.
-- C. No publicar por ahora: se juega en local con `npm run dev`.
-
-Respuesta:
+Respuesta: el repositorio es público y se publica en GitHub Pages. Al ser público, no se sube ningún dato sensible (ver la sección de seguridad de `CLAUDE.md`).

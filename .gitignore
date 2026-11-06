@@ -5,3 +5,15 @@ coverage/
 *.log
 .env
 herramientas/simulador/informes/
+
+# Nunca subir credenciales ni datos locales
+.env*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+.npmrc
+secrets/

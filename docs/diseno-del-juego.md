@@ -1,6 +1,6 @@
 # Gremio Rango D — Documento de Diseño
 
-Versión 1.1 · 6 de noviembre de 2026 · Este archivo es la versión de referencia · Fuente editable: [Claude Docs](https://claude.ai/artifact/FPcWSW7QnHpzhKs6YmdMyn)
+Versión 1.1 · 6 de noviembre de 2026 · Este archivo es la versión de referencia
 
 ## 1. Visión y pitch
 

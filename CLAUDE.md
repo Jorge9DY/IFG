@@ -2,6 +2,18 @@
 
 Juego de gestión isekai en el navegador (TypeScript + Three.js + Vite). Lee primero `docs/plan-de-desarrollo.md` y, cuando haga falta, `docs/diseno-del-juego.md`. Todo el texto del juego, los comentarios y los documentos están en español.
 
+## Seguridad: el repositorio es PÚBLICO
+
+Todo lo que se sube a este repositorio (archivos, commits, mensajes de commit, ramas, historial) es visible para cualquiera y no se puede borrar del todo. Por eso:
+
+- Nunca subas contraseñas, claves de API, tokens, certificados, archivos `.env`, cookies ni credenciales de ningún tipo, ni siquiera de prueba o caducadas.
+- Nunca incluyas datos personales del propietario: nombre real, emails, teléfonos, direcciones, ubicación, cuentas, capturas de su escritorio, rutas de su ordenador ni identificadores de cuentas o sesiones.
+- No pongas enlaces a sesiones, documentos o artefactos privados de claude.ai ni de otros servicios del propietario, ni en archivos ni en mensajes de commit. Los commits llevan solo `Co-Authored-By: Claude <noreply@anthropic.com>`, sin enlace de sesión.
+- Autor de los commits: `Claude <noreply@anthropic.com>`.
+- Si un servicio necesita una clave, no la pidas por el chat ni la escribas en el código: anótalo en `docs/preguntas.md` y que el propietario la configure como secreto fuera del repositorio.
+- Antes de cada commit revisa `git diff --staged` buscando cualquiera de lo anterior. CI ejecuta además un escáner de secretos (gitleaks); si falla, no se sube nada hasta corregirlo.
+- Si descubres que se subió algo sensible, no intentes taparlo con otro commit: avisa en `docs/preguntas.md` y en el resumen para que el propietario lo revoque.
+
 ## Arquitectura (no romperla)
 
 - `src/motor/`: reglas puras. No importa nada de `src/ui/`, `src/escena3d/` ni del navegador (ni `window` ni `document`).
@@ -33,7 +45,7 @@ Cuando trabajes sin supervisión (por ejemplo, desde una tarea programada):
 5. Ejecuta `npm run typecheck`, `npm test` y `npm run build`. Si algo falla y no lo puedes arreglar, deshaz tus cambios y anota el problema en la bitácora; nunca subas código roto.
 6. Si tocas el balance, ejecuta el simulador y actualiza `docs/informe-balance.md`.
 7. Marca la casilla en el plan, actualiza el diseño si cambió alguna regla o cifra y añade una entrada al principio de `docs/bitacora.md` (fecha, qué hiciste, qué queda, problemas).
-8. Commit en español, descriptivo, y `git push origin main`.
+8. Revisa `git diff --staged` según la sección de seguridad. Commit en español, descriptivo, y `git push origin main`.
 9. Si la interfaz o la escena 3D cambiaron, comprueba con Playwright que la página carga sin errores en la consola.
 
 Límites:

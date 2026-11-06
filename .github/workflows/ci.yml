@@ -6,6 +6,17 @@ on:
   pull_request:
 
 jobs:
+  secretos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Buscar secretos en el código y el historial
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   comprobar:
     runs-on: ubuntu-latest
     steps:

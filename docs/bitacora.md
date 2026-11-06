@@ -2,6 +2,12 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Repositorio público
+
+- El repositorio pasa a ser público. Revisado el historial: sin claves, contraseñas ni emails personales.
+- Nuevas reglas de seguridad en `CLAUDE.md`, `.gitignore` reforzado y escáner de secretos (gitleaks) en CI.
+- Vuelve la publicación en GitHub Pages.
+
 ## 2026-11-06 — Publicación
 
 - Eliminado el flujo de GitHub Pages: no es gratis en repositorios privados. El build usa rutas relativas y sirve para cualquier hosting estático. Pendiente de decidir dónde publicar (pregunta 4).
