@@ -77,13 +77,21 @@ export function interes(estado: EstadoJuego, gremioId: string, heroe: Heroe): nu
 }
 
 /** Crea el pujador de un rival: sube un 15% por ronda si va perdiendo, sin pasar del 40% de su oro. */
-export function pujadorIA(estado: EstadoJuego, azar: Azar, gremioId: string, heroe: Heroe, bonusExtra = 0): Pujador {
+export function pujadorIA(
+  estado: EstadoJuego,
+  azar: Azar,
+  gremioId: string,
+  heroe: Heroe,
+  bonusExtra = 0,
+  /** Prima mínima de la primera ronda (espionaje de los Tejedores). */
+  primaMinima = 0,
+): Pujador {
   const p = perfil(gremioId);
   const g = gremio(estado, gremioId);
   const valor = valorMercado(heroe);
   const salario = salarioPedido(heroe.rango);
   const tope = Math.max(0, g.oro * 0.4);
-  let prima = Math.min(tope, valor * (0.6 + azar.siguiente() * 0.4) * p.agresividad);
+  let prima = Math.min(tope, Math.max(primaMinima, valor * (0.6 + azar.siguiente() * 0.4) * p.agresividad));
   const contexto = contextoGremio(estado, gremioId, heroe, bonusExtra);
   return {
     contexto,

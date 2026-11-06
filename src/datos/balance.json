@@ -330,5 +330,17 @@
   "temporada": {
     "semanas": 20,
     "misionesParaDespertarI": 5
+  },
+  "sabotajes": {
+    "vetoDuque": 15,
+    "rangoMinimoVeto": "B",
+    "primaEspionaje": 1.05,
+    "probRumor": 10,
+    "rumorReputacion": 5,
+    "reputacionDescubre": 70,
+    "probRoboMision": 15,
+    "semanaOfertaCorona": 10,
+    "ofertaCoronaFactor": 1.3,
+    "semanaInicioSabotajes": 5
   }
 }

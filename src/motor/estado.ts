@@ -11,6 +11,8 @@ export interface MisionEnCurso {
   equipo: { heroeId: string; posicion: Posicion }[];
   /** Semana en cuyo cierre se resuelve. */
   semanaFin: number;
+  /** Semana en que se envió (las partidas antiguas no lo tienen). */
+  semanaInicio?: number;
 }
 
 export interface EntradaMercado {
@@ -35,7 +37,7 @@ export interface OfertaCompra {
 
 export interface Evento {
   semana: number;
-  tipo: 'mision' | 'fichaje' | 'venta' | 'muerte' | 'abandono' | 'despertar' | 'economia' | 'rival' | 'temporada';
+  tipo: 'mision' | 'fichaje' | 'venta' | 'muerte' | 'abandono' | 'despertar' | 'economia' | 'rival' | 'sabotaje' | 'temporada';
   texto: string;
 }
 
@@ -63,6 +65,13 @@ export interface EstadoJuego {
   registro: Evento[];
   fin: FinPartida;
   contadorIds: number;
+  /** Acciones especiales de los rivales ya usadas esta temporada. */
+  accionesTemporada?: AccionesTemporada;
+}
+
+export interface AccionesTemporada {
+  vetoUsado: boolean;
+  ofertaCoronaHecha: boolean;
 }
 
 export function jugador(estado: EstadoJuego): Gremio {

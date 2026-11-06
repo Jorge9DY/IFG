@@ -23,6 +23,7 @@ import { cierreIA, contextoGremio, pujadorIA, rivalesInteresados, turnoMisionesI
 import { resolverMision, type InformeMision, type MiembroEquipo } from './misiones';
 import { ofertaTotal, resolverSubasta, type Oferta, type Pujador, type ResultadoSubasta } from './pujas';
 import { puntosMision } from './ranking';
+import { ofertaAnualCorona, pujadoresRivales, reiniciarAccionesTemporada, sabotajesColmillo } from './rivales';
 import { generarOfertas, liberarHeroe } from './ventas';
 import { aplicarPerdida, cambiarMoral, derivaMoral, sumarAfinidadEquipo } from './vinculos';
 import {
@@ -222,7 +223,7 @@ export function pujarPorHeroe(estado: EstadoJuego, heroeId: string, ofertas: Ofe
         contexto: contextoGremio(estado, estado.jugadorId, h),
         pujar: (ronda) => ofertas[Math.min(ronda, ofertas.length) - 1] ?? null,
       },
-      ...rivalesInteresados(estado, azar, h, entrada.draft).map((id) => pujadorIA(estado, azar, id, h)),
+      ...pujadoresRivales(estado, azar, h, rivalesInteresados(estado, azar, h, entrada.draft), ofertas[0]),
     ];
     const subasta = resolverSubasta(valorMercado(h), h.rasgos, pujadores);
     if (subasta.ganador && subasta.oferta) firmar(estado, h, subasta.ganador, subasta.oferta);
@@ -269,7 +270,13 @@ export function enviarMision(estado: EstadoJuego, misionId: string, equipo: Plaz
   if (new Set(equipo.map((p) => p.heroeId)).size !== equipo.length) throw new Error('Héroe repetido en el equipo');
   for (const plaza of equipo) obtenerHeroe(estado, plaza.heroeId).estado = 'en mision';
   estado.tablon = estado.tablon.filter((m) => m.id !== misionId);
-  estado.enCurso.push({ mision, gremioId: j.id, equipo, semanaFin: estado.partida.semana + mision.duracion - 1 });
+  estado.enCurso.push({
+    mision,
+    gremioId: j.id,
+    equipo,
+    semanaInicio: estado.partida.semana,
+    semanaFin: estado.partida.semana + mision.duracion - 1,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -286,9 +293,13 @@ export interface ResumenSemana {
 export function terminarSemana(estado: EstadoJuego): ResumenSemana {
   if (estado.fin) throw new Error('La partida ha terminado');
   const semana = estado.partida.semana;
-  estado.registro = [];
+  // Se conservan los sucesos de esta semana (fichajes, pujas) para el informe del cierre.
+  estado.registro = estado.registro.filter((e) => e.semana === semana);
   return conAzar(estado, (azar) => {
     const j = jugador(estado);
+
+    // 0. Sabotajes del Colmillo Carmesí (rumores, robo de misiones recién enviadas).
+    sabotajesColmillo(estado, azar);
 
     // 1. Misiones del jugador que terminan esta semana.
     const informes = resolverMisionesDelJugador(estado, azar);
@@ -332,6 +343,7 @@ export function terminarSemana(estado: EstadoJuego): ResumenSemana {
 
     // 6. Mercado: ofertas por tus héroes en venta y nuevos agentes libres.
     generarOfertas(estado, azar);
+    ofertaAnualCorona(estado);
     renovarMercado(estado, azar);
 
     // 7. Avance del calendario.
@@ -446,6 +458,7 @@ function renovarMercado(estado: EstadoJuego, azar: Azar): void {
 }
 
 function cerrarTemporada(estado: EstadoJuego): void {
+  reiniciarAccionesTemporada(estado);
   for (const fila of tabla(estado)) {
     const g = gremio(estado, fila.gremioId);
     g.oro += premioFinTemporada(fila.puesto);
