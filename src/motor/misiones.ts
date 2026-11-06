@@ -5,7 +5,6 @@ import type { Azar } from './azar';
 import {
   indiceRango,
   type Clase,
-  type Elemento,
   type Heroe,
   type Mision,
   type Posicion,
@@ -41,26 +40,6 @@ export function multiplicadorMoral(moral: number): number {
   return M.moralBase + M.moralPorPunto * moral;
 }
 
-const CICLO: Partial<Record<Elemento, Elemento>> = {
-  Fuego: 'Viento',
-  Viento: 'Tierra',
-  Tierra: 'Agua',
-  Agua: 'Fuego',
-  Luz: 'Sombra',
-  Sombra: 'Luz',
-};
-
-/** true si el elemento `a` vence al elemento `b`. */
-export function vence(a: Elemento, b: Elemento): boolean {
-  return CICLO[a] === b;
-}
-
-export function multiplicadorElemento(heroe: Elemento, enemigo: Elemento): number {
-  if (vence(heroe, enemigo)) return M.elementoFavorable;
-  if (vence(enemigo, heroe)) return M.elementoDesfavorable;
-  return 1;
-}
-
 /** Suma de bonus de vínculos del héroe con otros miembros del mismo equipo (0,10 = +10%). */
 export function bonusVinculos(heroe: Heroe, equipo: readonly MiembroEquipo[]): number {
   const ids = new Set(equipo.map((m) => m.heroe.id));
@@ -80,18 +59,9 @@ function tieneVinculoPositivoEnEquipo(heroe: Heroe, equipo: readonly MiembroEqui
 }
 
 /** Aportación de un héroe al Poder de Equipo (PE). */
-export function aportacion(
-  miembro: MiembroEquipo,
-  equipo: readonly MiembroEquipo[],
-  elementoEnemigo: Elemento,
-): number {
-  const { heroe, posicion } = miembro;
-  let valor =
-    sumaCombate(heroe) *
-    multiplicadorMoral(heroe.stats.moral) *
-    (POSICION_NATURAL[heroe.clase] === posicion ? 1 : M.fueraDePosicion) *
-    multiplicadorElemento(heroe.elemento, elementoEnemigo) *
-    (1 + bonusVinculos(heroe, equipo));
+export function aportacion(miembro: MiembroEquipo, equipo: readonly MiembroEquipo[]): number {
+  const { heroe } = miembro;
+  let valor = sumaCombate(heroe) * multiplicadorMoral(heroe.stats.moral) * (1 + bonusVinculos(heroe, equipo));
   if (heroe.estado === 'luto') valor *= M.luto;
   if (heroe.rasgos.includes('Temerario')) valor *= M.temerarioPoder;
   if (heroe.rasgos.includes('Leal') && tieneVinculoPositivoEnEquipo(heroe, equipo)) {
@@ -100,8 +70,8 @@ export function aportacion(
   return valor;
 }
 
-export function poderEquipo(equipo: readonly MiembroEquipo[], elementoEnemigo: Elemento): number {
-  return equipo.reduce((total, m) => total + aportacion(m, equipo, elementoEnemigo), 0);
+export function poderEquipo(equipo: readonly MiembroEquipo[]): number {
+  return equipo.reduce((total, m) => total + aportacion(m, equipo), 0);
 }
 
 /**
@@ -164,9 +134,8 @@ export function riesgoMuerte(
 
   if (heroe.rasgos.includes('Temerario')) riesgo += r.temerario;
   riesgo *= 1 - heroe.stats.defensa / 200;
-  const tanqueProtege = equipo.some(
-    (m) => m !== miembro && m.heroe.clase === 'Tanque' && m.posicion === 'vanguardia',
-  );
+  // Un Tanque en el equipo protege a sus compañeros.
+  const tanqueProtege = equipo.some((m) => m !== miembro && m.heroe.clase === 'Tanque');
   if (tanqueProtege) riesgo *= 1 - r.reduccionTanque;
   if (opciones.despertarII) riesgo *= 1 - r.reduccionDespertarII;
   if (opciones.enfermeria) riesgo *= 1 - r.reduccionEnfermeria;
@@ -209,7 +178,7 @@ export function resolverMision(
     throw new Error('Un equipo debe tener entre 3 y 5 héroes');
   }
   const h = balance.heridas;
-  const pe = poderEquipo(equipo, mision.elemento);
+  const pe = poderEquipo(equipo);
   const haySoporte = equipo.some((m) => m.heroe.clase === 'Soporte');
   const probabilidad = probabilidadExito(pe, mision.poderRecomendado, haySoporte);
   const tirada = azar.d100();
@@ -269,7 +238,7 @@ export function vistaPreviaMision(
   equipo: readonly MiembroEquipo[],
   opciones: OpcionesRiesgo = {},
 ): VistaPreviaMision {
-  const poder = poderEquipo(equipo, mision.elemento);
+  const poder = poderEquipo(equipo);
   const haySoporte = equipo.some((m) => m.heroe.clase === 'Soporte');
   return {
     poder,

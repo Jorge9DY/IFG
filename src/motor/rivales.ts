@@ -135,8 +135,7 @@ function soborno(estado: EstadoJuego, azar: Azar): void {
       h.id !== 'h_000_elara' &&
       h.rasgos.includes('Codicioso') &&
       h.estado !== 'en mision' &&
-      !sobornos.some((s) => s.heroeId === h.id) &&
-      !(estado.cesiones ?? []).some((c) => c.heroeId === h.id),
+      !sobornos.some((s) => s.heroeId === h.id),
   );
   if (candidatos.length === 0 || !azar.probabilidad(S.probSoborno)) return;
   const h = azar.elegir(candidatos);

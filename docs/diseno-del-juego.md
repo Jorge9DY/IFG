@@ -2,6 +2,21 @@
 
 Versión 1.1 · 6 de noviembre de 2026 · Este archivo es la versión de referencia
 
+## 0. Síntesis del gameplay (6 de noviembre de 2026)
+
+El juego se ha reducido a su esencia: **fichar con astucia, arriesgar a tus héroes y escalar contra gremios más fuertes.** Esta sección manda sobre el resto del documento cuando se contradicen.
+
+| Antes | Ahora | Por qué |
+| --- | --- | --- |
+| Tablón de 6–10 misiones por rango, de 1 a 4 semanas | **3 misiones por semana a tu medida** (4 con plantilla de 7 o más): **Segura** (~95%), **Justa** (~75%) y **Arriesgada** (~45%), calibradas con tus 4 mejores héroes. Todas duran 1 semana. A más riesgo, más oro (×1,05 / ×1,5 / ×2,6 del poder recomendado), prestigio y puntos | La decisión de riesgo es el centro de cada semana; ninguna semana queda sin decisión |
+| 6 elementos con ventajas en ciclo | Eliminados | Cálculo sin decisión real |
+| 3 posiciones con penalización fuera de sitio | Eliminadas: eliges quién va. Cada clase hace su papel sola (el Tanque protege al resto, el Sanador salva a uno, el Soporte da +10%) | Menos pasos, la misma decisión |
+| 4 stats visibles por héroe | Un único número de **Poder** (incluye la moral) y su papel | Se compara de un vistazo |
+| Cesiones de héroes | Eliminadas | Complejas y poco usadas; queda pagar la cláusula para robar fichajes |
+| Riesgo base de muerte 35/18/8% | 25/12/6% | Con misiones arriesgadas cada semana, las muertes siguen siendo raras (0,6 por temporada jugando con prudencia) |
+
+Resultados con el simulador: 77% de éxito con juego prudente, 1% de semanas sin decisión (antes 24%) y, por primera vez, un jugador puede terminar la temporada 1 en el Top 3. Arriesgar compensa: el jugador arriesgado llega al 1.º puesto el triple de veces que el prudente, a cambio de más muertes.
+
 ## 1. Visión y pitch
 
 **Pitch:** El sistema te dio un rango D. Tú tienes poder de dios. Tu gremio tiene una sola maga y deudas. Ficha, vende y manda héroes a misiones hasta que el peor gremio del mundo sea el primero.

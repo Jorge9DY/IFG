@@ -75,6 +75,7 @@ IFG/
 - [x] `heroes.ts`: generación aleatoria de héroes, vínculos, XP, subida de rango y envejecimiento
 - [x] `ventas.ts`: ofertas de la IA, contraofertas y consecuencias
 - [x] `vinculos.ts`: afinidad, moral, luto y abandonos
+- [x] Síntesis del gameplay: tablón Segura/Justa/Arriesgada, sin elementos, posiciones ni cesiones
 - [x] `ia.ts`: los 4 perfiles rivales (pujas, misiones abstractas, fichajes)
 - [x] `estado.ts` y `partida.ts`: estado completo, acciones del jugador y `terminarSemana()`
 - [x] Acciones especiales de los rivales: Veto del Duque, espionaje, rumores, robo de misiones y oferta anual de la Corona

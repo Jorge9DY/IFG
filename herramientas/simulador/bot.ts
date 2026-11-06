@@ -94,13 +94,13 @@ function mandarMisiones(estado: EstadoJuego, e: Estrategia): void {
     // Prueba equipos de 3 a 5 con los más fuertes y elige el más pequeño que llegue al mínimo.
     const ordenados = [...libres].sort(
       (a, b) =>
-        poderEquipo([{ heroe: b, posicion: POSICION_NATURAL[b.clase] }], mision.elemento) -
-        poderEquipo([{ heroe: a, posicion: POSICION_NATURAL[a.clase] }], mision.elemento),
+        poderEquipo([{ heroe: b, posicion: POSICION_NATURAL[b.clase] }]) -
+        poderEquipo([{ heroe: a, posicion: POSICION_NATURAL[a.clase] }]),
     );
     for (let tam = 3; tam <= Math.min(5, ordenados.length); tam++) {
       const equipo: MiembroEquipo[] = ordenados.slice(0, tam).map((h) => ({ heroe: h, posicion: POSICION_NATURAL[h.clase] }));
       const prob = probabilidadExito(
-        poderEquipo(equipo, mision.elemento),
+        poderEquipo(equipo),
         mision.poderRecomendado,
         equipo.some((x) => x.heroe.clase === 'Soporte'),
       );

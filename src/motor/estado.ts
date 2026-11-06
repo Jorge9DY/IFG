@@ -69,17 +69,8 @@ export interface EstadoJuego {
   accionesTemporada?: AccionesTemporada;
   /** Héroes del jugador que el Colmillo intenta sobornar. */
   sobornos?: Soborno[];
-  /** Héroes cedidos al jugador por otros gremios. */
-  cesiones?: Cesion[];
 }
 
-export interface Cesion {
-  heroeId: string;
-  /** Gremio dueño del héroe, que recibe parte del oro de sus misiones. */
-  origenId: string;
-  /** Semana en cuyo cierre vuelve a su gremio. */
-  semanaFin: number;
-}
 
 export interface AccionesTemporada {
   vetoUsado: boolean;

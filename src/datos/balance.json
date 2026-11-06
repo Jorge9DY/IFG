@@ -151,9 +151,9 @@
     "penalizacionPrestigioFracaso": 2
   },
   "riesgoMuerte": {
-    "dosOMasRangosPorEncima": 35,
-    "unRangoPorEncima": 18,
-    "mismoRango": 8,
+    "dosOMasRangosPorEncima": 25,
+    "unRangoPorEncima": 12,
+    "mismoRango": 6,
     "porDebajo": 1,
     "exitoDosOMasPorEncima": 1,
     "reduccionTanque": 0.3,
@@ -176,9 +176,6 @@
     "moralClemente": -10
   },
   "modificadores": {
-    "fueraDePosicion": 0.8,
-    "elementoFavorable": 1.2,
-    "elementoDesfavorable": 0.85,
     "luto": 0.8,
     "temerarioPoder": 1.1,
     "lealConVinculo": 1.15,
@@ -323,17 +320,19 @@
     "interesFichaje": 0.6
   },
   "tablon": {
-    "misionesPorSemana": [
-      6,
-      10
-    ],
-    "rangoMaximoPorPuesto": {
-      "1": "S",
-      "2": "S",
-      "3": "A",
-      "4": "B",
-      "5": "B"
-    }
+    "multiplicadorPoder": {
+      "segura": 0.75,
+      "justa": 1.0,
+      "arriesgada": 1.38
+    },
+    "oroPorPoder": {
+      "segura": 1.05,
+      "justa": 1.5,
+      "arriesgada": 2.6
+    },
+    "plantillaParaCuartaMision": 7,
+    "poderMinimo": 400,
+    "variacion": 0.06
   },
   "temporada": {
     "semanas": 20,
@@ -396,14 +395,6 @@
     "semanasMenosEnfermeria": 1
   },
   "traspasos": {
-    "puntuacionMinimaClausula": 60,
-    "costeCesion": 0.3,
-    "oroCesion": 0.2,
-    "semanasCesion": [
-      4,
-      8
-    ],
-    "rangoMaximoCesion": "B",
-    "reputacionCesionAlba": 70
+    "puntuacionMinimaClausula": 60
   }
 }

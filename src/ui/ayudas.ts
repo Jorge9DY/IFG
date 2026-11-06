@@ -21,7 +21,7 @@ function opcionesRiesgo(estado: EstadoJuego) {
 }
 
 /**
- * Equipo recomendado: cada héroe en su posición natural. Busca el equipo más modesto que alcanza
+ * Equipo recomendado. Busca el equipo más modesto que alcanza
  * el 80% de éxito, para no gastar a los mejores héroes en misiones fáciles: primero prueba con los
  * más débiles y va sustituyéndolos por los más fuertes. Si ninguno llega, devuelve el más fuerte.
  */
@@ -29,7 +29,7 @@ export function equipoRecomendado(estado: EstadoJuego, mision: Mision, candidato
   if (candidatos.length < 3) return [];
   const naturales: MiembroEquipo[] = candidatos.map((h) => ({ heroe: h, posicion: POSICION_NATURAL[h.clase] }));
   const ascendentes = [...naturales].sort(
-    (a, b) => aportacion(a, naturales, mision.elemento) - aportacion(b, naturales, mision.elemento),
+    (a, b) => aportacion(a, naturales) - aportacion(b, naturales),
   );
   const prob = (equipo: MiembroEquipo[]): number => vistaPreviaMision(mision, equipo, opcionesRiesgo(estado)).probabilidad;
   const maximo = Math.min(5, ascendentes.length);

@@ -14,16 +14,38 @@ describe('Creación de la partida', () => {
     expect(j.deuda).toBe(40000);
   });
 
-  it('hay 4 rivales con plantilla, un Draft abierto y un tablón de 6 a 10 misiones', () => {
+  it('hay 4 rivales con plantilla y un Draft abierto', () => {
     expect(rivales(estado)).toHaveLength(4);
     for (const r of rivales(estado)) expect(r.plantilla.length).toBeGreaterThanOrEqual(10);
     expect(estado.mercado.filter((e) => e.draft)).toHaveLength(14);
-    expect(estado.tablon.length).toBeGreaterThanOrEqual(6);
-    expect(estado.tablon.length).toBeLessThanOrEqual(10);
   });
 
-  it('el 5.º puesto solo ve misiones hasta rango B', () => {
-    expect(estado.tablon.every((m) => ['F', 'D', 'C', 'B'].includes(m.rango))).toBe(true);
+  it('el tablón ofrece una misión Segura, una Justa y una Arriesgada', () => {
+    expect(estado.tablon.map((m) => m.tipo)).toEqual(['segura', 'justa', 'arriesgada']);
+  });
+
+  it('a más riesgo, más poder recomendado y más oro', () => {
+    const [segura, justa, arriesgada] = estado.tablon;
+    expect(segura!.poderRecomendado).toBeLessThan(justa!.poderRecomendado);
+    expect(justa!.poderRecomendado).toBeLessThan(arriesgada!.poderRecomendado);
+    expect(segura!.recompensa.oro).toBeLessThan(justa!.recompensa.oro);
+    expect(justa!.recompensa.oro).toBeLessThan(arriesgada!.recompensa.oro);
+  });
+
+  it('el tablón crece con la fuerza del gremio y añade una misión con plantilla grande', async () => {
+    const { generarHeroe } = await import('../src/motor/heroes');
+    const { generarTablon, poderReferencia } = await import('../src/motor/partida');
+    const { Azar } = await import('../src/motor/azar');
+    const e = crearPartida({ nombre: 'T', semilla: 9 });
+    const antes = poderReferencia(e);
+    const azar = new Azar(4);
+    for (let i = 0; i < 7; i++) {
+      const h = generarHeroe(azar, `t${i}`, 'B');
+      e.heroes[h.id] = h;
+      jugador(e).plantilla.push(h.id);
+    }
+    expect(poderReferencia(e)).toBeGreaterThan(antes);
+    expect(generarTablon(e, azar)).toHaveLength(4);
   });
 
   it('la misma semilla genera la misma partida', () => {

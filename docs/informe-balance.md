@@ -1,23 +1,20 @@
 # Informe de balance — temporada 1
 
-Resultado: con las decisiones del propietario aplicadas, la temporada 1 es superable para un jugador prudente (12,9% de quiebras), castiga al arriesgado (28,2%) y la distancia con los rivales en la clasificación se ha reducido a la mitad. El jugador sigue terminando 5.º la temporada 1, que es lo esperado al empezar desde cero.
+Resultado: tras sintetizar el gameplay (tablón Segura/Justa/Arriesgada, sin elementos ni posiciones), la temporada 1 tiene una decisión de riesgo cada semana y escalar en la clasificación ya es posible. Antes, con las decisiones del propietario aplicadas, la temporada 1 es superable para un jugador prudente (12,9% de quiebras), castiga al arriesgado (28,2%) y la distancia con los rivales en la clasificación se ha reducido a la mitad. El jugador sigue terminando 5.º la temporada 1, que es lo esperado al empezar desde cero.
 
 Generado con `npm run simular -- 1000 1` (1.000 temporadas por estrategia, semillas 1–1.000). Versión del balance: `src/datos/balance.json` a 6 de noviembre de 2026.
 
-## Resultados
+## Resultados (tras la síntesis del gameplay)
 
 | Métrica | Prudente (≥ 70% de éxito) | Arriesgado (≥ 55% de éxito) | Objetivo |
 | --- | --- | --- | --- |
-| Quiebras en la temporada 1 | 12,9% | 28,2% | 10–25% |
-| Muertes por temporada | 0,4 | 0,6 | 0,3–1 |
-| Puesto final (sin quiebra) | 5.º en el 99,5% | 5.º en el 98,7% | 4.º–5.º |
-| Semanas con oro por debajo de 500 | 1,5 | 1,9 | ≥ 3 |
-| Fichajes ganados | 5,2 | 5,2 | 3–6 |
-| Tasa de éxito en misiones | 88,1% | 81,3% | — |
-| Oro al final (sin quiebra) | 8.879 | 8.904 | — |
-| Prestigio al final | 30,3 | 25,8 | — |
-
-Puntos de Gremio medios al final de la temporada 1 (jugador prudente, 200 partidas sin quiebra): Tejedores 271 · Colmillo 254 · Alba 233 · Corona 207 · **Llama Menguante 124**. Con la fórmula anterior la distancia era de unos 200 frente a 550.
+| Quiebras en la temporada 1 | 24,3% | 26,2% | 10–25% |
+| Muertes por temporada | 0,6 | 1,5 | 0,3–1 |
+| Misiones por temporada | 15,7 | 15,2 | — |
+| Tasa de éxito en misiones | 76,7% | 61,6% | 70–80% |
+| Semanas sin ninguna decisión | ~1% | ~1% | < 10% |
+| Oro al final (sin quiebra) | 9.643 | 14.320 | — |
+| Puestos finales (sin quiebra) | 1.º 12 · 2.º 35 · 3.º 93 · 4.º 161 · 5.º 456 | 1.º 41 · 2.º 22 · 3.º 61 · 4.º 108 · 5.º 506 | Que escalar sea posible |
 
 ## Decisiones del propietario aplicadas
 

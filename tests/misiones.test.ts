@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Azar } from '../src/motor/azar';
 import {
-  multiplicadorElemento,
   multiplicadorMoral,
   poderEquipo,
   probabilidadExito,
@@ -13,8 +12,8 @@ import {
 } from '../src/motor/misiones';
 import { elara, heroe, mision } from './fabrica';
 
-const brann = heroe({ id: 'brann', clase: 'Tanque', elemento: 'Tierra' });
-const lio = heroe({ id: 'lio', clase: 'Explorador', elemento: 'Agua' });
+const brann = heroe({ id: 'brann', clase: 'Tanque' });
+const lio = heroe({ id: 'lio', clase: 'Explorador' });
 const equipoInicial: MiembroEquipo[] = [
   { heroe: elara(), posicion: 'retaguardia' },
   { heroe: brann, posicion: 'vanguardia' },
@@ -43,7 +42,7 @@ describe('Probabilidad de éxito (sección 9)', () => {
 
 describe('Poder de equipo', () => {
   it('el equipo inicial (Elara, Brann y Lio) ronda 536 y tiene un 82% de éxito en una misión C', () => {
-    const pe = poderEquipo(equipoInicial, 'Luz');
+    const pe = poderEquipo(equipoInicial);
     expect(pe).toBeCloseTo(536.4, 0);
     expect(probabilidadExito(pe, 500, false)).toBeCloseTo(82.3, 0);
   });
@@ -53,37 +52,30 @@ describe('Poder de equipo', () => {
     expect(multiplicadorMoral(100)).toBeCloseTo(1.15);
   });
 
-  it('el ciclo elemental: Fuego vence a Viento y pierde contra Agua; Luz y Sombra se vencen mutuamente', () => {
-    expect(multiplicadorElemento('Fuego', 'Viento')).toBe(1.2);
-    expect(multiplicadorElemento('Fuego', 'Agua')).toBe(0.85);
-    expect(multiplicadorElemento('Luz', 'Sombra')).toBe(1.2);
-    expect(multiplicadorElemento('Fuego', 'Luz')).toBe(1);
-  });
-
-  it('jugar fuera de posición reduce la aportación un 20%', () => {
-    const enSuSitio = poderEquipo([{ heroe: brann, posicion: 'vanguardia' }], 'Luz');
-    const fuera = poderEquipo([{ heroe: brann, posicion: 'retaguardia' }], 'Luz');
-    expect(fuera / enSuSitio).toBeCloseTo(0.8);
+  it('la posición ya no cambia la aportación', () => {
+    const delante = poderEquipo([{ heroe: brann, posicion: 'vanguardia' }]);
+    const detras = poderEquipo([{ heroe: brann, posicion: 'retaguardia' }]);
+    expect(detras).toBe(delante);
   });
 
   it('un vínculo familiar en el mismo equipo suma un 10% a ambos', () => {
     const a = heroe({ id: 'a', vinculos: [{ con: 'b', tipo: 'Familia', oculto: false }] });
     const b = heroe({ id: 'b', vinculos: [{ con: 'a', tipo: 'Familia', oculto: false }] });
-    const sinVinculo = poderEquipo([{ heroe: heroe({ id: 'a' }), posicion: 'vanguardia' }, { heroe: heroe({ id: 'b' }), posicion: 'vanguardia' }], 'Luz');
-    const conVinculo = poderEquipo([{ heroe: a, posicion: 'vanguardia' }, { heroe: b, posicion: 'vanguardia' }], 'Luz');
+    const sinVinculo = poderEquipo([{ heroe: heroe({ id: 'a' }), posicion: 'vanguardia' }, { heroe: heroe({ id: 'b' }), posicion: 'vanguardia' }]);
+    const conVinculo = poderEquipo([{ heroe: a, posicion: 'vanguardia' }, { heroe: b, posicion: 'vanguardia' }]);
     expect(conVinculo / sinVinculo).toBeCloseTo(1.1);
   });
 });
 
 describe('Riesgo de muerte', () => {
   it('riesgo base según la diferencia de rango', () => {
-    expect(riesgoBase('B', 1)).toBe(35); // misión B, héroe D
-    expect(riesgoBase('C', 1)).toBe(18);
-    expect(riesgoBase('D', 1)).toBe(8);
+    expect(riesgoBase('B', 1)).toBe(25); // misión B, héroe D
+    expect(riesgoBase('C', 1)).toBe(12);
+    expect(riesgoBase('D', 1)).toBe(6);
     expect(riesgoBase('F', 1)).toBe(1);
   });
 
-  it('un Tanque en vanguardia reduce un 30% el riesgo del resto', () => {
+  it('un Tanque en el equipo reduce un 30% el riesgo del resto', () => {
     const m = mision({ rango: 'B' });
     const lioMiembro = equipoInicial[2]!;
     const conTanque = riesgoMuerte(lioMiembro, equipoInicial, m, 'fracaso');
@@ -146,7 +138,7 @@ describe('Vista previa de la Formación', () => {
     const { vistaPreviaMision } = await import('../src/motor/misiones');
     const m = mision();
     const vista = vistaPreviaMision(m, equipoInicial);
-    expect(vista.poder).toBeCloseTo(poderEquipo(equipoInicial, m.elemento));
+    expect(vista.poder).toBeCloseTo(poderEquipo(equipoInicial));
     expect(vista.probabilidad).toBeCloseTo(probabilidadExito(vista.poder, m.poderRecomendado, false));
     expect(vista.riesgos).toHaveLength(3);
     expect(vista.riesgos[2]!.riesgo).toBeCloseTo(riesgoMuerte(equipoInicial[2]!, equipoInicial, m, 'fracaso'));

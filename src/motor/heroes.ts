@@ -8,7 +8,6 @@ import {
   RANGOS,
   indiceRango,
   type Clase,
-  type Elemento,
   type Heroe,
   type Rango,
   type Rasgo,
@@ -18,7 +17,6 @@ import {
 
 export const CLASES: readonly Clase[] = ['Tanque', 'Guerrero', 'Mago', 'Sanador', 'Explorador', 'Soporte'];
 export const RAZAS: readonly Raza[] = ['Humano', 'Elfo', 'Enano', 'Bestiahombre', 'Draconido', 'Demonio menor'];
-export const ELEMENTOS: readonly Elemento[] = ['Fuego', 'Agua', 'Tierra', 'Viento', 'Luz', 'Sombra'];
 export const RASGOS: readonly Rasgo[] = ['Codicioso', 'Leal', 'Temerario', 'Cobarde', 'Ambicioso', 'Romantico', 'Veterano'];
 
 type StatCombate = 'poder' | 'defensa' | 'magia' | 'agilidad';
@@ -144,7 +142,6 @@ export function generarHeroe(azar: Azar, id: string, rango: Rango, opciones: Opc
     potencial: generarPotencial(azar, rango),
     potencialVisible: false,
     clase,
-    elemento: azar.elegir(ELEMENTOS),
     stats: repartirStats(azar, clase, suma),
     rasgos,
     vinculos: [],

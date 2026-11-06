@@ -2,6 +2,13 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Síntesis del gameplay
+
+- Petición del propietario: dejar el juego en su esencia más divertida sin añadir sistemas.
+- Tablón: 3 misiones semanales a medida (Segura, Justa, Arriesgada; una Justa más con 7+ héroes), todas de 1 semana.
+- Eliminados: elementos, efecto de las posiciones, cesiones. Héroes con un único número de Poder. Riesgo base de muerte 25/12/6%.
+- Resultado: 1% de semanas sin decisión (antes 24%), 77% de éxito prudente, y ya se puede terminar en el Top 3. Ver sección 0 del diseño e informe de balance.
+
 ## 2026-11-06 — Interfaz intuitiva sin perder profundidad
 
 - Cartas de héroe en mercado, plantilla y otros gremios: rango, clase, elemento, barras de stats (la principal en cian), moral, rasgos con explicación al pasar el ratón y vínculos.

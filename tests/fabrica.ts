@@ -10,7 +10,6 @@ export function heroe(datos: Partial<Heroe> & Pick<Heroe, 'id'>): Heroe {
     potencial: 'B',
     potencialVisible: false,
     clase: 'Guerrero',
-    elemento: 'Tierra',
     stats: { poder: 32, defensa: 31, magia: 31, agilidad: 31, moral: 60 },
     rasgos: [],
     vinculos: [],
@@ -30,7 +29,6 @@ export const elara = (): Heroe =>
     rango: 'S',
     potencial: 'S',
     clase: 'Mago',
-    elemento: 'Fuego',
     stats: { poder: 75, defensa: 72, magia: 99, agilidad: 88, moral: 40 },
   });
 
@@ -39,7 +37,7 @@ export function mision(datos: Partial<Mision> = {}): Mision {
     id: 'm_prueba',
     rango: 'C',
     etiqueta: 'Caza',
-    elemento: 'Luz',
+    tipo: 'justa',
     poderRecomendado: 500,
     duracion: 2,
     recompensa: { oro: 1600, prestigio: 2, xp: 40 },

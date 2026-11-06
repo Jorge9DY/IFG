@@ -277,3 +277,17 @@ summary { cursor: pointer; color: var(--tenue); font-size: 13px; }
 .oferta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; margin-bottom: 6px; background: var(--caja); border: 1px solid var(--linea-suave); }
 .oferta p { margin: 0; }
 .oferta .botones { margin: 0; }
+
+/* ---------- Síntesis: poder, tipo de misión y equipo ---------- */
+.poder { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: end; }
+.poder b { grid-row: span 2; font-family: var(--titulo); font-size: 34px; line-height: 1; color: var(--cian); font-variant-numeric: tabular-nums; }
+.poder span { font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--tenue); }
+.poder p { margin: 0; font-size: 12.5px; color: var(--texto); }
+.tipo { font-family: var(--titulo); font-weight: 700; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; padding: 1px 8px; color: #111; }
+.t-segura { background: #8fd98a; }
+.t-justa { background: var(--cian); }
+.t-arriesgada { background: var(--naranja); color: var(--texto); }
+.equipo-mision { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; min-height: 52px; }
+.equipo-mision .ficha { display: flex; align-items: center; gap: 8px; padding: 6px 8px; min-width: 150px; }
+.equipo-mision .ficha .quien { flex: 1; }
+.panel-cuerpo .equipo-mision .ficha button { margin: 0; padding: 0 8px; }

@@ -15,7 +15,7 @@ import { gastosSemanales } from '../motor/economia';
 import { prestigioGanado } from '../motor/ranking';
 import { salarioPedido, valorMercado } from '../motor/heroes';
 import { contextoGremio } from '../motor/ia';
-import { POSICION_NATURAL, sumaCombate, vistaPreviaMision, type MiembroEquipo } from '../motor/misiones';
+import { POSICION_NATURAL, aportacion, sumaCombate, vistaPreviaMision, type MiembroEquipo } from '../motor/misiones';
 import {
   crearPartida,
   enviarMision,
@@ -28,7 +28,7 @@ import type { Heroe, Posicion } from '../motor/tipos';
 import { aceptarOferta, contraofertar, ponerEnVenta, quitarDeVenta } from '../motor/ventas';
 import { retenerHeroe } from '../motor/rivales';
 import { construirMejora, infoMejoras } from '../motor/sede';
-import { condicionesCesion, pagarClausula, pedirCesion } from '../motor/traspasos';
+import { pagarClausula } from '../motor/traspasos';
 import type { Mejora } from '../motor/tipos';
 import { Azar } from '../motor/azar';
 import { objetivoActual } from './objetivo';
@@ -87,6 +87,17 @@ const MENU: { panel: Panel; texto: string }[] = [
   { panel: 'informe', texto: 'Informe' },
   { panel: 'sede', texto: 'Elara y la sede' },
 ];
+
+const TIPO_MISION: Record<string, string> = { segura: 'Segura', justa: 'Justa', arriesgada: 'Arriesgada' };
+
+const ROL: Record<string, string> = {
+  Tanque: 'Protege: −30% de riesgo para el resto',
+  Guerrero: 'Ataque cuerpo a cuerpo',
+  Mago: 'Ataque mágico',
+  Sanador: 'Salva a un compañero de la muerte',
+  Explorador: 'Rápido y ágil',
+  Soporte: '+10% de éxito al equipo',
+};
 
 const BARRAS_POR_ESTADO: Record<string, number> = { disponible: 3, luto: 2, 'en mision': 3, herido: 1, muerto: 0 };
 
@@ -192,7 +203,6 @@ export class Interfaz {
           <span class="pastilla ${j.oro < 500 ? 'mal' : ''}">Oro <b>${num(j.oro)}</b></span>
           <span class="pastilla">Puesto <b>${puesto(estado, j.id)}.º</b></span>
           <span class="pastilla">Prestigio <b>${num(j.prestigio)}</b></span>
-          <span class="pastilla">Deuda <b>${num(j.deuda)}</b></span>
         </div>`;
     }
     const o = objetivoActual(estado);
@@ -277,10 +287,7 @@ export class Interfaz {
 
   /** Carta de héroe: lo esencial a la vista y el detalle plegado. */
   private carta(estado: EstadoJuego, h: Heroe, pie: string, extraClase = ''): string {
-    const s = h.stats;
-    const barra = (nombre: string, valor: number, principal: boolean): string =>
-      `<div class="stat ${principal ? 'principal' : ''}" title="${nombre} ${valor}/100"><span>${nombre}</span><i style="--v:${valor}%"></i><b>${valor}</b></div>`;
-    const principal = { Tanque: 'DEF', Guerrero: 'POD', Mago: 'MAG', Sanador: 'MAG', Explorador: 'AGI', Soporte: 'MAG' }[h.clase];
+    const poder = Math.round(aportacion({ heroe: h, posicion: POSICION_NATURAL[h.clase] }, []));
     const vinculos = h.vinculos
       .filter((v) => !v.oculto || estado.partida.despertares >= 1)
       .map((v) => {
@@ -294,13 +301,11 @@ export class Interfaz {
     return `<article class="carta ${extraClase}">
       <header>
         <span class="rango r${h.rango}">${h.rango}</span>${potencial}
-        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${esc(h.clase)} · ${esc(h.elemento)} · ${esc(h.edad)} años</span></div>
+        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${esc(h.clase)} · ${esc(h.edad)} años</span></div>
         ${estadoTexto}
       </header>
-      <div class="stats">
-        ${barra('POD', s.poder, principal === 'POD')}${barra('DEF', s.defensa, principal === 'DEF')}${barra('MAG', s.magia, principal === 'MAG')}${barra('AGI', s.agilidad, principal === 'AGI')}
-      </div>
-      <div class="chips"><span class="chip moral" title="Moral: multiplica su rendimiento">Moral ${s.moral}</span>${rasgos}${vinculos}</div>
+      <div class="poder" title="Poder: lo que aporta en una misión (incluye su moral)"><b>${num(poder)}</b><span>Poder</span><p>${ROL[h.clase]}</p></div>
+      <div class="chips">${rasgos}${vinculos}</div>
       <footer>${pie}</footer>
     </article>`;
   }
@@ -310,11 +315,9 @@ export class Interfaz {
     const cartas = heroesDe(estado, j.id)
       .map((h) => {
         const enVenta = estado.enVenta.some((t) => t.heroeId === h.id);
-        const cesion = (estado.cesiones ?? []).find((c) => c.heroeId === h.id);
         const sueldo = `<span class="precio">${h.id === 'h_000_elara' ? 'Maestra del gremio' : `Salario <b>${num(h.contrato?.salario ?? 0)}</b>/sem.`}</span>`;
         let boton = '';
-        if (cesion) boton = `<span class="tenue">Cedido hasta la semana ${cesion.semanaFin}</span>`;
-        else if (h.id !== 'h_000_elara') {
+        if (h.id !== 'h_000_elara') {
           boton = enVenta
             ? `<button data-accion="quitar-venta" data-id="${h.id}">Quitar de venta</button>`
             : `<button data-accion="vender" data-id="${h.id}" title="Los gremios harán ofertas al cerrar la semana">Vender · ${num(valorMercado(h))}</button>`;
@@ -356,8 +359,8 @@ export class Interfaz {
         const prob = probabilidadConMejorEquipo(estado, m);
         const nivel = nivelDificultad(prob);
         return `<button class="tarjeta mision ${this.misionId === m.id ? 'activo' : ''}" data-accion="elegir-mision" data-id="${m.id}">
-          <span class="linea"><span class="rango r${m.rango}">${m.rango}</span> <strong>${esc(m.etiqueta)}</strong> <span class="tenue">· ${esc(m.elemento)}</span></span>
-          <span class="linea"><b class="cifra">${num(m.recompensa.oro)}</b> oro · +${m.recompensa.prestigio} prestigio · ${m.duracion} sem.</span>
+          <span class="linea"><span class="tipo t-${m.tipo ?? 'justa'}">${TIPO_MISION[m.tipo ?? 'justa']}</span> <span class="rango r${m.rango}">${m.rango}</span> <strong>${esc(m.etiqueta)}</strong></span>
+          <span class="linea"><b class="cifra">${num(m.recompensa.oro)}</b> oro · +${m.recompensa.prestigio} prestigio</span>
           <span class="dificultad d-${nivel}">${TEXTO_DIFICULTAD[nivel]}${prob === null ? '' : ` · ${pct(prob)}`}</span>
         </button>`;
       })
@@ -365,7 +368,7 @@ export class Interfaz {
     return `${enCurso ? `<h3>En curso</h3><ul class="lista">${enCurso}</ul>` : ''}
       ${this.formacion(estado)}
       <h3>Tablón · semana ${estado.partida.semana}</h3>
-      <p class="tenue">La dificultad se calcula con tu mejor equipo disponible.</p>
+      <p class="tenue">Cada semana, tres misiones a tu medida. Cuanto más riesgo, más oro, prestigio y puntos; si fracasa, tus héroes pueden caer.</p>
       <div class="tarjetas">${tarjetas || '<p class="tenue">No quedan misiones esta semana.</p>'}</div>`;
   }
 
@@ -378,26 +381,17 @@ export class Interfaz {
     const j = jugador(estado);
     const vista = vistaPreviaMision(mision, miembros, { despertarII: estado.partida.despertares >= 2, enfermeria: j.mejoras.includes('Enfermeria') });
     const riesgo = new Map(vista.riesgos.map((r) => [r.heroeId, r.riesgo]));
-    const columna = (pos: Posicion, nombre: string): string => {
-      const aqui = miembros.filter((m) => m.posicion === pos);
-      const fichas = aqui
-        .map((m) => {
-          const natural = POSICION_NATURAL[m.heroe.clase] === pos;
-          const r = riesgo.get(m.heroe.id) ?? 0;
-          return `<div class="ficha ${natural ? '' : 'fuera-de-sitio'}">
-            <span class="rango r${m.heroe.rango}">${m.heroe.rango}</span>
-            <span class="quien"><strong>${esc(m.heroe.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${esc(m.heroe.clase)}${natural ? '' : ' · fuera de su sitio −20%'}</span></span>
-            <span class="riesgo" title="Riesgo de muerte si la misión fracasa">${estado.partida.modoClemente ? '—' : `${r.toFixed(0)}%`}</span>
-            <span class="mover">
-              <button data-accion="mover" data-id="${m.heroe.id}" data-dir="-1" aria-label="Mover a la izquierda" ${pos === 'vanguardia' ? 'disabled' : ''}>‹</button>
-              <button data-accion="mover" data-id="${m.heroe.id}" data-dir="1" aria-label="Mover a la derecha" ${pos === 'retaguardia' ? 'disabled' : ''}>›</button>
-              <button data-accion="quitar" data-id="${m.heroe.id}" aria-label="Quitar del equipo">×</button>
-            </span>
-          </div>`;
-        })
-        .join('');
-      return `<div class="columna"><h4>${nombre}</h4>${fichas || '<p class="tenue vacio">Vacío</p>'}</div>`;
-    };
+    const fichas = miembros
+      .map((m) => {
+        const r = riesgo.get(m.heroe.id) ?? 0;
+        return `<div class="ficha">
+          <span class="rango r${m.heroe.rango}">${m.heroe.rango}</span>
+          <span class="quien"><strong>${esc(m.heroe.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${esc(m.heroe.clase)}</span></span>
+          <span class="riesgo" title="Riesgo de muerte si la misión fracasa">${estado.partida.modoClemente ? '' : `${r.toFixed(0)}%`}</span>
+          <button data-accion="quitar" data-id="${m.heroe.id}" aria-label="Quitar del equipo">×</button>
+        </div>`;
+      })
+      .join('');
     const fuera = libres
       .filter((h) => !this.equipo.has(h.id))
       .map((h) => `<button class="mini" data-accion="añadir" data-id="${h.id}" ${this.equipo.size >= 5 ? 'disabled' : ''}><span class="rango r${h.rango}">${h.rango}</span> ${esc(h.nombre.split(' ')[0] ?? '')} <span class="tenue">${esc(h.clase)}</span></button>`)
@@ -407,17 +401,18 @@ export class Interfaz {
     const nivel = tam ? nivelDificultad(vista.probabilidad) : 'sin-equipo';
     return `<section class="formacion">
       <div class="formacion-cabecera">
-        <div><span class="rango r${mision.rango}">${mision.rango}</span> <strong>${esc(mision.etiqueta)}</strong> contra <strong>${esc(mision.elemento)}</strong>
+        <div><span class="rango r${mision.rango}">${mision.rango}</span> <strong>${TIPO_MISION[mision.tipo ?? 'justa']} · ${esc(mision.etiqueta)}</strong>
           <div class="tenue">Poder ${num(Math.round(vista.poder))} de ${num(mision.poderRecomendado)} recomendado</div></div>
         <div class="medidor d-${nivel}"><b>${tam ? pct(vista.probabilidad) : '—'}</b><span>${tam ? 'de éxito' : 'elige héroes'}</span></div>
       </div>
-      <div class="columnas">${columna('vanguardia', 'Vanguardia')}${columna('centro', 'Centro')}${columna('retaguardia', 'Retaguardia')}</div>
+      <div class="equipo-mision">${fichas || '<p class="tenue vacio">Elige de 3 a 5 héroes.</p>'}</div>
+      <p class="tenue">Tanque: protege al resto · Sanador: salva a uno de la muerte · Soporte: +10% de éxito.</p>
       <div class="botones">
         <button data-accion="recomendado">Equipo recomendado</button>
         <button data-accion="vaciar" ${tam ? '' : 'disabled'}>Vaciar</button>
         <button data-accion="enviar" class="principal" ${valido ? '' : 'disabled'}>${valido ? `Enviar ${tam} héroes` : `Faltan ${Math.max(0, 3 - tam)} héroes`}</button>
       </div>
-      ${fuera ? `<p class="tenue">Pulsa un héroe para añadirlo en su posición natural:</p><div class="minis">${fuera}</div>` : ''}
+      ${fuera ? `<p class="tenue">Pulsa un héroe para añadirlo:</p><div class="minis">${fuera}</div>` : ''}
     </section>`;
   }
 
@@ -455,14 +450,12 @@ export class Interfaz {
     const cartas = heroesDe(estado, this.gremioRival)
       .sort((a, b) => sumaCombate(a) - sumaCombate(b))
       .map((h) => {
-        const cesion = condicionesCesion(estado, h.id);
         const pie = `<span class="precio">Cláusula <b>${num(h.contrato?.clausula ?? 0)}</b></span>
-          <button data-accion="clausula" data-id="${h.id}" title="Ficha al momento si su puntuación con tu gremio llega a 60">Pagar cláusula</button>
-          ${cesion.bloqueo ? '' : `<button data-accion="cesion" data-id="${h.id}" title="Pagas su salario y su gremio cobra el 20% del oro de sus misiones">Cesión 4 sem. · ${num(cesion.coste)}</button>`}`;
+          <button data-accion="clausula" data-id="${h.id}" title="Ficha al momento si su puntuación con tu gremio llega a 60">Pagar cláusula</button>`;
         return this.carta(estado, h, pie);
       })
       .join('');
-    return `<p class="tenue">Paga la cláusula para fichar a un héroe al momento, o pídelo cedido unas semanas. Nadie cede héroes de rango A o S.</p>
+    return `<p class="tenue">Paga la cláusula para quitarle un héroe a otro gremio. Solo vendrá si su puntuación con tu gremio llega a 60.</p>
       <div class="pestanas pequenas">${pestañas}</div>
       <div class="cartas">${cartas}</div>`;
   }
@@ -617,13 +610,6 @@ export class Interfaz {
       case 'quitar':
         this.equipo.delete(id);
         return this.repintar();
-      case 'mover': {
-        const orden: Posicion[] = ['vanguardia', 'centro', 'retaguardia'];
-        const actual = orden.indexOf(this.equipo.get(id) ?? 'centro');
-        const nueva = orden[Math.max(0, Math.min(2, actual + Number(objetivo.dataset.dir ?? 0)))];
-        if (nueva) this.equipo.set(id, nueva);
-        return this.repintar();
-      }
       case 'pestana-mercado':
         this.pestanaMercado = id === 'rivales' ? 'rivales' : 'libres';
         this.heroeMercado = null;
@@ -700,12 +686,6 @@ export class Interfaz {
         const h = obtenerHeroe(estado, id);
         const r = pagarClausula(estado, id);
         this.mensaje = r === 'fichado' ? `${h.nombre} se une a la Llama Menguante.` : `${h.nombre} rechaza venir aunque pagues su cláusula. No se ha cobrado nada.`;
-        return this.tras('mercado', false);
-      }
-      case 'cesion': {
-        const h = obtenerHeroe(estado, id);
-        pedirCesion(estado, id, 4);
-        this.mensaje = `${h.nombre} juega cedido con el gremio durante 4 semanas.`;
         return this.tras('mercado', false);
       }
       case 'terminar': {

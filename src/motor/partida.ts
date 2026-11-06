@@ -21,12 +21,11 @@ import {
 import { estadoInicialJugador } from './estadoInicial';
 import { envejecer, ganarXp, generarHeroe, generarVinculos, salarioPedido, valorMercado } from './heroes';
 import { cierreIA, contextoGremio, pujadorIA, rivalesInteresados, turnoMisionesIA } from './ia';
-import { resolverMision, type InformeMision, type MiembroEquipo } from './misiones';
+import { aportacion, poderEquipo, resolverMision, type InformeMision, type MiembroEquipo } from './misiones';
 import { ofertaTotal, resolverSubasta, type Oferta, type Pujador, type ResultadoSubasta } from './pujas';
 import { puntosMision } from './ranking';
 import { ofertaAnualCorona, pujadoresRivales, reiniciarAccionesTemporada, resolverSobornos, sabotajesColmillo } from './rivales';
 import { aplicarEfectosPermanentes, multiplicadorXp, semanasDeBaja } from './sede';
-import { devolverCesiones, repartirOroCesiones } from './traspasos';
 import { generarOfertas, liberarHeroe } from './ventas';
 import { aplicarPerdida, cambiarMoral, derivaMoral, sumarAfinidadEquipo } from './vinculos';
 import {
@@ -39,6 +38,7 @@ import {
   type Mision,
   type Posicion,
   type Rango,
+  type TipoMision,
 } from './tipos';
 
 export interface OpcionesPartida {
@@ -60,7 +60,6 @@ function crearElara(): Heroe {
     potencial: 'S',
     potencialVisible: true,
     clase: 'Mago',
-    elemento: 'Fuego',
     stats: { poder: 75, defensa: 72, magia: 99, agilidad: 88, moral: 40 },
     rasgos: ['Leal'],
     vinculos: [],
@@ -167,29 +166,53 @@ function agregarAlMercado(estado: EstadoJuego, azar: Azar, rango: Rango, draft: 
 
 const ETIQUETAS: readonly EtiquetaMision[] = ['Caza', 'Escolta', 'Exploracion', 'Rescate', 'Mazmorra'];
 
+/**
+ * Poder del mejor equipo de 4 del jugador (estén libres o no).
+ * El tablón se calcula a partir de él para que siempre haya misiones a su medida.
+ */
+export function poderReferencia(estado: EstadoJuego): number {
+  const miembros = heroesDe(estado, estado.jugadorId)
+    .filter((h) => h.estado !== 'muerto')
+    .map((h) => ({ heroe: h, posicion: 'centro' as Posicion }));
+  const mejores = miembros.sort((x, y) => aportacion(y, miembros) - aportacion(x, miembros)).slice(0, 4);
+  return Math.max(balance.tablon.poderMinimo, poderEquipo(mejores));
+}
+
+/** Rango de una misión según su poder recomendado (el más cercano de la tabla). */
+function rangoPorPoder(poder: number): Rango {
+  let mejor: Rango = 'F';
+  for (const r of RANGOS) if (balance.misiones[r].poderRecomendado <= poder * 1.1) mejor = r;
+  return mejor;
+}
+
+const TIPOS_SEMANA: TipoMision[] = ['segura', 'justa', 'arriesgada'];
+
+/**
+ * Tablón semanal: tres misiones a la medida del gremio (Segura, Justa y Arriesgada) y una Justa
+ * más si la plantilla es grande. Cuanto más riesgo, más oro, prestigio y puntos.
+ */
 export function generarTablon(estado: EstadoJuego, azar: Azar): Mision[] {
   const t = balance.tablon;
-  const maximo = t.rangoMaximoPorPuesto[String(puesto(estado, estado.jugadorId)) as '1'] as Rango;
-  const [min, max] = t.misionesPorSemana as [number, number];
-  const misiones: Mision[] = [];
-  const cantidad = azar.entero(min, max);
-  for (let i = 0; i < cantidad; i++) {
-    // Más misiones de rango bajo que alto.
-    const tope = indiceRango(maximo);
-    const rango = RANGOS[Math.min(azar.entero(0, tope), azar.entero(0, tope))] ?? 'F';
+  const referencia = poderReferencia(estado);
+  const tipos = [...TIPOS_SEMANA];
+  if (jugador(estado).plantilla.length >= t.plantillaParaCuartaMision) tipos.splice(2, 0, 'justa');
+  return tipos.map((tipo) => {
+    const variacion = 1 + (azar.siguiente() * 2 - 1) * t.variacion;
+    const poderRecomendado = Math.round(referencia * t.multiplicadorPoder[tipo] * variacion);
+    const rango = rangoPorPoder(poderRecomendado);
     const m = balance.misiones[rango];
-    misiones.push({
+    return {
       id: nuevoId(estado, 'm'),
       rango,
       etiqueta: azar.elegir(ETIQUETAS),
-      elemento: azar.elegir(['Fuego', 'Agua', 'Tierra', 'Viento', 'Luz', 'Sombra'] as const),
-      poderRecomendado: Math.round(m.poderRecomendado * (0.9 + azar.siguiente() * 0.2)),
-      duracion: m.duracion,
-      recompensa: { oro: azar.entero(m.oro[0] ?? 0, m.oro[1] ?? 0), prestigio: m.prestigio, xp: m.xp },
+      tipo,
+      poderRecomendado,
+      // Todas las misiones duran una semana: cada semana es una decisión nueva.
+      duracion: 1,
+      recompensa: { oro: Math.round(poderRecomendado * t.oroPorPoder[tipo]), prestigio: m.prestigio, xp: m.xp },
       heroeRescatable: null,
-    });
-  }
-  return misiones.sort((a, b) => indiceRango(a.rango) - indiceRango(b.rango));
+    };
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -339,8 +362,7 @@ export function terminarSemana(estado: EstadoJuego): ResumenSemana {
       }
     }
 
-    // Fin de cesiones y efectos de las mejoras de la sede.
-    devolverCesiones(estado);
+    // Efectos de las mejoras de la sede.
     aplicarEfectosPermanentes(estado);
 
     // 5. Despertar I: 5 misiones con éxito en la temporada 1.
@@ -389,7 +411,6 @@ function resolverMisionesDelJugador(estado: EstadoJuego, azar: Azar): InformeMis
     informes.push(informe);
 
     j.oro += informe.oro;
-    repartirOroCesiones(estado, enCurso.equipo.map((p) => p.heroeId), informe.oro);
     j.prestigio = Math.max(0, Math.min(100, j.prestigio + informe.prestigio));
     if (informe.resultado === 'exito') {
       j.puntosMisionTemporada += puntosMision(enCurso.mision.rango);

@@ -1,18 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { Azar } from '../src/motor/azar';
-import { gremio, heroesDe, jugador, type EstadoJuego } from '../src/motor/estado';
+import { gremio, jugador, type EstadoJuego } from '../src/motor/estado';
 import { generarHeroe, valorMercado } from '../src/motor/heroes';
-import { crearPartida, enviarMision, terminarSemana } from '../src/motor/partida';
+import { crearPartida } from '../src/motor/partida';
 import { construirMejora, infoMejoras, multiplicadorXp, semanasDeBaja } from '../src/motor/sede';
-import {
-  condicionesCesion,
-  devolverCesiones,
-  esCedido,
-  pagarClausula,
-  pedirCesion,
-  repartirOroCesiones,
-} from '../src/motor/traspasos';
-import { ponerEnVenta } from '../src/motor/ventas';
+import { pagarClausula } from '../src/motor/traspasos';
 import balance from '../src/datos/balance.json';
 
 function partidaRica(semilla = 8): EstadoJuego {
@@ -70,8 +62,8 @@ describe('Mejoras de la sede', () => {
 
   it('la Biblioteca arcana revela el potencial de la plantilla', () => {
     const estado = partidaRica();
-    const h = heroeRival(estado, 'alba', 'C');
-    pedirCesion(estado, h.id, 4);
+    const h = heroeRival(estado, 'tejedores', 'D');
+    expect(pagarClausula(estado, h.id)).toBe('fichado');
     h.potencialVisible = false;
     construirMejora(estado, 'Biblioteca arcana');
     expect(h.potencialVisible).toBe(true);
@@ -106,66 +98,5 @@ describe('Cláusula de rescisión', () => {
     const estado = crearPartida({ nombre: 'Test', semilla: 8 });
     const h = heroeRival(estado, 'corona', 'A');
     expect(() => pagarClausula(estado, h.id)).toThrow('La cláusula cuesta');
-  });
-});
-
-describe('Cesiones', () => {
-  it('cuesta el 30% del valor, el héroe juega con el jugador y no se puede vender', () => {
-    const estado = partidaRica();
-    const h = heroeRival(estado, 'colmillo', 'C');
-    const { coste } = condicionesCesion(estado, h.id);
-    expect(coste).toBe(Math.round(valorMercado(h) * 0.3));
-    pedirCesion(estado, h.id, 4);
-    expect(jugador(estado).oro).toBe(50000 - coste);
-    expect(esCedido(estado, h.id)).toBe(true);
-    expect(() => ponerEnVenta(estado, h.id, 100)).toThrow('cedido');
-  });
-
-  it('nadie cede héroes de rango A o S (salvo el Alba con reputación 70 o más)', () => {
-    const estado = partidaRica();
-    const a = heroeRival(estado, 'corona', 'A');
-    expect(condicionesCesion(estado, a.id).bloqueo).not.toBeNull();
-    const b = heroeRival(estado, 'alba', 'A');
-    expect(condicionesCesion(estado, b.id).bloqueo).not.toBeNull();
-    jugador(estado).reputacion = 70;
-    expect(condicionesCesion(estado, b.id).bloqueo).toBeNull();
-  });
-
-  it('el gremio dueño cobra el 20% del oro de las misiones del cedido', () => {
-    const estado = partidaRica();
-    const h = heroeRival(estado, 'colmillo', 'C');
-    pedirCesion(estado, h.id, 4);
-    const oroJugador = jugador(estado).oro;
-    const oroRival = gremio(estado, 'colmillo').oro;
-    expect(repartirOroCesiones(estado, [h.id, 'otro'], 1000)).toBe(200);
-    expect(jugador(estado).oro).toBe(oroJugador - 200);
-    expect(gremio(estado, 'colmillo').oro).toBe(oroRival + 200);
-    expect(repartirOroCesiones(estado, ['otro'], 1000)).toBe(0);
-  });
-
-  it('vuelve a su gremio al terminar el plazo, pero no a mitad de una misión', () => {
-    const estado = partidaRica();
-    const h = heroeRival(estado, 'colmillo', 'C');
-    pedirCesion(estado, h.id, 4);
-    estado.partida.semana += 3;
-    h.estado = 'en mision';
-    devolverCesiones(estado);
-    expect(jugador(estado).plantilla).toContain(h.id);
-    h.estado = 'disponible';
-    devolverCesiones(estado);
-    expect(jugador(estado).plantilla).not.toContain(h.id);
-    expect(gremio(estado, 'colmillo').plantilla).toContain(h.id);
-  });
-
-  it('una temporada con cesión se juega entera sin errores', () => {
-    const estado = partidaRica(12);
-    const h = heroeRival(estado, 'alba', 'C');
-    pedirCesion(estado, h.id, 6);
-    const equipo = heroesDe(estado, estado.jugadorId).slice(0, 3);
-    if (equipo.length === 3 && estado.tablon[0]) {
-      enviarMision(estado, estado.tablon[0].id, equipo.map((x) => ({ heroeId: x.id, posicion: 'vanguardia' as const })));
-    }
-    while (!estado.fin) terminarSemana(estado);
-    expect(esCedido(estado, h.id)).toBe(false);
   });
 });

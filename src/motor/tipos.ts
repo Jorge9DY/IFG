@@ -5,7 +5,6 @@ export type Rango = (typeof RANGOS)[number];
 
 export type Clase = 'Tanque' | 'Guerrero' | 'Mago' | 'Sanador' | 'Explorador' | 'Soporte';
 export type Raza = 'Humano' | 'Elfo' | 'Enano' | 'Bestiahombre' | 'Draconido' | 'Demonio menor';
-export type Elemento = 'Fuego' | 'Agua' | 'Tierra' | 'Viento' | 'Luz' | 'Sombra';
 export type Posicion = 'vanguardia' | 'centro' | 'retaguardia';
 export type TipoVinculo = 'Romance' | 'Familia' | 'Amistad' | 'Rivalidad';
 export type Rasgo =
@@ -48,7 +47,6 @@ export interface Heroe {
   potencial: Rango;
   potencialVisible: boolean;
   clase: Clase;
-  elemento: Elemento;
   stats: Stats;
   rasgos: Rasgo[];
   vinculos: Vinculo[];
@@ -59,13 +57,16 @@ export interface Heroe {
   misionesExito: number;
 }
 
+export type TipoMision = 'segura' | 'justa' | 'arriesgada';
+
 export type EtiquetaMision = 'Caza' | 'Escolta' | 'Exploracion' | 'Rescate' | 'Mazmorra';
 
 export interface Mision {
   id: string;
   rango: Rango;
   etiqueta: EtiquetaMision;
-  elemento: Elemento;
+  /** Riesgo de la misión según la fuerza del gremio. */
+  tipo?: TipoMision;
   poderRecomendado: number;
   duracion: number;
   recompensa: { oro: number; prestigio: number; xp: number };
