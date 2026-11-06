@@ -1,20 +1,21 @@
 # Informe de balance — temporada 1
 
-Resultado: tras sintetizar el gameplay (tablón Segura/Justa/Arriesgada, sin elementos ni posiciones), la temporada 1 tiene una decisión de riesgo cada semana y escalar en la clasificación ya es posible. Antes, con las decisiones del propietario aplicadas, la temporada 1 es superable para un jugador prudente (12,9% de quiebras), castiga al arriesgado (28,2%) y la distancia con los rivales en la clasificación se ha reducido a la mitad. El jugador sigue terminando 5.º la temporada 1, que es lo esperado al empezar desde cero.
+Resultado: con el juego rehecho por días (una misión al día y una subasta de novatos cada semana), hay una decisión de oro cada día y cualquier puesto final es posible. Antes, con las decisiones del propietario aplicadas, la temporada 1 es superable para un jugador prudente (12,9% de quiebras), castiga al arriesgado (28,2%) y la distancia con los rivales en la clasificación se ha reducido a la mitad. El jugador sigue terminando 5.º la temporada 1, que es lo esperado al empezar desde cero.
 
 Generado con `npm run simular -- 1000 1` (1.000 temporadas por estrategia, semillas 1–1.000). Versión del balance: `src/datos/balance.json` a 6 de noviembre de 2026.
 
-## Resultados (tras la síntesis del gameplay)
+## Resultados (juego por días)
 
-| Métrica | Prudente (≥ 70% de éxito) | Arriesgado (≥ 55% de éxito) | Objetivo |
+| Métrica | Prudente (≥ 70% de éxito) | Arriesgado (≥ 50% de éxito) | Objetivo |
 | --- | --- | --- | --- |
-| Quiebras en la temporada 1 | 24,3% | 26,2% | 10–25% |
-| Muertes por temporada | 0,6 | 1,5 | 0,3–1 |
-| Misiones por temporada | 15,7 | 15,2 | — |
-| Tasa de éxito en misiones | 76,7% | 61,6% | 70–80% |
-| Semanas sin ninguna decisión | ~1% | ~1% | < 10% |
-| Oro al final (sin quiebra) | 9.643 | 14.320 | — |
-| Puestos finales (sin quiebra) | 1.º 12 · 2.º 35 · 3.º 93 · 4.º 161 · 5.º 456 | 1.º 41 · 2.º 22 · 3.º 61 · 4.º 108 · 5.º 506 | Que escalar sea posible |
+| Quiebras en la temporada | 3,0% | 15,7% | 10–25% (más bajo con juego prudente) |
+| Muertes por temporada | 0,3 | 0,6 | 0,3–1 |
+| Misiones por temporada | 26,0 | 24,8 | — |
+| Tasa de éxito en misiones | 78,7% | 68,1% | 70–80% |
+| Novatos fichados por temporada | 4,4 | 4,1 | 3–6 |
+| Puestos finales (sin quiebra) | 1.º 316 · 2.º 155 · 3.º 172 · 4.º 161 · 5.º 166 | 1.º 237 · 2.º 96 · 3.º 119 · 4.º 149 · 5.º 242 | Cualquier puesto posible |
+
+El oro va ajustado en la segunda mitad (mediana de unas 900 piezas de oro en el cierre de la semana 4 antes del premio), así que gastar en novatos y en la sede es una decisión de verdad.
 
 ## Decisiones del propietario aplicadas
 

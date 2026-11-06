@@ -147,7 +147,7 @@ export type Consecuencia = 'ilesa' | 'heridaLeve' | 'heridaGrave' | 'muerte';
 export interface ParteHeroe {
   heroeId: string;
   consecuencia: Consecuencia;
-  semanasFuera: number;
+  diasFuera: number;
   /** true si un Sanador o el Modo Clemente evitó la muerte. */
   salvado: boolean;
 }
@@ -174,8 +174,8 @@ export function resolverMision(
   azar: Azar,
   opciones: OpcionesMision = {},
 ): InformeMision {
-  if (equipo.length < 3 || equipo.length > 5) {
-    throw new Error('Un equipo debe tener entre 3 y 5 héroes');
+  if (equipo.length < 1 || equipo.length > 5) {
+    throw new Error('Un equipo debe tener entre 1 y 5 héroes');
   }
   const h = balance.heridas;
   const pe = poderEquipo(equipo);
@@ -187,25 +187,25 @@ export function resolverMision(
   let sanadorDisponible = equipo.some((m) => m.heroe.clase === 'Sanador');
   const partes: ParteHeroe[] = equipo.map((miembro) => {
     const riesgo = riesgoMuerte(miembro, equipo, mision, resultado, opciones);
-    const grave = (): number => azar.entero(h.semanasGrave[0] ?? 3, h.semanasGrave[1] ?? 4);
+    const grave = (): number => azar.entero(h.diasGrave[0] ?? 5, h.diasGrave[1] ?? 7);
     if (azar.probabilidad(riesgo)) {
       if (opciones.modoClemente) {
-        return { heroeId: miembro.heroe.id, consecuencia: 'heridaGrave', semanasFuera: h.semanasClemente, salvado: true };
+        return { heroeId: miembro.heroe.id, consecuencia: 'heridaGrave', diasFuera: h.diasClemente, salvado: true };
       }
       if (sanadorDisponible) {
         sanadorDisponible = false;
-        return { heroeId: miembro.heroe.id, consecuencia: 'heridaGrave', semanasFuera: grave(), salvado: true };
+        return { heroeId: miembro.heroe.id, consecuencia: 'heridaGrave', diasFuera: grave(), salvado: true };
       }
-      return { heroeId: miembro.heroe.id, consecuencia: 'muerte', semanasFuera: 0, salvado: false };
+      return { heroeId: miembro.heroe.id, consecuencia: 'muerte', diasFuera: 0, salvado: false };
     }
     // Quien no muere tira por herida: grave con la misma probabilidad que la muerte, leve según el resultado.
     if (azar.probabilidad(riesgo)) {
-      return { heroeId: miembro.heroe.id, consecuencia: 'heridaGrave', semanasFuera: grave(), salvado: false };
+      return { heroeId: miembro.heroe.id, consecuencia: 'heridaGrave', diasFuera: grave(), salvado: false };
     }
     if (azar.probabilidad(h.leveProbabilidad[resultado])) {
-      return { heroeId: miembro.heroe.id, consecuencia: 'heridaLeve', semanasFuera: h.semanasLeve, salvado: false };
+      return { heroeId: miembro.heroe.id, consecuencia: 'heridaLeve', diasFuera: h.diasLeve, salvado: false };
     }
-    return { heroeId: miembro.heroe.id, consecuencia: 'ilesa', semanasFuera: 0, salvado: false };
+    return { heroeId: miembro.heroe.id, consecuencia: 'ilesa', diasFuera: 0, salvado: false };
   });
 
   const fraccion = resultado === 'exito' ? 1 : resultado === 'parcial' ? 0.5 : 0;

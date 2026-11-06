@@ -147,7 +147,7 @@ export function generarHeroe(azar: Azar, id: string, rango: Rango, opciones: Opc
     vinculos: [],
     contrato: null,
     estado: 'disponible',
-    semanasFuera: 0,
+    diasFuera: 0,
     xp: 0,
     misionesExito: 0,
   };

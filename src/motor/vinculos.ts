@@ -40,7 +40,7 @@ export function aplicarPerdida(
         cambiarMoral(companero, motivo === 'muerte' ? MO.vinculadoMuerto : MO.vinculadoVendido);
         if (motivo === 'muerte' && companero.estado === 'disponible') {
           companero.estado = 'luto';
-          companero.semanasFuera = MO.semanasLuto;
+          companero.diasFuera = MO.diasLuto;
         }
         const prob = vinculo.tipo === 'Romance' ? MO.probAbandonoRomance : MO.probAbandonoFamilia;
         if (azar.probabilidad(prob) && companero.id !== 'h_000_elara') abandonan.push(companero.id);

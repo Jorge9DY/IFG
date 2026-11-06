@@ -291,3 +291,117 @@ summary { cursor: pointer; color: var(--tenue); font-size: 13px; }
 .equipo-mision .ficha { display: flex; align-items: center; gap: 8px; padding: 6px 8px; min-width: 150px; }
 .equipo-mision .ficha .quien { flex: 1; }
 .panel-cuerpo .equipo-mision .ficha button { margin: 0; padding: 0 8px; }
+
+/* =========================================================================
+   Pantalla principal sencilla: oro grande, gastar a la izquierda,
+   ganar a la derecha, mercado en el centro, terminar día arriba a la derecha.
+   ========================================================================= */
+.cabecera { gap: 4px; }
+.cabecera .oro { display: flex; flex-direction: column; line-height: 1; }
+.cabecera .oro span { font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--tenue); }
+.cabecera .oro b { font-family: var(--titulo); font-weight: 700; font-size: 64px; color: #f2c94c; font-variant-numeric: tabular-nums; text-shadow: 0 2px 0 #000; }
+.cabecera .oro.negativo b { color: var(--alerta); }
+.cabecera .calendario { font-size: 13px; color: var(--texto); background: var(--caja); padding: 4px 10px; border-left: 3px solid var(--cian); }
+
+.objetivo { width: auto; }
+.boton-dia {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding: 12px 20px;
+  background: var(--caja); color: var(--texto); border: 1px solid var(--linea);
+  font-family: var(--titulo); font-weight: 700; font-size: 24px; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.boton-dia small { font-family: var(--cuerpo); font-weight: 400; font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--tenue); }
+.boton-dia:hover { border-color: var(--cian); }
+.boton-dia.novatos { background: var(--naranja); border-color: var(--naranja); animation: latido 1.6s ease-in-out infinite; }
+.boton-dia.novatos small { color: var(--texto); }
+@keyframes latido { 50% { box-shadow: 0 0 0 6px rgba(184, 103, 58, 0.25); } }
+
+.boton-grande {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: 230px; padding: 18px 20px;
+  background: var(--caja); color: var(--texto); border: 1px solid var(--linea);
+  font-family: var(--titulo); font-weight: 700; font-size: 24px; letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+  transition: transform 0.12s, border-color 0.12s;
+}
+.boton-grande small { font-family: var(--cuerpo); font-weight: 400; font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--tenue); }
+.boton-grande:hover:not(:disabled) { transform: translateY(-2px); }
+.boton-grande:disabled { opacity: 0.5; cursor: default; }
+.boton-grande .signo { position: absolute; top: 10px; right: 14px; font-size: 30px; line-height: 1; }
+.boton-grande.gastar { border-left: 4px solid var(--alerta); }
+.boton-grande.gastar .signo { color: var(--alerta); }
+.boton-grande.ganar { border-right: 4px solid #8fd98a; }
+.boton-grande.ganar .signo { color: #8fd98a; }
+.boton-grande.mercado { align-items: center; text-align: center; border-top: 3px solid var(--cian); }
+
+/* Posiciones: gastar a la izquierda, ganar a la derecha, mercado en el centro abajo. */
+.menu { left: 24px; top: 50%; width: auto; transform: translateY(-50%); }
+.equipo { right: 24px; left: auto; top: 50%; bottom: auto; transform: translateY(-50%); max-height: none; overflow: visible; }
+.accion { left: 50%; bottom: 22px; transform: translateX(-50%); }
+.accion::before { content: none; }
+
+/* Misiones: tres tarjetas grandes. */
+.tres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.panel-cuerpo .tarjeta-mision {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px; margin: 0;
+  border: 1px solid var(--linea); background: rgba(255, 255, 255, 0.03); text-align: left;
+}
+.panel-cuerpo .tarjeta-mision:hover { background: rgba(63, 216, 232, 0.08); }
+.nivel { font-family: var(--titulo); font-weight: 700; font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; padding: 2px 8px; color: #111; }
+.t-segura .nivel, .nivel.t-segura { background: #8fd98a; }
+.t-justa .nivel, .nivel.t-justa { background: var(--cian); }
+.t-arriesgada .nivel, .nivel.t-arriesgada { background: var(--naranja); color: var(--texto); }
+.oro-mision { font-family: var(--titulo); font-weight: 700; font-size: 34px; color: #f2c94c; line-height: 1; }
+.oro-mision small { font-size: 13px; color: var(--tenue); margin-left: 4px; }
+.cabecera-mision { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.fichas { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
+.panel-cuerpo .ficha-heroe { display: flex; align-items: center; gap: 8px; padding: 8px 10px; margin: 0; text-align: left; }
+.ficha-heroe .quien { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.ficha-heroe .marca { font-size: 12px; color: var(--tenue); }
+.panel-cuerpo .ficha-heroe.va { border-color: #8fd98a; background: rgba(143, 217, 138, 0.1); }
+.ficha-heroe.va .marca { color: #8fd98a; }
+
+/* Gremio: nivel de la sede. */
+.sede-nivel { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding: 14px; border: 1px solid var(--linea); margin-bottom: 8px; }
+.nivel-actual { display: flex; flex-direction: column; }
+.nivel-actual b { font-family: var(--titulo); font-size: 34px; line-height: 1; color: var(--cian); }
+.sede-nivel .mejora { flex: 1; min-width: 220px; }
+.sede-nivel .mejora p { margin: 0 0 8px; }
+
+/* Prueba de Novatos: subasta con reloj. */
+.subasta { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: center; }
+.marcador { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px; border: 1px solid var(--linea); }
+.marcador b { font-family: var(--titulo); font-size: 48px; line-height: 1; color: #f2c94c; font-variant-numeric: tabular-nums; }
+.marcador .lider { font-size: 14px; }
+.subasta.ganando .marcador { border-color: #8fd98a; }
+.reloj { width: 100%; height: 8px; background: #2c2e30; }
+.reloj i { display: block; height: 100%; background: var(--cian); transition: width 0.25s linear; }
+.panel-cuerpo button.pujar {
+  width: 100%; padding: 14px; margin: 0; background: #f2c94c; color: #111; border: none;
+  font-family: var(--titulo); font-weight: 700; font-size: 22px; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.panel-cuerpo button.pujar:disabled { background: #3a3d40; color: var(--tenue); opacity: 1; }
+
+/* Resumen del día. */
+.resultado { display: flex; flex-direction: column; gap: 4px; padding: 12px; margin-bottom: 8px; border: 1px solid var(--linea-suave); }
+.resultado b { font-family: var(--titulo); font-size: 20px; letter-spacing: 0.06em; }
+.r-exito { border-color: #8fd98a; } .r-exito b { color: #8fd98a; }
+.r-parcial b { color: #e8b04f; }
+.r-fracaso { border-color: var(--alerta); } .r-fracaso b { color: var(--alerta); }
+.caidos { color: var(--alerta); margin: 0; }
+
+@media (max-width: 900px) {
+  .cabecera .oro b { font-size: 42px; }
+  .boton-grande { width: auto; padding: 10px 12px; font-size: 16px; }
+  .boton-grande small { display: none; }
+  .menu, .equipo { top: auto; bottom: 22px; transform: none; }
+  .menu { left: 12px; right: auto; }
+  .equipo { right: 12px; display: flex; }
+  .accion { bottom: 90px; }
+  .boton-dia { font-size: 16px; padding: 8px 12px; }
+  .tres, .subasta { grid-template-columns: 1fr; }
+}
+/* El aviso de la sede va por encima del botón Mercado y nunca bloquea clics. */
+.aviso { bottom: 120px; pointer-events: none; }
+
+.boton-grande { padding-right: 48px; }
+.boton-grande .signo { top: 50%; transform: translateY(-50%); right: 16px; font-size: 34px; }
+.boton-grande.mercado { padding-right: 20px; }
+.panel-cuerpo button.pasar { align-self: stretch; margin: 0; }

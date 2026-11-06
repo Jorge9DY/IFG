@@ -128,8 +128,9 @@ describe('Resolución de misiones', () => {
     expect(informe.prestigio).toBe(-2);
   });
 
-  it('exige equipos de 3 a 5 héroes', () => {
-    expect(() => resolverMision(mision(), equipoInicial.slice(0, 2), new Azar(1))).toThrow();
+  it('exige equipos de 1 a 5 héroes', () => {
+    expect(() => resolverMision(mision(), [], new Azar(1))).toThrow();
+    expect(() => resolverMision(mision(), equipoInicial.slice(0, 1), new Azar(1))).not.toThrow();
   });
 });
 

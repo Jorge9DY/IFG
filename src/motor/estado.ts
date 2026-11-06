@@ -9,83 +9,44 @@ export interface MisionEnCurso {
   mision: Mision;
   gremioId: string;
   equipo: { heroeId: string; posicion: Posicion }[];
-  /** Semana en cuyo cierre se resuelve. */
-  semanaFin: number;
-  /** Semana en que se envió (las partidas antiguas no lo tienen). */
-  semanaInicio?: number;
-}
-
-export interface EntradaMercado {
-  heroeId: string;
-  /** Candidato del Draft de la semana 1. */
-  draft: boolean;
-  semanaLlegada: number;
-}
-
-export interface Traspaso {
-  heroeId: string;
-  precio: number;
-}
-
-export interface OfertaCompra {
-  id: string;
-  heroeId: string;
-  compradorId: string;
-  precio: number;
-  contraofertas: number;
+  /** Día en cuyo cierre se resuelve. */
+  diaFin: number;
+  /** Día en que se envió. */
+  diaInicio: number;
 }
 
 export interface Evento {
-  semana: number;
-  tipo: 'mision' | 'fichaje' | 'venta' | 'muerte' | 'abandono' | 'despertar' | 'economia' | 'rival' | 'sabotaje' | 'sede' | 'temporada';
+  dia: number;
+  tipo: 'mision' | 'fichaje' | 'venta' | 'muerte' | 'abandono' | 'despertar' | 'economia' | 'rival' | 'sede' | 'novatos' | 'temporada';
   texto: string;
 }
 
 export type FinPartida = null | 'quiebra' | 'fin-temporada';
 
 export interface EstadoJuego {
-  version: 1;
+  version: 2;
   partida: Partida;
   /** Estado del generador aleatorio, para continuar la misma secuencia. */
   azar: number;
   heroes: Record<string, Heroe>;
   gremios: Record<string, Gremio>;
   jugadorId: string;
+  /** Las tres misiones del día (fácil, media y difícil). */
   tablon: Mision[];
   enCurso: MisionEnCurso[];
-  mercado: EntradaMercado[];
-  enVenta: Traspaso[];
-  ofertas: OfertaCompra[];
+  /** Novatos de la próxima Prueba de Novatos (día 7 de cada semana). */
+  novatos: string[];
   /** Afinidad entre pares de héroes (clave "idA|idB" ordenada). */
   afinidades: Record<string, number>;
   exitosTemporada: number;
+  /** Misiones con éxito en la semana en curso (si es 0 al cierre, el prestigio decae). */
+  exitosSemana: number;
   muertesTemporada: Record<string, number>;
-  /** Informes de las misiones del jugador resueltas en el último cierre. */
+  /** Informes de las misiones del jugador resueltas en el último cierre de día. */
   informes: InformeMision[];
   registro: Evento[];
   fin: FinPartida;
   contadorIds: number;
-  /** Acciones especiales de los rivales ya usadas esta temporada. */
-  accionesTemporada?: AccionesTemporada;
-  /** Héroes del jugador que el Colmillo intenta sobornar. */
-  sobornos?: Soborno[];
-}
-
-
-export interface AccionesTemporada {
-  vetoUsado: boolean;
-  ofertaCoronaHecha: boolean;
-  /** Puesto del jugador al empezar la temporada (para el modo amenaza). */
-  puestoInicial?: number;
-  amenazaAnunciada?: boolean;
-}
-
-export interface Soborno {
-  heroeId: string;
-  /** Salario que hay que pagarle para que se quede. */
-  salarioPedido: number;
-  /** Semana en cuyo cierre se va si no se le retiene. */
-  semanaLimite: number;
 }
 
 export function jugador(estado: EstadoJuego): Gremio {
@@ -133,6 +94,16 @@ export function puesto(estado: EstadoJuego, gremioId: string): number {
   return tabla(estado).find((f) => f.gremioId === gremioId)?.puesto ?? 5;
 }
 
+/** Semana (1–4) a la que pertenece un día (1–28). */
+export function semanaDeDia(dia: number): number {
+  return Math.ceil(dia / balance.temporada.diasPorSemana);
+}
+
+/** true el último día de cada semana: el día de la Prueba de Novatos. */
+export function esDiaDeNovatos(dia: number): boolean {
+  return dia % balance.temporada.diasPorSemana === 0;
+}
+
 export function claveAfinidad(a: string, b: string): string {
   return a < b ? `${a}|${b}` : `${b}|${a}`;
 }
@@ -148,5 +119,5 @@ export function nuevoId(estado: EstadoJuego, prefijo: string): string {
 }
 
 export function registrar(estado: EstadoJuego, tipo: Evento['tipo'], texto: string): void {
-  estado.registro.push({ semana: estado.partida.semana, tipo, texto });
+  estado.registro.push({ dia: estado.partida.dia, tipo, texto });
 }

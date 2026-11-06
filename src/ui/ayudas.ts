@@ -1,11 +1,8 @@
 // Ayudas para que el juego sea fácil de usar sin quitar decisiones: equipo recomendado,
 // dificultad de las misiones y ofertas sugeridas. Solo leen el estado y usan reglas del motor.
 
-import { heroesDe, salariosDe, jugador, type EstadoJuego } from '../motor/estado';
-import { salarioPedido, valorMercado } from '../motor/heroes';
-import { contextoGremio } from '../motor/ia';
+import { heroesDe, jugador, type EstadoJuego } from '../motor/estado';
 import { POSICION_NATURAL, aportacion, vistaPreviaMision, type MiembroEquipo } from '../motor/misiones';
-import { ofertaTotal, puntuacionOferta, type Oferta } from '../motor/pujas';
 import type { Heroe, Mision } from '../motor/tipos';
 
 /** Héroes del jugador que pueden salir de misión ahora. */
@@ -14,32 +11,32 @@ export function heroesLibres(estado: EstadoJuego): Heroe[] {
 }
 
 function opcionesRiesgo(estado: EstadoJuego) {
-  return {
-    despertarII: estado.partida.despertares >= 2,
-    enfermeria: jugador(estado).mejoras.includes('Enfermeria'),
-  };
+  return { despertarII: estado.partida.despertares >= 2 };
 }
 
 /**
- * Equipo recomendado. Busca el equipo más modesto que alcanza
- * el 80% de éxito, para no gastar a los mejores héroes en misiones fáciles: primero prueba con los
- * más débiles y va sustituyéndolos por los más fuertes. Si ninguno llega, devuelve el más fuerte.
+ * Equipo recomendado: el de menor poder total que alcanza el 80% de éxito, para arriesgar lo justo.
+ * Si ninguno llega, devuelve el equipo más fuerte (hasta 5).
  */
 export function equipoRecomendado(estado: EstadoJuego, mision: Mision, candidatos = heroesLibres(estado)): MiembroEquipo[] {
-  if (candidatos.length < 3) return [];
+  if (candidatos.length === 0) return [];
   const naturales: MiembroEquipo[] = candidatos.map((h) => ({ heroe: h, posicion: POSICION_NATURAL[h.clase] }));
   const ascendentes = [...naturales].sort(
     (a, b) => aportacion(a, naturales) - aportacion(b, naturales),
   );
   const prob = (equipo: MiembroEquipo[]): number => vistaPreviaMision(mision, equipo, opcionesRiesgo(estado)).probabilidad;
+  const poder = (equipo: MiembroEquipo[]): number => equipo.reduce((t, m) => t + aportacion(m, naturales), 0);
   const maximo = Math.min(5, ascendentes.length);
-  for (let tam = 3; tam <= maximo; tam++) {
-    // Ventana de `tam` héroes que se desliza de los más débiles a los más fuertes.
+  // De todos los equipos de 1 a 5 héroes consecutivos (de más débil a más fuerte) que llegan al 80%,
+  // se queda con el de menor poder total: arriesga lo justo.
+  let mejor: MiembroEquipo[] | null = null;
+  for (let tam = 1; tam <= maximo; tam++) {
     for (let inicio = 0; inicio + tam <= ascendentes.length; inicio++) {
       const equipo = ascendentes.slice(inicio, inicio + tam);
-      if (prob(equipo) >= 80) return equipo;
+      if (prob(equipo) >= 80 && (!mejor || poder(equipo) < poder(mejor))) mejor = equipo;
     }
   }
+  if (mejor) return mejor;
   return ascendentes.slice(-maximo);
 }
 
@@ -61,71 +58,11 @@ export function nivelDificultad(probabilidad: number | null): NivelDificultad {
   return 'muy-dificil';
 }
 
-/** Probabilidad de éxito de una misión con el equipo recomendado (null si no hay 3 héroes libres). */
+/** Probabilidad de éxito de una misión con el equipo recomendado (null si no hay héroes libres). */
 export function probabilidadConMejorEquipo(estado: EstadoJuego, mision: Mision): number | null {
   const equipo = equipoRecomendado(estado, mision);
-  if (equipo.length < 3) return null;
+  if (equipo.length === 0) return null;
   return vistaPreviaMision(mision, equipo, opcionesRiesgo(estado)).probabilidad;
-}
-
-export type Confianza = 'muy-probable' | 'probable' | 'incierta' | 'dificil' | 'imposible';
-
-export const TEXTO_CONFIANZA: Record<Confianza, string> = {
-  'muy-probable': 'Muy probable',
-  probable: 'Probable',
-  incierta: 'Incierta',
-  dificil: 'Difícil',
-  imposible: 'No ficharía por ti',
-};
-
-/**
- * Lo probable que es ganar una puja con esa puntuación. Un rival típico que paga el valor de
- * mercado ronda los 65–80 puntos; la Corona, con su prestigio, algo más.
- */
-export function confianzaPuja(puntuacion: number, elegible: boolean): Confianza {
-  if (!elegible) return 'imposible';
-  if (puntuacion >= 95) return 'muy-probable';
-  if (puntuacion >= 80) return 'probable';
-  if (puntuacion >= 65) return 'incierta';
-  return 'dificil';
-}
-
-export interface OfertaSugerida {
-  id: 'justa' | 'generosa' | 'maxima';
-  nombre: string;
-  oferta: Oferta;
-  puntuacion: number;
-  confianza: Confianza;
-}
-
-/** Oro que se puede ofrecer de prima: el disponible menos 4 semanas de salarios. */
-export function oroParaPujar(estado: EstadoJuego): number {
-  return Math.max(0, jugador(estado).oro - 4 * salariosDe(estado, estado.jugadorId));
-}
-
-export function evaluarOferta(estado: EstadoJuego, heroe: Heroe, oferta: Oferta): { puntuacion: number; confianza: Confianza } {
-  const d = puntuacionOferta(ofertaTotal(oferta), valorMercado(heroe), contextoGremio(estado, estado.jugadorId, heroe), heroe.rasgos);
-  return { puntuacion: d.total, confianza: confianzaPuja(d.total, d.elegible) };
-}
-
-/** Tres ofertas de un clic. Las que no se pueden pagar no aparecen. */
-export function ofertasSugeridas(estado: EstadoJuego, heroe: Heroe): OfertaSugerida[] {
-  const valor = valorMercado(heroe);
-  const salario = salarioPedido(heroe.rango);
-  const disponible = oroParaPujar(estado);
-  const opciones: { id: OfertaSugerida['id']; nombre: string; prima: number; salario: number }[] = [
-    { id: 'justa', nombre: 'Justa', prima: Math.round(valor * 0.9), salario },
-    { id: 'generosa', nombre: 'Generosa', prima: Math.round(valor * 1.2), salario: Math.round(salario * 1.1) },
-    { id: 'maxima', nombre: 'Todo lo posible', prima: Math.min(disponible, Math.round(valor * 1.5)), salario: Math.round(salario * 1.2) },
-  ];
-  const vistas = new Set<number>();
-  return opciones
-    .filter((o) => o.prima <= disponible && o.prima > 0)
-    .filter((o) => (vistas.has(o.prima) ? false : (vistas.add(o.prima), true)))
-    .map((o) => {
-      const oferta: Oferta = { prima: o.prima, salario: o.salario, duracion: 2 };
-      return { id: o.id, nombre: o.nombre, oferta, ...evaluarOferta(estado, heroe, oferta) };
-    });
 }
 
 /** Explicación corta de cada rasgo, para los chips de las cartas. */

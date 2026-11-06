@@ -141,7 +141,7 @@ export function turnoMisionesIA(estado: EstadoJuego, azar: Azar, gremioId: strin
     // El equipo queda ocupado lo que dura la misión, igual que los héroes del jugador.
     for (const h of equipo) {
       h.estado = 'en mision';
-      h.semanasFuera = m.duracion;
+      h.diasFuera = m.duracion;
     }
     const exito = azar.probabilidad(prob);
     if (exito) {

@@ -167,12 +167,12 @@
       "parcial": 10,
       "fracaso": 20
     },
-    "semanasLeve": 1,
-    "semanasGrave": [
-      3,
-      4
+    "diasLeve": 2,
+    "diasGrave": [
+      5,
+      7
     ],
-    "semanasClemente": 4,
+    "diasClemente": 7,
     "moralClemente": -10
   },
   "modificadores": {
@@ -221,7 +221,7 @@
     "cuotaDeuda": 500,
     "patrocinioPorPrestigio": 10,
     "patrocinioPorReputacion": 5,
-    "cierresNegativosParaQuiebra": 3,
+    "cierresNegativosParaQuiebra": 2,
     "decaimientoPrestigio": 0.5,
     "premios": [
       30000,
@@ -297,9 +297,9 @@
     "rivalMuerto": 10,
     "probAbandonoRomance": 30,
     "probAbandonoFamilia": 20,
-    "semanasLuto": 2,
     "exitoMision": 3,
-    "fracasoMision": -5
+    "fracasoMision": -5,
+    "diasLuto": 3
   },
   "ventas": {
     "probInteres": 40,
@@ -312,8 +312,8 @@
   },
   "ia": {
     "misionesPorSemana": [
-      1,
-      2
+      0,
+      1
     ],
     "probExitoMinima": 70,
     "probMuerteFracaso": 4,
@@ -326,16 +326,17 @@
       "arriesgada": 1.38
     },
     "oroPorPoder": {
-      "segura": 1.05,
-      "justa": 1.5,
-      "arriesgada": 2.6
+      "segura": 0.27,
+      "justa": 0.4,
+      "arriesgada": 0.7
     },
     "plantillaParaCuartaMision": 7,
-    "poderMinimo": 400,
+    "poderMinimo": 300,
     "variacion": 0.06
   },
   "temporada": {
-    "semanas": 20,
+    "dias": 28,
+    "diasPorSemana": 7,
     "misionesParaDespertarI": 5
   },
   "sabotajes": {
@@ -355,46 +356,57 @@
     "amenazaPuestos": 2,
     "amenazaAgresividad": 1.1
   },
-  "mejoras": {
-    "Dormitorios I": {
-      "coste": 3000,
-      "requiere": null,
-      "efecto": "Plantilla máxima de 6 a 10"
-    },
-    "Dormitorios II": {
-      "coste": 8000,
-      "requiere": "Dormitorios I",
-      "efecto": "Plantilla máxima de 10 a 15"
-    },
-    "Enfermeria": {
-      "coste": 5000,
-      "requiere": null,
-      "efecto": "Heridas 1 semana más cortas; −10% de riesgo de muerte"
-    },
-    "Sala de entrenamiento": {
-      "coste": 4000,
-      "requiere": null,
-      "efecto": "+20% de XP"
-    },
-    "Biblioteca arcana": {
-      "coste": 6000,
-      "requiere": null,
-      "efecto": "Muestra el potencial real de los héroes de tu plantilla"
-    },
-    "Salon de banquetes": {
-      "coste": 7000,
-      "requiere": null,
-      "efecto": "+5 de Moral semanal a toda la plantilla; +5 de prestigio"
-    }
-  },
-  "efectosMejoras": {
-    "plantillaDormitoriosI": 10,
-    "plantillaDormitoriosII": 15,
-    "xpEntrenamiento": 1.2,
-    "prestigioBanquetes": 5,
-    "semanasMenosEnfermeria": 1
-  },
   "traspasos": {
     "puntuacionMinimaClausula": 60
+  },
+  "sede": {
+    "plantillaPorNivel": [
+      6,
+      8,
+      10,
+      12,
+      15
+    ],
+    "costeSubir": [
+      1500,
+      3000,
+      5000,
+      8000
+    ],
+    "prestigioPorNivel": [
+      5,
+      5,
+      8,
+      10
+    ],
+    "mantenimientoPorNivel": 100
+  },
+  "novatos": {
+    "porSemana": 4,
+    "rangos": [
+      "D",
+      "C",
+      "C",
+      "B",
+      "B",
+      "A"
+    ],
+    "edad": [
+      16,
+      22
+    ],
+    "probVinculoJugador": 45,
+    "precioInicial": 0.3,
+    "incrementoMinimo": 50,
+    "incrementoRelativo": 0.1,
+    "duracionSegundos": 10,
+    "tiempoTrasPuja": 3,
+    "probPujaRivalPorSegundo": 40,
+    "preferenciaVinculo": 1.2,
+    "maximoRivalMin": 0.7,
+    "maximoRivalMax": 1.4
+  },
+  "venta": {
+    "factorPrecio": 0.9
   }
 }

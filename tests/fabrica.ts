@@ -15,7 +15,7 @@ export function heroe(datos: Partial<Heroe> & Pick<Heroe, 'id'>): Heroe {
     vinculos: [],
     contrato: null,
     estado: 'disponible',
-    semanasFuera: 0,
+    diasFuera: 0,
     xp: 0,
     misionesExito: 0,
     ...datos,

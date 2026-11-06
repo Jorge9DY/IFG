@@ -23,7 +23,7 @@ npm install
 npm run dev
 ```
 
-Abre la dirección que aparece en la terminal (normalmente `http://localhost:5173`). Crea una partida, muévete por la sede con WASD o las flechas y pulsa E junto a los puntos marcados en el suelo, o usa el menú de la izquierda para abrir los paneles. La partida se guarda sola en el navegador.
+Abre la dirección que aparece en la terminal (normalmente `http://localhost:5173`). Cada día lanzas una misión para ganar oro, compras o vendes héroes en el mercado y mejoras tu sede; el día 7 de cada semana pujas en directo por los novatos. La partida se guarda sola en el navegador.
 
 | Comando | Qué hace |
 | --- | --- |

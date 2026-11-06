@@ -63,13 +63,12 @@ describe('Economía (sección 10)', () => {
     expect(g.deuda).toBe(38000);
   });
 
-  it('tres cierres seguidos con oro negativo significan la quiebra', () => {
+  it('dos cierres seguidos con oro negativo significan la quiebra', () => {
     const g = { ...llamaInicial(), oro: -5000 };
     expect(cierreSemanal(g, 0, false).quiebra).toBe(false);
-    expect(cierreSemanal(g, 0, false).quiebra).toBe(false);
-    const tercero = cierreSemanal(g, 0, false);
-    expect(tercero.aviso).toBe(true);
-    expect(tercero.quiebra).toBe(true);
+    const segundo = cierreSemanal(g, 0, false);
+    expect(segundo.aviso).toBe(true);
+    expect(segundo.quiebra).toBe(true);
   });
 });
 

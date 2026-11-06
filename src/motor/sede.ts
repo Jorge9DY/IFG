@@ -1,63 +1,50 @@
-// Mejoras de la sede (sección 10 del diseño).
+// Mejorar la sede: un único nivel (1–5). Cada nivel da más plazas de héroe y más prestigio.
 
 import balance from '../datos/balance.json';
-import { heroesDe, jugador, registrar, type EstadoJuego } from './estado';
-import type { Mejora } from './tipos';
+import { jugador, registrar, type EstadoJuego } from './estado';
+import type { Gremio } from './tipos';
 
-const E = balance.efectosMejoras;
+const S = balance.sede;
+export const NIVEL_MAXIMO = S.plantillaPorNivel.length;
 
-export const MEJORAS = Object.keys(balance.mejoras) as Mejora[];
+export function nivelSede(gremio: Gremio): number {
+  return gremio.nivelSede ?? 1;
+}
 
-export interface InfoMejora {
-  mejora: Mejora;
-  coste: number;
-  efecto: string;
-  construida: boolean;
-  /** Motivo por el que no se puede construir ahora, o null si se puede. */
+export interface InfoSede {
+  nivel: number;
+  plazas: number;
+  /** Datos del siguiente nivel, o null si ya está al máximo. */
+  siguiente: { coste: number; plazas: number; prestigio: number } | null;
+  /** Por qué no se puede mejorar ahora, o null si se puede. */
   bloqueo: string | null;
 }
 
-export function infoMejoras(estado: EstadoJuego): InfoMejora[] {
+export function infoSede(estado: EstadoJuego): InfoSede {
   const j = jugador(estado);
-  return MEJORAS.map((mejora) => {
-    const datos = balance.mejoras[mejora];
-    const construida = j.mejoras.includes(mejora);
-    let bloqueo: string | null = null;
-    if (construida) bloqueo = 'Ya construida';
-    else if (datos.requiere && !j.mejoras.includes(datos.requiere as Mejora)) bloqueo = `Necesita ${datos.requiere}`;
-    else if (j.oro < datos.coste) bloqueo = 'No hay oro suficiente';
-    return { mejora, coste: datos.coste, efecto: datos.efecto, construida, bloqueo };
-  });
+  const nivel = nivelSede(j);
+  const plazas = S.plantillaPorNivel[nivel - 1] ?? j.plantillaMax;
+  if (nivel >= NIVEL_MAXIMO) return { nivel, plazas, siguiente: null, bloqueo: 'La sede ya está al máximo' };
+  const siguiente = {
+    coste: S.costeSubir[nivel - 1] ?? 0,
+    plazas: S.plantillaPorNivel[nivel] ?? plazas,
+    prestigio: S.prestigioPorNivel[nivel - 1] ?? 0,
+  };
+  return { nivel, plazas, siguiente, bloqueo: j.oro < siguiente.coste ? 'No tienes oro suficiente' : null };
 }
 
-export function construirMejora(estado: EstadoJuego, mejora: Mejora): void {
-  const info = infoMejoras(estado).find((m) => m.mejora === mejora);
-  if (!info) throw new Error(`No existe la mejora ${mejora}`);
-  if (info.bloqueo) throw new Error(info.bloqueo);
+export function mejorarSede(estado: EstadoJuego): void {
+  const info = infoSede(estado);
+  if (!info.siguiente || info.bloqueo) throw new Error(info.bloqueo ?? 'No se puede mejorar');
   const j = jugador(estado);
-  j.oro -= info.coste;
-  j.mejoras.push(mejora);
-  aplicarEfectosPermanentes(estado);
-  if (mejora === 'Salon de banquetes') j.prestigio = Math.min(100, j.prestigio + E.prestigioBanquetes);
-  registrar(estado, 'sede', `Construida la mejora ${mejora} por ${info.coste} de oro.`);
+  j.oro -= info.siguiente.coste;
+  j.nivelSede = info.nivel + 1;
+  j.plantillaMax = info.siguiente.plazas;
+  j.prestigio = Math.min(100, j.prestigio + info.siguiente.prestigio);
+  registrar(estado, 'sede', `La sede sube al nivel ${j.nivelSede}: ${j.plantillaMax} plazas y +${info.siguiente.prestigio} de prestigio.`);
 }
 
-/** Efectos que dependen de la plantilla actual: se aplican al construir y en cada cierre. */
-export function aplicarEfectosPermanentes(estado: EstadoJuego): void {
-  const j = jugador(estado);
-  if (j.mejoras.includes('Dormitorios II')) j.plantillaMax = Math.max(j.plantillaMax, E.plantillaDormitoriosII);
-  else if (j.mejoras.includes('Dormitorios I')) j.plantillaMax = Math.max(j.plantillaMax, E.plantillaDormitoriosI);
-  if (j.mejoras.includes('Biblioteca arcana')) {
-    for (const h of heroesDe(estado, j.id)) h.potencialVisible = true;
-  }
-}
-
-export function multiplicadorXp(estado: EstadoJuego): number {
-  return jugador(estado).mejoras.includes('Sala de entrenamiento') ? E.xpEntrenamiento : 1;
-}
-
-/** Semanas de baja con la Enfermería: una menos, con un mínimo de 1. */
-export function semanasDeBaja(estado: EstadoJuego, semanas: number): number {
-  if (semanas <= 0 || !jugador(estado).mejoras.includes('Enfermeria')) return semanas;
-  return Math.max(1, semanas - E.semanasMenosEnfermeria);
+/** Mantenimiento extra por cada nivel por encima del primero. */
+export function mantenimientoSede(gremio: Gremio): number {
+  return (nivelSede(gremio) - 1) * S.mantenimientoPorNivel;
 }

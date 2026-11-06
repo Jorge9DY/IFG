@@ -52,7 +52,7 @@ export interface Heroe {
   vinculos: Vinculo[];
   contrato: Contrato | null;
   estado: EstadoHeroe;
-  semanasFuera: number;
+  diasFuera: number;
   xp: number;
   misionesExito: number;
 }
@@ -93,6 +93,8 @@ export interface Gremio {
   plantilla: string[];
   plantillaMax: number;
   mejoras: Mejora[];
+  /** Nivel de la sede (1–5): más plazas de héroe y más prestigio. */
+  nivelSede?: number;
   puntosMisionTemporada: number;
   /** Prestigio al empezar la temporada: la clasificación cuenta solo el ganado desde entonces. */
   prestigioInicioTemporada?: number;
@@ -104,7 +106,8 @@ export interface Partida {
   protagonista: { nombre: string; aspecto: number };
   modoClemente: boolean;
   temporada: number;
-  semana: number;
+  /** Día de la temporada (1–28). La semana se deriva de él. */
+  dia: number;
   despertares: number;
   sospecha: number;
   afinidadElara: number;

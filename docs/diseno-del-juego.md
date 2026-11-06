@@ -2,20 +2,34 @@
 
 Versión 1.1 · 6 de noviembre de 2026 · Este archivo es la versión de referencia
 
-## 0. Síntesis del gameplay (6 de noviembre de 2026)
+## 0. El juego, en su esencia (versión actual)
 
-El juego se ha reducido a su esencia: **fichar con astucia, arriesgar a tus héroes y escalar contra gremios más fuertes.** Esta sección manda sobre el resto del documento cuando se contradicen.
+Esta sección manda sobre el resto del documento cuando se contradicen. El resto describe el mundo, la historia y reglas de fondo que el motor sigue usando.
 
-| Antes | Ahora | Por qué |
-| --- | --- | --- |
-| Tablón de 6–10 misiones por rango, de 1 a 4 semanas | **3 misiones por semana a tu medida** (4 con plantilla de 7 o más): **Segura** (~95%), **Justa** (~75%) y **Arriesgada** (~45%), calibradas con tus 4 mejores héroes. Todas duran 1 semana. A más riesgo, más oro (×1,05 / ×1,5 / ×2,6 del poder recomendado), prestigio y puntos | La decisión de riesgo es el centro de cada semana; ninguna semana queda sin decisión |
-| 6 elementos con ventajas en ciclo | Eliminados | Cálculo sin decisión real |
-| 3 posiciones con penalización fuera de sitio | Eliminadas: eliges quién va. Cada clase hace su papel sola (el Tanque protege al resto, el Sanador salva a uno, el Soporte da +10%) | Menos pasos, la misma decisión |
-| 4 stats visibles por héroe | Un único número de **Poder** (incluye la moral) y su papel | Se compara de un vistazo |
-| Cesiones de héroes | Eliminadas | Complejas y poco usadas; queda pagar la cláusula para robar fichajes |
-| Riesgo base de muerte 35/18/8% | 25/12/6% | Con misiones arriesgadas cada semana, las muertes siguen siendo raras (0,6 por temporada jugando con prudencia) |
+**El reto de cada partida:** tienes una cantidad de oro. ¿Cómo la gestionas para hacer más fuerte a tu gremio?
 
-Resultados con el simulador: 77% de éxito con juego prudente, 1% de semanas sin decisión (antes 24%) y, por primera vez, un jugador puede terminar la temporada 1 en el Top 3. Arriesgar compensa: el jugador arriesgado llega al 1.º puesto el triple de veces que el prudente, a cambio de más muertes.
+**La pantalla principal**, sencilla como la de un juego infantil:
+
+| Lugar | Qué hay |
+| --- | --- |
+| Arriba a la izquierda | El oro, en grande, con el día, la semana y el puesto |
+| Arriba a la derecha | **Terminar día** (el día 7 se convierte en **Prueba de Novatos**) |
+| Izquierda: gastar | **Gestionar gremio**: mejorar la sede, ver tus héroes y la clasificación |
+| Centro, bajo la sede 3D | **Mercado**: comprar héroes de otros gremios o vender los tuyos al instante |
+| Derecha: ganar | **Lanzar misión**: 3 misiones al día (fácil, media y difícil); eliges una y a los héroes que van |
+
+**El tiempo:** se avanza por días. Una temporada dura 4 semanas (28 días).
+- **Días 1 a 6:** una misión al día (equipo de 1 a 5 héroes, con uno recomendado ya marcado). El equipo vuelve al terminar el día.
+- **Día 7: Prueba de Novatos.** Llegan 4 novatos que acaban de despertar sus poderes y se subastan en directo contra los demás gremios: unos 10 segundos por novato, cada puja alarga el reloj y gana la puja más alta cuando llega a cero. Los novatos con un vínculo con alguien de tu gremio te prefieren: un rival tiene que superar tu puja en un 20%. Ese mismo día se cobran el patrocinio y se pagan sueldos, manutención, licencia, mantenimiento y la cuota de la deuda.
+
+**Las tres formas de usar el oro:**
+1. **Ganar:** misiones (fácil ~95% de éxito, media ~75%, difícil ~45% pero mucho más oro) o vender héroes (90% de su valor, al instante).
+2. **Gastar en héroes:** pujar en la Prueba de Novatos o comprar héroes de otros gremios (pagando su precio; solo vienen si quieren).
+3. **Gastar en el gremio:** mejorar la sede (niveles 1–5): más plazas para héroes (6, 8, 10, 12, 15) y más prestigio para subir en la clasificación. Cuesta 1.500, 3.000, 5.000 y 8.000.
+
+**Derrota:** dos cierres de semana seguidos con oro negativo. **Clasificación:** puntos de misión y prestigio ganado en la temporada.
+
+**Eliminado del juego visible:** sobornos, contraofertas, agentes libres, cesiones, elementos, posiciones, las seis mejoras sueltas (sustituidas por el nivel de sede) y los paneles de objetivo, informe y clasificación sueltos.
 
 ## 1. Visión y pitch
 

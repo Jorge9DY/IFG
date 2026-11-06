@@ -5,8 +5,8 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { jugador, puesto, type EstadoJuego } from '../../src/motor/estado';
-import { crearPartida, terminarSemana } from '../../src/motor/partida';
-import { ESTRATEGIA_ARRIESGADA, ESTRATEGIA_BASE, jugarSemana, type Estrategia, type MetricasBot } from './bot';
+import { crearPartida, terminarDia } from '../../src/motor/partida';
+import { ESTRATEGIA_ARRIESGADA, ESTRATEGIA_BASE, jugarDia, type Estrategia, type MetricasBot } from './bot';
 
 export interface ResultadoTemporada {
   semilla: number;
@@ -30,17 +30,17 @@ export function simularTemporada(semilla: number, estrategia: Estrategia = ESTRA
   let misiones = 0;
   let exitos = 0;
   while (!estado.fin) {
-    jugarSemana(estado, estrategia, m);
-    const resumen = terminarSemana(estado);
+    jugarDia(estado, estrategia, m);
+    const resumen = terminarDia(estado);
     misiones += resumen.informes.length;
     exitos += resumen.informes.filter((i) => i.resultado === 'exito').length;
-    if (jugador(estado).oro < 500) semanasOroBajo++;
+    if (resumen.cierre && jugador(estado).oro < 500) semanasOroBajo++;
   }
   const j = jugador(estado);
   return {
     semilla,
     quiebra: estado.fin === 'quiebra',
-    semanaFin: estado.partida.semana,
+    semanaFin: Math.ceil(estado.partida.dia / 7),
     puestoFinal: puesto(estado, j.id),
     oroFinal: j.oro,
     prestigioFinal: j.prestigio,

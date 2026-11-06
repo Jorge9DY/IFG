@@ -1,10 +1,12 @@
-// Partida: creación, acciones del jugador y bucle semanal (secciones 6, 7, 9, 10 y 14).
+// Partida: creación, acciones del jugador y bucle diario (una misión al día; el día 7 de cada semana,
+// Prueba de Novatos y cierre económico de la semana).
 
 import balance from '../datos/balance.json';
 import datosGremios from '../datos/gremios.json';
 import { Azar } from './azar';
 import { cierreSemanal, premioFinTemporada, type ResultadoCierre } from './economia';
 import {
+  esDiaDeNovatos,
   gremio,
   heroe as obtenerHeroe,
   heroesDe,
@@ -15,31 +17,19 @@ import {
   registrar,
   rivales,
   salariosDe,
+  semanaDeDia,
   tabla,
   type EstadoJuego,
 } from './estado';
 import { estadoInicialJugador } from './estadoInicial';
 import { envejecer, ganarXp, generarHeroe, generarVinculos, salarioPedido, valorMercado } from './heroes';
-import { cierreIA, contextoGremio, pujadorIA, rivalesInteresados, turnoMisionesIA } from './ia';
+import { cierreIA, turnoMisionesIA } from './ia';
 import { aportacion, poderEquipo, resolverMision, type InformeMision, type MiembroEquipo } from './misiones';
-import { ofertaTotal, resolverSubasta, type Oferta, type Pujador, type ResultadoSubasta } from './pujas';
 import { puntosMision } from './ranking';
-import { ofertaAnualCorona, pujadoresRivales, reiniciarAccionesTemporada, resolverSobornos, sabotajesColmillo } from './rivales';
-import { aplicarEfectosPermanentes, multiplicadorXp, semanasDeBaja } from './sede';
-import { generarOfertas, liberarHeroe } from './ventas';
+import { mantenimientoSede } from './sede';
+import { resolverNovatosPendientes } from './subasta';
 import { aplicarPerdida, cambiarMoral, derivaMoral, sumarAfinidadEquipo } from './vinculos';
-import {
-  RANGOS,
-  indiceRango,
-  type Clase,
-  type EtiquetaMision,
-  type Gremio,
-  type Heroe,
-  type Mision,
-  type Posicion,
-  type Rango,
-  type TipoMision,
-} from './tipos';
+import { RANGOS, indiceRango, type Clase, type EtiquetaMision, type Gremio, type Heroe, type Mision, type Posicion, type Rango, type TipoMision } from './tipos';
 
 export interface OpcionesPartida {
   nombre: string;
@@ -65,7 +55,7 @@ function crearElara(): Heroe {
     vinculos: [],
     contrato: { gremio: 'llama', salario: 0, temporadasRestantes: 99, clausula: 0 },
     estado: 'disponible',
-    semanasFuera: 0,
+    diasFuera: 0,
     xp: 0,
     misionesExito: 0,
   };
@@ -82,12 +72,12 @@ function conAzar<T>(estado: EstadoJuego, f: (azar: Azar) => T): T {
 export function crearPartida(opciones: OpcionesPartida): EstadoJuego {
   const semilla = opciones.semilla ?? Math.floor(Math.random() * 2 ** 31);
   const estado: EstadoJuego = {
-    version: 1,
+    version: 2,
     partida: {
       protagonista: { nombre: opciones.nombre, aspecto: opciones.aspecto ?? 0 },
       modoClemente: opciones.modoClemente ?? false,
       temporada: 1,
-      semana: 1,
+      dia: 1,
       despertares: 0,
       sospecha: 0,
       afinidadElara: 20,
@@ -99,11 +89,10 @@ export function crearPartida(opciones: OpcionesPartida): EstadoJuego {
     jugadorId: 'llama',
     tablon: [],
     enCurso: [],
-    mercado: [],
-    enVenta: [],
-    ofertas: [],
+    novatos: [],
     afinidades: {},
     exitosTemporada: 0,
+    exitosSemana: 0,
     muertesTemporada: {},
     informes: [],
     registro: [],
@@ -144,24 +133,35 @@ export function crearPartida(opciones: OpcionesPartida): EstadoJuego {
       }
     }
 
-    // Draft de la semana 1 y primeros agentes libres.
-    for (const [rango, cantidad] of Object.entries(balance.generacion.draft)) {
-      for (let i = 0; i < cantidad; i++) agregarAlMercado(estado, azar, rango as Rango, true);
-    }
-    for (let i = 0; i < 4; i++) agregarAlMercado(estado, azar, azar.elegir(['F', 'D', 'D', 'C'] as Rango[]), false);
-
     generarVinculos(azar, Object.values(estado.heroes).filter((h) => h.id !== ID_ELARA));
+    generarNovatos(estado, azar);
     estado.tablon = generarTablon(estado, azar);
   });
-  registrar(estado, 'temporada', 'Empieza la temporada 1. El Draft está abierto esta semana.');
+  registrar(estado, 'temporada', 'Empieza la temporada 1. El día 7 se celebra la Prueba de Novatos.');
   return estado;
 }
 
-function agregarAlMercado(estado: EstadoJuego, azar: Azar, rango: Rango, draft: boolean): Heroe {
-  const h = generarHeroe(azar, nuevoId(estado, 'h'), rango, draft ? { edad: azar.entero(16, 30) } : {});
-  estado.heroes[h.id] = h;
-  estado.mercado.push({ heroeId: h.id, draft, semanaLlegada: estado.partida.semana });
-  return h;
+/**
+ * Novatos de la próxima Prueba de Novatos. Casi la mitad tiene un vínculo (familia, amistad o
+ * romance) con alguien de tu gremio: esos prefieren tu oferta en la subasta.
+ */
+export function generarNovatos(estado: EstadoJuego, azar: Azar): void {
+  const N = balance.novatos;
+  const [edadMin, edadMax] = N.edad as [number, number];
+  const plantilla = heroesDe(estado, estado.jugadorId).filter((h) => h.id !== ID_ELARA);
+  estado.novatos = [];
+  for (let i = 0; i < N.porSemana; i++) {
+    const h = generarHeroe(azar, nuevoId(estado, 'h'), azar.elegir(N.rangos as Rango[]), { edad: azar.entero(edadMin, edadMax) });
+    h.potencialVisible = estado.partida.despertares >= 1;
+    const amigo = plantilla.length > 0 && azar.probabilidad(N.probVinculoJugador) ? azar.elegir(plantilla) : null;
+    if (amigo && amigo.vinculos.length < 3) {
+      const tipo = azar.elegir(amigo.raza === h.raza ? (['Familia', 'Amistad', 'Romance'] as const) : (['Amistad', 'Romance'] as const));
+      h.vinculos.push({ con: amigo.id, tipo, oculto: false });
+      amigo.vinculos.push({ con: h.id, tipo, oculto: false });
+    }
+    estado.heroes[h.id] = h;
+    estado.novatos.push(h.id);
+  }
 }
 
 const ETIQUETAS: readonly EtiquetaMision[] = ['Caza', 'Escolta', 'Exploracion', 'Rescate', 'Mazmorra'];
@@ -185,18 +185,13 @@ function rangoPorPoder(poder: number): Rango {
   return mejor;
 }
 
-const TIPOS_SEMANA: TipoMision[] = ['segura', 'justa', 'arriesgada'];
+const TIPOS_DIA: TipoMision[] = ['segura', 'justa', 'arriesgada'];
 
-/**
- * Tablón semanal: tres misiones a la medida del gremio (Segura, Justa y Arriesgada) y una Justa
- * más si la plantilla es grande. Cuanto más riesgo, más oro, prestigio y puntos.
- */
+/** Las tres misiones del día, a la medida del gremio: fácil, media y difícil. Solo se puede hacer una. */
 export function generarTablon(estado: EstadoJuego, azar: Azar): Mision[] {
   const t = balance.tablon;
   const referencia = poderReferencia(estado);
-  const tipos = [...TIPOS_SEMANA];
-  if (jugador(estado).plantilla.length >= t.plantillaParaCuartaMision) tipos.splice(2, 0, 'justa');
-  return tipos.map((tipo) => {
+  return TIPOS_DIA.map((tipo) => {
     const variacion = 1 + (azar.siguiente() * 2 - 1) * t.variacion;
     const poderRecomendado = Math.round(referencia * t.multiplicadorPoder[tipo] * variacion);
     const rango = rangoPorPoder(poderRecomendado);
@@ -207,7 +202,7 @@ export function generarTablon(estado: EstadoJuego, azar: Azar): Mision[] {
       etiqueta: azar.elegir(ETIQUETAS),
       tipo,
       poderRecomendado,
-      // Todas las misiones duran una semana: cada semana es una decisión nueva.
+      // Todas las misiones vuelven al terminar el día.
       duracion: 1,
       recompensa: { oro: Math.round(poderRecomendado * t.oroPorPoder[tipo]), prestigio: m.prestigio, xp: m.xp },
       heroeRescatable: null,
@@ -219,66 +214,6 @@ export function generarTablon(estado: EstadoJuego, azar: Azar): Mision[] {
 // Acciones del jugador
 // ---------------------------------------------------------------------------
 
-/** Oro que el jugador puede gastar en una puja: el disponible menos 4 semanas de salarios. */
-export function oroDisponibleParaPujar(estado: EstadoJuego): number {
-  return Math.max(0, jugador(estado).oro - 4 * salariosDe(estado, estado.jugadorId));
-}
-
-export interface ResultadoFichaje {
-  fichado: boolean;
-  subasta: ResultadoSubasta;
-  motivo?: string;
-}
-
-/**
- * El jugador puja por un héroe del mercado. `ofertas` es su oferta en cada ronda
- * (si hay menos de 3, repite la última). Pujan también los rivales interesados.
- */
-export function pujarPorHeroe(estado: EstadoJuego, heroeId: string, ofertas: Oferta[]): ResultadoFichaje {
-  const entrada = estado.mercado.find((e) => e.heroeId === heroeId);
-  if (!entrada) throw new Error('El héroe no está en el mercado');
-  const j = jugador(estado);
-  if (j.plantilla.length >= j.plantillaMax) throw new Error('La plantilla está llena');
-  const disponible = oroDisponibleParaPujar(estado);
-  if (ofertas.length === 0 || ofertas.some((o) => o.prima > disponible)) {
-    throw new Error(`No puedes ofrecer más de ${disponible} de oro de prima`);
-  }
-  return conAzar(estado, (azar) => {
-    const h = obtenerHeroe(estado, heroeId);
-    const pujadores: Pujador[] = [
-      {
-        contexto: contextoGremio(estado, estado.jugadorId, h),
-        pujar: (ronda) => ofertas[Math.min(ronda, ofertas.length) - 1] ?? null,
-      },
-      ...pujadoresRivales(estado, azar, h, rivalesInteresados(estado, azar, h, entrada.draft), ofertas[0]),
-    ];
-    const subasta = resolverSubasta(valorMercado(h), h.rasgos, pujadores);
-    if (subasta.ganador && subasta.oferta) firmar(estado, h, subasta.ganador, subasta.oferta);
-    const fichado = subasta.ganador === estado.jugadorId;
-    if (fichado) {
-      const rivalesTop3 = subasta.rondas[0]?.some(
-        (p) => p.gremioId !== estado.jugadorId && puesto(estado, p.gremioId) <= 3,
-      );
-      if (rivalesTop3) j.prestigio = Math.min(100, j.prestigio + 1);
-    }
-    return { fichado, subasta, motivo: subasta.ganador ? undefined : 'El héroe no aceptó ninguna oferta' };
-  });
-}
-
-function firmar(estado: EstadoJuego, h: Heroe, gremioId: string, oferta: Oferta): void {
-  const g = gremio(estado, gremioId);
-  g.oro -= oferta.prima;
-  g.plantilla.push(h.id);
-  h.contrato = {
-    gremio: gremioId,
-    salario: oferta.salario,
-    temporadasRestantes: oferta.duracion,
-    clausula: Math.round(valorMercado(h) * 1.5),
-  };
-  estado.mercado = estado.mercado.filter((e) => e.heroeId !== h.id);
-  registrar(estado, 'fichaje', `${h.nombre} (${h.rango}, ${h.clase}) ficha por ${g.nombre} por ${ofertaTotal(oferta)} de oro.`);
-}
-
 export interface PlazaEquipo {
   heroeId: string;
   posicion: Posicion;
@@ -287,8 +222,11 @@ export interface PlazaEquipo {
 export function enviarMision(estado: EstadoJuego, misionId: string, equipo: PlazaEquipo[]): void {
   const mision = estado.tablon.find((m) => m.id === misionId);
   if (!mision) throw new Error('La misión no está en el tablón');
-  if (equipo.length < 3 || equipo.length > 5) throw new Error('Un equipo debe tener entre 3 y 5 héroes');
+  if (equipo.length < 1 || equipo.length > 5) throw new Error('Un equipo tiene entre 1 y 5 héroes');
   const j = jugador(estado);
+  if (estado.enCurso.some((c) => c.gremioId === j.id && c.diaInicio === estado.partida.dia)) {
+    throw new Error('Hoy ya has lanzado una misión');
+  }
   for (const plaza of equipo) {
     if (!j.plantilla.includes(plaza.heroeId)) throw new Error('Ese héroe no es de tu gremio');
     const h = obtenerHeroe(estado, plaza.heroeId);
@@ -296,105 +234,103 @@ export function enviarMision(estado: EstadoJuego, misionId: string, equipo: Plaz
   }
   if (new Set(equipo.map((p) => p.heroeId)).size !== equipo.length) throw new Error('Héroe repetido en el equipo');
   for (const plaza of equipo) obtenerHeroe(estado, plaza.heroeId).estado = 'en mision';
-  estado.tablon = estado.tablon.filter((m) => m.id !== misionId);
-  estado.enCurso.push({
-    mision,
-    gremioId: j.id,
-    equipo,
-    semanaInicio: estado.partida.semana,
-    semanaFin: estado.partida.semana + mision.duracion - 1,
-  });
+  // Solo se puede elegir una de las tres misiones del día.
+  estado.tablon = [];
+  estado.enCurso.push({ mision, gremioId: j.id, equipo, diaInicio: estado.partida.dia, diaFin: estado.partida.dia });
 }
 
 // ---------------------------------------------------------------------------
-// Cierre de semana
+// Cierre del día
 // ---------------------------------------------------------------------------
 
-export interface ResumenSemana {
-  semana: number;
+export interface ResumenDia {
+  dia: number;
   informes: InformeMision[];
-  cierre: ResultadoCierre;
+  /** Cierre económico de la semana (solo el día de la Prueba de Novatos). */
+  cierre: ResultadoCierre | null;
   puesto: number;
 }
 
-export function terminarSemana(estado: EstadoJuego): ResumenSemana {
+export function terminarDia(estado: EstadoJuego): ResumenDia {
   if (estado.fin) throw new Error('La partida ha terminado');
-  const semana = estado.partida.semana;
-  // Se conservan los sucesos de esta semana (fichajes, pujas) para el informe del cierre.
-  estado.registro = estado.registro.filter((e) => e.semana === semana);
+  const dia = estado.partida.dia;
+  // Se conservan los sucesos de hoy (fichajes, ventas, pujas) para el informe.
+  estado.registro = estado.registro.filter((e) => e.dia === dia);
   return conAzar(estado, (azar) => {
     const j = jugador(estado);
 
-    // 0. Sobornos que vencen y sabotajes del Colmillo Carmesí (rumores, robos, nuevos sobornos).
-    for (const id of resolverSobornos(estado, azar)) liberarHeroe(estado, id);
-    sabotajesColmillo(estado, azar);
-
-    // 1. Misiones del jugador que terminan esta semana.
+    // 1. Vuelve la misión del día.
     const informes = resolverMisionesDelJugador(estado, azar);
-    const huboExito = informes.some((i) => i.resultado === 'exito');
     estado.informes = informes;
+    estado.exitosSemana += informes.filter((i) => i.resultado === 'exito').length;
 
-    // 2. Turno de los rivales: misiones, fichajes en el mercado y cierre.
-    for (const rival of rivales(estado)) {
-      const { exitos } = turnoMisionesIA(estado, azar, rival.id);
-      cierreIA(estado, rival.id, exitos > 0);
-    }
-    fichajesIA(estado, azar, semana === 1);
+    // 2. Los rivales también trabajan cada día.
+    const exitosRivales: Record<string, number> = {};
+    for (const rival of rivales(estado)) exitosRivales[rival.id] = turnoMisionesIA(estado, azar, rival.id).exitos;
 
-    // 3. Cierre económico del jugador.
-    const cierre = cierreSemanal(j, salariosDe(estado, j.id), huboExito, manutencionDe(estado, j.id));
-    if (cierre.aviso) registrar(estado, 'economia', `Aviso de la Asociación: el gremio está en números rojos (${cierre.oroFinal} de oro).`);
-
-    // 4. Recuperación, luto y moral.
-    for (const h of heroesDe(estado, j.id)) {
-      if ((h.estado === 'herido' || h.estado === 'luto') && --h.semanasFuera <= 0) {
-        h.estado = 'disponible';
-        h.semanasFuera = 0;
-      }
-      derivaMoral(h, j.mejoras.includes('Salon de banquetes'));
-    }
-    for (const rival of rivales(estado)) {
-      for (const h of heroesDe(estado, rival.id)) {
-        if (h.estado !== 'disponible' && --h.semanasFuera <= 0) {
+    // 3. Recuperación de heridos, luto y equipos rivales que vuelven.
+    for (const g of Object.values(estado.gremios)) {
+      for (const h of heroesDe(estado, g.id)) {
+        const vuelve = h.estado !== 'disponible' && (g.esJugador ? h.estado !== 'en mision' : true);
+        if (vuelve && --h.diasFuera <= 0) {
           h.estado = 'disponible';
-          h.semanasFuera = 0;
+          h.diasFuera = 0;
         }
       }
     }
 
-    // Efectos de las mejoras de la sede.
-    aplicarEfectosPermanentes(estado);
+    // 4. Último día de la semana: Prueba de Novatos (las subastas que queden) y cierre de la semana.
+    let cierre: ResultadoCierre | null = null;
+    if (esDiaDeNovatos(dia)) {
+      resolverNovatosPendientes(estado, azar);
+      for (const rival of rivales(estado)) cierreIA(estado, rival.id, (exitosRivales[rival.id] ?? 0) > 0 || azar.probabilidad(70));
+      j.oro -= mantenimientoSede(j);
+      cierre = cierreSemanal(j, salariosDe(estado, j.id), estado.exitosSemana > 0, manutencionDe(estado, j.id));
+      if (cierre.aviso) registrar(estado, 'economia', `Aviso de la Asociación: el gremio está en números rojos (${cierre.oroFinal} de oro).`);
+      for (const h of heroesDe(estado, j.id)) derivaMoral(h, false);
+      estado.exitosSemana = 0;
+      generarNovatos(estado, azar);
+    }
 
-    // 5. Despertar I: 5 misiones con éxito en la temporada 1.
+    // 5. Despertar I: 5 misiones con éxito en la temporada.
     if (estado.partida.despertares === 0 && estado.exitosTemporada >= balance.temporada.misionesParaDespertarI) {
       estado.partida.despertares = 1;
       for (const h of Object.values(estado.heroes)) h.potencialVisible = true;
       registrar(estado, 'despertar', 'Despertar I: Ojo del Origen. Ahora ves el potencial oculto de todos los héroes.');
     }
 
-    // 6. Mercado: ofertas por tus héroes en venta y nuevos agentes libres.
-    generarOfertas(estado, azar);
-    ofertaAnualCorona(estado);
-    renovarMercado(estado, azar);
-
-    // 7. Avance del calendario.
-    if (cierre.quiebra) {
+    // 6. Calendario.
+    if (cierre?.quiebra) {
       estado.fin = 'quiebra';
       registrar(estado, 'economia', 'La Asociación retira la licencia del gremio: quiebra.');
-    } else if (semana >= balance.temporada.semanas) {
+    } else if (dia >= balance.temporada.dias) {
       cerrarTemporada(estado);
     } else {
-      estado.partida.semana += 1;
+      estado.partida.dia += 1;
       estado.tablon = generarTablon(estado, azar);
     }
-    return { semana, informes, cierre, puesto: puesto(estado, j.id) };
+    return { dia, informes, cierre, puesto: puesto(estado, j.id) };
   });
+}
+
+/** Semana actual (1–4). */
+export function semanaActual(estado: EstadoJuego): number {
+  return semanaDeDia(estado.partida.dia);
+}
+
+/** El héroe deja el gremio del jugador (por ejemplo, al perder a un ser querido). */
+function abandonar(estado: EstadoJuego, heroeId: string): void {
+  const j = jugador(estado);
+  j.plantilla = j.plantilla.filter((id) => id !== heroeId);
+  const h = obtenerHeroe(estado, heroeId);
+  h.contrato = null;
+  if (h.estado !== 'muerto') h.estado = 'disponible';
 }
 
 function resolverMisionesDelJugador(estado: EstadoJuego, azar: Azar): InformeMision[] {
   const j = jugador(estado);
-  const semana = estado.partida.semana;
-  const terminan = estado.enCurso.filter((c) => c.semanaFin <= semana && c.gremioId === j.id);
+  const dia = estado.partida.dia;
+  const terminan = estado.enCurso.filter((c) => c.diaFin <= dia && c.gremioId === j.id);
   estado.enCurso = estado.enCurso.filter((c) => !terminan.includes(c));
   const informes: InformeMision[] = [];
 
@@ -406,7 +342,6 @@ function resolverMisionesDelJugador(estado: EstadoJuego, azar: Azar): InformeMis
     const informe = resolverMision(enCurso.mision, equipo, azar, {
       modoClemente: estado.partida.modoClemente,
       despertarII: estado.partida.despertares >= 2,
-      enfermeria: j.mejoras.includes('Enfermeria'),
     });
     informes.push(informe);
 
@@ -423,21 +358,20 @@ function resolverMisionesDelJugador(estado: EstadoJuego, azar: Azar): InformeMis
       if (parte.consecuencia === 'muerte') {
         h.estado = 'muerto';
         j.plantilla = j.plantilla.filter((id) => id !== h.id);
-        quitarDeListas(estado, h.id);
         estado.muertesTemporada[j.id] = (estado.muertesTemporada[j.id] ?? 0) + 1;
         if (indiceRango(enCurso.mision.rango) - indiceRango(h.rango) >= 2) j.reputacion = Math.max(0, j.reputacion - 3);
         registrar(estado, 'muerte', `${h.nombre} ha muerto en la misión ${enCurso.mision.id} (${enCurso.mision.rango}).`);
-        for (const id of aplicarPerdida(estado, azar, h, j.id, 'muerte')) liberarHeroe(estado, id);
+        for (const id of aplicarPerdida(estado, azar, h, j.id, 'muerte')) abandonar(estado, id);
         continue;
       }
       supervivientes.push(h);
-      ganarXp(azar, h, Math.round(informe.xp * multiplicadorXp(estado)));
+      ganarXp(azar, h, informe.xp);
       if (informe.resultado === 'exito') h.misionesExito += 1;
       cambiarMoral(h, informe.resultado === 'fracaso' ? balance.moral.fracasoMision : balance.moral.exitoMision);
       if (parte.salvado && estado.partida.modoClemente) cambiarMoral(h, balance.heridas.moralClemente);
       if (parte.consecuencia === 'heridaLeve' || parte.consecuencia === 'heridaGrave') {
         h.estado = 'herido';
-        h.semanasFuera = semanasDeBaja(estado, parte.semanasFuera);
+        h.diasFuera = parte.diasFuera;
       } else {
         h.estado = 'disponible';
       }
@@ -452,44 +386,7 @@ function resolverMisionesDelJugador(estado: EstadoJuego, azar: Azar): InformeMis
   return informes;
 }
 
-function quitarDeListas(estado: EstadoJuego, heroeId: string): void {
-  estado.enVenta = estado.enVenta.filter((t) => t.heroeId !== heroeId);
-  estado.ofertas = estado.ofertas.filter((o) => o.heroeId !== heroeId);
-}
-
-/** Los rivales fichan en el mercado. En la semana 1 se subasta todo el Draft que quede. */
-function fichajesIA(estado: EstadoJuego, azar: Azar, cierreDraft: boolean): void {
-  for (const entrada of [...estado.mercado]) {
-    const h = obtenerHeroe(estado, entrada.heroeId);
-    const interesados = rivalesInteresados(estado, azar, h, entrada.draft);
-    if (interesados.length === 0) continue;
-    const subasta = resolverSubasta(
-      valorMercado(h),
-      h.rasgos,
-      interesados.map((id) => pujadorIA(estado, azar, id, h)),
-    );
-    if (subasta.ganador && subasta.oferta) firmar(estado, h, subasta.ganador, subasta.oferta);
-  }
-  if (cierreDraft) {
-    for (const e of estado.mercado) e.draft = false;
-  }
-}
-
-function renovarMercado(estado: EstadoJuego, azar: Azar): void {
-  const g = balance.generacion;
-  // Los agentes libres que llevan más de 3 semanas se van a otra ciudad.
-  estado.mercado = estado.mercado.filter((e) => e.draft || estado.partida.semana - e.semanaLlegada < 3);
-  const [min, max] = g.agentesLibresPorSemana as [number, number];
-  const nuevos = azar.entero(min, max);
-  for (let i = 0; i < nuevos; i++) {
-    const h = agregarAlMercado(estado, azar, azar.elegir(g.rangosAgentesLibres as Rango[]), false);
-    h.potencialVisible = estado.partida.despertares >= 1;
-    h.estado = 'disponible';
-  }
-}
-
 function cerrarTemporada(estado: EstadoJuego): void {
-  reiniciarAccionesTemporada(estado);
   for (const fila of tabla(estado)) {
     const g = gremio(estado, fila.gremioId);
     g.oro += premioFinTemporada(fila.puesto);

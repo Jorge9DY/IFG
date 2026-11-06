@@ -16,7 +16,7 @@ Todo lo que se sube a este repositorio (archivos, commits, mensajes de commit, r
 
 ## Diseño de la experiencia
 
-- La esencia del juego es fichar con astucia, arriesgar a tus héroes y escalar contra gremios más fuertes. No añadas sistemas nuevos sin que el propietario lo pida; mejora los existentes (ver la sección 0 del diseño).
+- La esencia del juego: tienes oro, ¿cómo lo gestionas para hacer más fuerte a tu gremio? Ganar (misiones, vender), gastar en héroes (Prueba de Novatos, comprar) o gastar en el gremio (mejorar la sede). La interfaz debe ser tan sencilla como un juego infantil. No añadas sistemas ni botones nuevos sin que el propietario lo pida (ver la sección 0 del diseño).
 - El juego debe ser intuitivo y fácil de usar, al estilo Nintendo, sin perder profundidad: cada pantalla propone una opción razonable por defecto (equipo recomendado, ofertas sugeridas, objetivo del momento) y deja el detalle plegado para quien lo quiera.
 - Disposición fija: fondo negro, la habitación del gremio pequeña en el centro, menús a los lados. Estética táctica sobria: grises, líneas finas, cajas translúcidas y acentos cian, oliva y naranja.
 

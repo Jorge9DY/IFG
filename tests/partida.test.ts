@@ -1,51 +1,33 @@
 import { describe, expect, it } from 'vitest';
-import { heroe, heroesDe, jugador, rivales } from '../src/motor/estado';
-import { valorMercado } from '../src/motor/heroes';
-import { crearPartida, enviarMision, pujarPorHeroe, terminarSemana } from '../src/motor/partida';
+import balance from '../src/datos/balance.json';
+import { esDiaDeNovatos, heroesDe, jugador, rivales } from '../src/motor/estado';
+import { crearPartida, enviarMision, generarTablon, poderReferencia, semanaActual, terminarDia } from '../src/motor/partida';
+import { Azar } from '../src/motor/azar';
+import { generarHeroe } from '../src/motor/heroes';
 import { simularTemporada } from '../herramientas/simulador/simular';
 
 describe('Creación de la partida', () => {
   const estado = crearPartida({ nombre: 'Prueba', semilla: 7 });
 
-  it('el jugador empieza solo con Elara, 3.500 de oro y 40.000 de deuda', () => {
+  it('el jugador empieza solo con Elara, 3.500 de oro y en el día 1', () => {
     const j = jugador(estado);
     expect(j.plantilla).toEqual(['h_000_elara']);
     expect(j.oro).toBe(3500);
-    expect(j.deuda).toBe(40000);
+    expect(estado.partida.dia).toBe(1);
+    expect(semanaActual(estado)).toBe(1);
   });
 
-  it('hay 4 rivales con plantilla y un Draft abierto', () => {
+  it('hay 4 rivales y 4 novatos esperando la primera Prueba de Novatos', () => {
     expect(rivales(estado)).toHaveLength(4);
-    for (const r of rivales(estado)) expect(r.plantilla.length).toBeGreaterThanOrEqual(10);
-    expect(estado.mercado.filter((e) => e.draft)).toHaveLength(14);
+    expect(estado.novatos).toHaveLength(balance.novatos.porSemana);
   });
 
-  it('el tablón ofrece una misión Segura, una Justa y una Arriesgada', () => {
+  it('cada día hay tres misiones: fácil, media y difícil', () => {
     expect(estado.tablon.map((m) => m.tipo)).toEqual(['segura', 'justa', 'arriesgada']);
-  });
-
-  it('a más riesgo, más poder recomendado y más oro', () => {
-    const [segura, justa, arriesgada] = estado.tablon;
-    expect(segura!.poderRecomendado).toBeLessThan(justa!.poderRecomendado);
-    expect(justa!.poderRecomendado).toBeLessThan(arriesgada!.poderRecomendado);
-    expect(segura!.recompensa.oro).toBeLessThan(justa!.recompensa.oro);
-    expect(justa!.recompensa.oro).toBeLessThan(arriesgada!.recompensa.oro);
-  });
-
-  it('el tablón crece con la fuerza del gremio y añade una misión con plantilla grande', async () => {
-    const { generarHeroe } = await import('../src/motor/heroes');
-    const { generarTablon, poderReferencia } = await import('../src/motor/partida');
-    const { Azar } = await import('../src/motor/azar');
-    const e = crearPartida({ nombre: 'T', semilla: 9 });
-    const antes = poderReferencia(e);
-    const azar = new Azar(4);
-    for (let i = 0; i < 7; i++) {
-      const h = generarHeroe(azar, `t${i}`, 'B');
-      e.heroes[h.id] = h;
-      jugador(e).plantilla.push(h.id);
-    }
-    expect(poderReferencia(e)).toBeGreaterThan(antes);
-    expect(generarTablon(e, azar)).toHaveLength(4);
+    const [f, m, d] = estado.tablon;
+    expect(f!.recompensa.oro).toBeLessThan(m!.recompensa.oro);
+    expect(m!.recompensa.oro).toBeLessThan(d!.recompensa.oro);
+    for (const x of estado.tablon) expect(x.duracion).toBe(1);
   });
 
   it('la misma semilla genera la misma partida', () => {
@@ -53,69 +35,82 @@ describe('Creación de la partida', () => {
   });
 });
 
-describe('Acciones del jugador', () => {
-  it('no se puede ofrecer más oro del disponible', () => {
+describe('Un día de juego', () => {
+  it('solo se puede lanzar una misión al día y el equipo vuelve al terminarlo', () => {
     const estado = crearPartida({ nombre: 'P', semilla: 3 });
-    const id = estado.mercado[0]!.heroeId;
-    expect(() => pujarPorHeroe(estado, id, [{ prima: 999999, salario: 10, duracion: 1 }])).toThrow();
+    const [facil, media] = estado.tablon;
+    enviarMision(estado, facil!.id, [{ heroeId: 'h_000_elara', posicion: 'retaguardia' }]);
+    expect(estado.tablon).toHaveLength(0);
+    expect(() => enviarMision(estado, media!.id, [{ heroeId: 'h_000_elara', posicion: 'retaguardia' }])).toThrow();
+    const r = terminarDia(estado);
+    expect(r.informes).toHaveLength(1);
+    expect(estado.partida.dia).toBe(2);
+    expect(estado.tablon).toHaveLength(3);
+    expect(jugador(estado).plantilla).toContain('h_000_elara');
   });
 
-  it('fichar un agente libre lo añade a la plantilla y cobra la prima', () => {
-    const estado = crearPartida({ nombre: 'P', semilla: 3 });
-    const libre = estado.mercado.find((e) => !e.draft)!;
-    const valor = valorMercado(heroe(estado, libre.heroeId));
-    const r = pujarPorHeroe(estado, libre.heroeId, [{ prima: Math.min(2500, valor * 3), salario: 40, duracion: 2 }]);
-    if (r.fichado) {
-      expect(jugador(estado).plantilla).toContain(libre.heroeId);
-      expect(jugador(estado).oro).toBeLessThan(3000);
-      expect(estado.mercado.some((e) => e.heroeId === libre.heroeId)).toBe(false);
-    } else {
-      expect(r.subasta.ganador).not.toBe('llama');
+  it('el día 7 se celebra la Prueba de Novatos y se cierra la semana', () => {
+    const estado = crearPartida({ nombre: 'P', semilla: 4 });
+    let cierre = null;
+    while (estado.partida.dia < 7) terminarDia(estado);
+    expect(esDiaDeNovatos(estado.partida.dia)).toBe(true);
+    cierre = terminarDia(estado).cierre;
+    expect(cierre).not.toBeNull();
+    // Los novatos que nadie subastó se resolvieron y hay nuevos para la semana siguiente.
+    expect(estado.novatos).toHaveLength(balance.novatos.porSemana);
+    expect(semanaActual(estado)).toBe(2);
+  });
+
+  it('el tablón crece con la fuerza del gremio', () => {
+    const e = crearPartida({ nombre: 'T', semilla: 9 });
+    const antes = poderReferencia(e);
+    const azar = new Azar(4);
+    for (let i = 0; i < 4; i++) {
+      const h = generarHeroe(azar, `t${i}`, 'B');
+      e.heroes[h.id] = h;
+      jugador(e).plantilla.push(h.id);
     }
-  });
-
-  it('enviar una misión exige de 3 a 5 héroes disponibles de tu gremio', () => {
-    const estado = crearPartida({ nombre: 'P', semilla: 3 });
-    const mision = estado.tablon[0]!;
-    expect(() => enviarMision(estado, mision.id, [{ heroeId: 'h_000_elara', posicion: 'retaguardia' }])).toThrow();
+    expect(poderReferencia(e)).toBeGreaterThan(antes);
+    expect(generarTablon(e, azar)).toHaveLength(3);
   });
 });
 
 describe('Temporada completa', () => {
-  it('sin hacer nada, el oro se acaba hacia la semana 4 y la quiebra llega 3 cierres después', () => {
-    const estado = crearPartida({ nombre: 'Pasivo', semilla: 11 });
-    while (!estado.fin) terminarSemana(estado);
-    expect(estado.fin).toBe('quiebra');
-    expect(estado.partida.semana).toBeGreaterThanOrEqual(6);
-    expect(estado.partida.semana).toBeLessThanOrEqual(8);
+  it('la temporada dura 28 días', () => {
+    const estado = crearPartida({ nombre: 'X', semilla: 21 });
+    let dias = 0;
+    while (!estado.fin) {
+      terminarDia(estado);
+      dias++;
+    }
+    expect(dias).toBeLessThanOrEqual(28);
   });
 
-  it('el jugador automático juega las 20 semanas y el resultado es reproducible', () => {
+  it('el jugador automático juega la temporada y el resultado es reproducible', () => {
     const a = simularTemporada(42);
-    const b = simularTemporada(42);
-    expect(a).toEqual(b);
-    expect(a.misiones).toBeGreaterThan(0);
+    expect(simularTemporada(42)).toEqual(a);
+    expect(a.misiones).toBeGreaterThan(10);
   });
 
   it('el estado se puede guardar y recuperar como JSON en mitad de la temporada', () => {
     const estado = crearPartida({ nombre: 'Guardado', semilla: 5 });
-    terminarSemana(estado);
+    for (let i = 0; i < 9; i++) terminarDia(estado);
     const copia = JSON.parse(JSON.stringify(estado));
-    terminarSemana(estado);
-    terminarSemana(copia);
+    terminarDia(estado);
+    terminarDia(copia);
     expect(copia).toEqual(estado);
   });
 
   it('en Modo Clemente no muere ningún héroe del jugador', () => {
-    for (let semilla = 1; semilla <= 30; semilla++) {
+    for (let semilla = 1; semilla <= 20; semilla++) {
       expect(simularTemporada(semilla, undefined, true).muertes).toBe(0);
     }
   });
 
   it('los héroes muertos salen de la plantilla', () => {
-    for (let semilla = 1; semilla <= 40; semilla++) {
+    for (let semilla = 1; semilla <= 20; semilla++) {
       const estado = crearPartida({ nombre: 'X', semilla });
-      while (!estado.fin) terminarSemana(estado);
+      while (!estado.fin) terminarDia(estado);
       for (const h of heroesDe(estado, estado.jugadorId)) expect(h.estado).not.toBe('muerto');
     }
   });

@@ -2,6 +2,15 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — El juego rehecho por días, con extrema sencillez
+
+- Petición del propietario: reducir el juego a "tienes oro, ¿cómo lo gestionas para hacer más fuerte a tu gremio?" con una interfaz de juego infantil.
+- Pantalla principal: oro en grande arriba a la izquierda, Terminar día arriba a la derecha, Gestionar gremio a la izquierda, Mercado en el centro y Lanzar misión a la derecha. Se mantiene la sede 3D en el centro.
+- Motor: `terminarDia()` (28 días, 4 semanas), 3 misiones diarias y una sola elegible, equipos de 1 a 5, Prueba de Novatos el día 7 con subasta en tiempo real (`subasta.ts`), mercado de compra y venta inmediata (`mercado.ts`), nivel de sede (`sede.ts`). Los rivales hacen misiones a diario.
+- Eliminado: sobornos y acciones especiales de los rivales, ofertas y contraofertas, agentes libres, cesiones, las seis mejoras sueltas.
+- Balance: quiebras 3% (prudente) y 16% (arriesgado); cualquier puesto final es posible.
+- 68 tests; probado en navegador (una semana completa con subasta) sin errores.
+
 ## 2026-11-06 — Síntesis del gameplay
 
 - Petición del propietario: dejar el juego en su esencia más divertida sin añadir sistemas.
