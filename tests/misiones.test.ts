@@ -140,3 +140,20 @@ describe('Resolución de misiones', () => {
     expect(() => resolverMision(mision(), equipoInicial.slice(0, 2), new Azar(1))).toThrow();
   });
 });
+
+describe('Vista previa de la Formación', () => {
+  it('coincide con el cálculo de la misión y da el riesgo en caso de fracaso', async () => {
+    const { vistaPreviaMision } = await import('../src/motor/misiones');
+    const m = mision();
+    const vista = vistaPreviaMision(m, equipoInicial);
+    expect(vista.poder).toBeCloseTo(poderEquipo(equipoInicial, m.elemento));
+    expect(vista.probabilidad).toBeCloseTo(probabilidadExito(vista.poder, m.poderRecomendado, false));
+    expect(vista.riesgos).toHaveLength(3);
+    expect(vista.riesgos[2]!.riesgo).toBeCloseTo(riesgoMuerte(equipoInicial[2]!, equipoInicial, m, 'fracaso'));
+  });
+
+  it('con el equipo vacío la probabilidad es 0', async () => {
+    const { vistaPreviaMision } = await import('../src/motor/misiones');
+    expect(vistaPreviaMision(mision(), []).probabilidad).toBe(0);
+  });
+});

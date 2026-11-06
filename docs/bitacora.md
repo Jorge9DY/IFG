@@ -2,6 +2,15 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Fase 3: la temporada se juega en el navegador
+
+- Paneles de gestión sobre la sede 3D: nueva partida (nombre y Modo Clemente), plantilla con ventas y ofertas, tablón y formación con probabilidad de éxito y riesgo en vivo, mercado con puja y desglose de puntuación, clasificación, informe de la semana, consejos de Elara, terminar semana y pantalla de fin.
+- Los puntos de la sede 3D abren su panel; el personaje se queda quieto mientras hay un panel abierto.
+- Guardado automático en el navegador.
+- Motor: `vistaPreviaMision` (con tests) para que la Formación no duplique reglas.
+- Probado con Playwright: partida nueva, 3 fichajes, misión enviada, 3 semanas cerradas y recarga sin errores.
+- Queda: mejoras de la sede, aspecto del protagonista, acciones especiales de los rivales, cesiones y cláusulas; preguntas de balance 1–3.
+
 ## 2026-11-06 — Repositorio público
 
 - El repositorio pasa a ser público. Revisado el historial: sin claves, contraseñas ni emails personales.

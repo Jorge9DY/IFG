@@ -255,3 +255,25 @@ export function resolverMision(
     partes,
   };
 }
+
+export interface VistaPreviaMision {
+  poder: number;
+  probabilidad: number;
+  /** Riesgo de muerte de cada héroe si la misión fracasa, en porcentaje. */
+  riesgos: { heroeId: string; riesgo: number }[];
+}
+
+/** Lo que la pantalla de Formación muestra antes de enviar un equipo. */
+export function vistaPreviaMision(
+  mision: Mision,
+  equipo: readonly MiembroEquipo[],
+  opciones: OpcionesRiesgo = {},
+): VistaPreviaMision {
+  const poder = poderEquipo(equipo, mision.elemento);
+  const haySoporte = equipo.some((m) => m.heroe.clase === 'Soporte');
+  return {
+    poder,
+    probabilidad: equipo.length === 0 ? 0 : probabilidadExito(poder, mision.poderRecomendado, haySoporte),
+    riesgos: equipo.map((m) => ({ heroeId: m.heroe.id, riesgo: riesgoMuerte(m, equipo, mision, 'fracaso', opciones) })),
+  };
+}

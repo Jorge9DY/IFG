@@ -4,13 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gremio Rango D</title>
-    <link rel="stylesheet" href="/src/ui/estilos.css" />
+    <link rel="stylesheet" href="./src/ui/estilos.css" />
   </head>
   <body>
     <canvas id="escena"></canvas>
     <header id="barra" class="barra"></header>
+    <nav id="menu" class="menu" aria-label="Paneles del gremio"></nav>
+    <section id="panel" class="panel" hidden></section>
     <div id="aviso" class="aviso" hidden></div>
-    <p class="ayuda">WASD o flechas para moverte · E para interactuar</p>
-    <script type="module" src="/src/main.ts"></script>
+    <p class="ayuda">WASD o flechas para moverte · E para interactuar · Esc para cerrar un panel</p>
+    <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

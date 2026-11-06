@@ -13,6 +13,8 @@ export interface PuntoInteraccion {
 export interface EventosSede {
   alAcercarse(punto: PuntoInteraccion | null): void;
   alInteractuar(punto: PuntoInteraccion): void;
+  /** true mientras un panel está abierto: el personaje no se mueve ni interactúa. */
+  estaBloqueada?(): boolean;
 }
 
 const ANCHO = 16;
@@ -145,6 +147,10 @@ export function iniciarSede(canvas: HTMLCanvasElement, eventos: EventosSede): ()
   const teclas = new Set<string>();
   let cercano: PuntoInteraccion | null = null;
   const alPulsar = (e: KeyboardEvent): void => {
+    if (eventos.estaBloqueada?.()) {
+      teclas.clear();
+      return;
+    }
     teclas.add(e.code);
     if (e.code === 'KeyE' && cercano) eventos.alInteractuar(cercano);
   };

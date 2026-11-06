@@ -23,7 +23,7 @@ npm install
 npm run dev
 ```
 
-Abre la dirección que aparece en la terminal (normalmente `http://localhost:5173`). Muévete con WASD o las flechas y pulsa E junto a los puntos marcados en el suelo.
+Abre la dirección que aparece en la terminal (normalmente `http://localhost:5173`). Crea una partida, muévete por la sede con WASD o las flechas y pulsa E junto a los puntos marcados en el suelo, o usa el menú de la izquierda para abrir los paneles. La partida se guarda sola en el navegador.
 
 | Comando | Qué hace |
 | --- | --- |
@@ -38,7 +38,8 @@ Abre la dirección que aparece en la terminal (normalmente `http://localhost:517
 - **Fase 0 (preparación):** terminada.
 - **Fase 1 (motor de reglas):** temporada completa jugable por código. Faltan las acciones especiales de los rivales, cesiones y mejoras de la sede.
 - **Fase 2 (balance):** simulador listo; ver el [informe de balance](docs/informe-balance.md), con decisiones de diseño pendientes.
-- **Sede 3D:** primera versión con formas simples, movimiento y puntos de interacción.
+- **Fase 3 (paneles):** la temporada 1 se juega entera en el navegador. Faltan las mejoras de la sede y el aspecto del protagonista.
+- **Sede 3D:** formas simples, movimiento y puntos de interacción que abren los paneles.
 
 ## Estructura
 

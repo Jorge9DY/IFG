@@ -107,16 +107,19 @@ IFG/
 
 ### Fase 3 — Paneles de gestión
 
-- [ ] Barra superior y botón "Terminar semana"
-- [ ] Plantilla y ficha de héroe
-- [ ] Tablón de misiones y Formación (P(éxito) y riesgo en vivo)
-- [ ] Informe de misión
-- [ ] Mercado y Puja
-- [ ] Clasificación
-- [ ] Panel de la sede (mejoras, Elara)
-- [ ] Guardado y carga automáticos
-- [ ] Nueva partida: nombre y aspecto del protagonista, Modo Clemente
-- [ ] Menú lateral para abrir cualquier panel sin caminar
+- [x] Barra superior y botón "Terminar semana"
+- [x] Plantilla (stats, estado, vínculos, venta y ofertas recibidas)
+- [x] Tablón de misiones y Formación (P(éxito) y riesgo en vivo)
+- [x] Informe de la semana (misiones y sucesos)
+- [x] Mercado y Puja (con desglose de la puntuación)
+- [x] Clasificación
+- [x] Panel de Elara con consejos según la situación
+- [ ] Construir mejoras de la sede desde el panel
+- [x] Guardado y carga automáticos
+- [x] Nueva partida: nombre del protagonista y Modo Clemente
+- [ ] Elección del aspecto del protagonista
+- [x] Menú lateral para abrir cualquier panel sin caminar
+- [x] Pantalla de fin (quiebra o fin de temporada)
 
 **Terminado cuando:** se pueden jugar las 20 semanas desde los paneles.
 
@@ -126,7 +129,7 @@ IFG/
 - [x] Protagonista con movimiento por teclado (WASD y flechas), colisiones básicas y cámara que lo sigue
 - [ ] Movimiento con clic o toque en el suelo
 - [x] Puntos de interacción con aviso y tecla E (tablón, mostrador, Elara, dormitorios, pizarra, puerta)
-- [ ] Conectar cada punto con su panel (cuando existan los paneles de la fase 3)
+- [x] Conectar cada punto con su panel
 - [ ] Sustituir formas simples por assets CC0 (Kenney, Quaternius) y animaciones de Mixamo
 - [ ] Héroes de la plantilla en la sede según su estado
 - [ ] Estados de la sede (ruina → legendaria) y mejoras visibles

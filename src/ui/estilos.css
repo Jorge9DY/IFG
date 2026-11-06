@@ -20,3 +20,62 @@ html, body { margin: 0; height: 100%; background: var(--fondo); color: var(--tex
   padding: 10px 16px; background: var(--panel); border: 1px solid var(--acento); border-radius: 8px; font-size: 15px;
 }
 .ayuda { position: fixed; left: 16px; bottom: 8px; margin: 0; color: var(--tenue); font-size: 13px; }
+
+/* Menú lateral */
+.menu {
+  position: fixed; top: 56px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2;
+}
+button {
+  font: inherit; color: var(--texto); background: rgba(40, 34, 52, 0.9); border: 1px solid #4a4058;
+  border-radius: 8px; padding: 6px 12px; cursor: pointer;
+}
+button:hover:not(:disabled) { border-color: var(--acento); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.activo { border-color: var(--acento); }
+button.principal { background: var(--acento); color: #21180c; border-color: var(--acento); font-weight: 600; }
+.menu button { text-align: left; min-width: 150px; }
+
+/* Panel */
+.panel {
+  position: fixed; top: 56px; right: 12px; bottom: 40px; width: min(860px, calc(100% - 200px)); z-index: 3;
+  display: flex; flex-direction: column; background: rgba(22, 18, 30, 0.96); border: 1px solid #4a4058; border-radius: 12px;
+}
+.panel-cabecera { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #3a3246; }
+.panel-cabecera h2 { margin: 0; font-size: 18px; }
+.panel-cuerpo { overflow: auto; padding: 12px 16px 16px; }
+.panel h3 { font-size: 15px; margin: 18px 0 8px; color: var(--acento); }
+.panel p { line-height: 1.45; }
+.mensaje { margin: 10px 16px 0; padding: 8px 12px; border-left: 3px solid var(--acento); background: rgba(232, 160, 74, 0.1); }
+.tenue { color: var(--tenue); font-size: 12.5px; }
+.resumen { font-size: 14px; }
+.aviso-texto { color: var(--acento); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #332b3e; vertical-align: top; }
+th { color: var(--tenue); font-weight: 500; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.propio td { color: var(--acento); font-weight: 600; }
+.lista { padding-left: 18px; margin: 0; }
+.lista li { margin-bottom: 8px; }
+.lista button { margin-left: 6px; padding: 2px 8px; font-size: 12.5px; }
+td button { margin-top: 4px; padding: 2px 8px; font-size: 12.5px; }
+.rango { display: inline-block; min-width: 22px; text-align: center; border-radius: 4px; font-weight: 700; font-size: 12px; padding: 1px 4px; color: #1a1420; }
+.rS { background: #f2c94c; } .rA { background: #b18cf0; } .rB { background: #6fa8f0; }
+.rC { background: #74c98a; } .rD { background: #a7a2ad; } .rF { background: #b0855a; }
+.etiqueta { font-size: 11px; color: #21180c; background: var(--acento); border-radius: 4px; padding: 1px 6px; }
+.tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.tarjeta { text-align: left; }
+.campo { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--tenue); margin: 8px 0; }
+.campo.casilla { flex-direction: row; align-items: center; color: var(--texto); }
+input, select { font: inherit; color: var(--texto); background: #2a2334; border: 1px solid #4a4058; border-radius: 6px; padding: 5px 8px; }
+.fila { display: flex; flex-wrap: wrap; gap: 12px; }
+.puja { border: 1px solid #4a4058; border-radius: 10px; padding: 4px 12px 12px; margin-bottom: 12px; }
+.elara { margin: 0; padding: 4px 16px; border-left: 3px solid #d9643a; background: rgba(217, 100, 58, 0.08); }
+
+@media (max-width: 720px) {
+  .menu { top: auto; bottom: 34px; left: 8px; right: 8px; flex-direction: row; overflow-x: auto; }
+  .menu button { min-width: auto; white-space: nowrap; }
+  .panel { left: 8px; right: 8px; width: auto; top: 96px; bottom: 84px; }
+}
+
+/* El aviso de interacción no se ve mientras hay un panel abierto. */
+.panel:not([hidden]) ~ .aviso { display: none; }
