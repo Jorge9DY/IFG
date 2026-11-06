@@ -9,7 +9,7 @@ Juego de gestión de fantasía isekai. El sistema te clasificó como rango D, pe
 
 ## Stack
 
-TypeScript · Three.js · Vite · Vitest · GitHub Actions · GitHub Pages
+TypeScript · Three.js · Vite · Vitest · GitHub Actions
 
 ## Cómo arrancarlo
 

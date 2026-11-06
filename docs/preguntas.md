@@ -27,3 +27,13 @@ Respuesta:
 Con un juego sensato hay unas 0,4–0,6 muertes por temporada. ¿Está bien así (la muerte es rara y pesa más) o deberían ser 1–3?
 
 Respuesta:
+
+## 4. ¿Dónde publicamos el juego?
+
+GitHub Pages solo es gratis en repositorios públicos. Opciones:
+
+- A. Netlify o Cloudflare Pages: gratis con el repositorio privado. El propietario conecta su cuenta de GitHub una vez desde la web del servicio; después se publica solo en cada push a `main` (comando `npm run build`, carpeta `dist`). **Recomendada.**
+- B. Hacer público el repositorio y usar GitHub Pages.
+- C. No publicar por ahora: se juega en local con `npm run dev`.
+
+Respuesta:

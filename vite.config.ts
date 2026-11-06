@@ -1,8 +1,8 @@
 import { defineConfig } from 'vitest/config';
 
-// En GitHub Pages el juego se sirve desde /<repositorio>/.
 export default defineConfig({
-  base: process.env.GITHUB_ACTIONS ? '/ifg/' : '/',
+  // Rutas relativas: el build funciona en cualquier hosting estático (Netlify, Cloudflare Pages, GitHub Pages...).
+  base: './',
   build: { chunkSizeWarningLimit: 800 },
   test: {
     include: ['tests/**/*.test.ts'],

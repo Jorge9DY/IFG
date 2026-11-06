@@ -2,6 +2,10 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Publicación
+
+- Eliminado el flujo de GitHub Pages: no es gratis en repositorios privados. El build usa rutas relativas y sirve para cualquier hosting estático. Pendiente de decidir dónde publicar (pregunta 4).
+
 ## 2026-11-06 — Fase 1 completa y simulador de balance
 
 - Motor: generación de héroes y vínculos, XP y envejecimiento, ventas y contraofertas, vínculos y moral, IA de los rivales, estado de la partida y `terminarSemana()`. Una temporada completa se juega por código.

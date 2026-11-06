@@ -16,7 +16,7 @@ Objetivo: tener un **prototipo jugable de la temporada 1** (prólogo + 20 semana
 | Datos | JSON en `src/datos/` | El balance se ajusta sin tocar el código |
 | Guardado | `localStorage` | Partidas guardadas en el navegador |
 | Integración continua | **GitHub Actions** | Tipos y tests en cada push y pull request |
-| Publicación | **GitHub Pages** | Jugar desde una URL pública |
+| Publicación | Hosting estático gratuito (pendiente de elegir: Netlify o Cloudflare Pages) | Jugar desde una URL pública sin hacer público el repositorio |
 
 **Reglas de arquitectura**
 
@@ -60,7 +60,7 @@ IFG/
 - [x] Página que arranca con `npm run dev` y muestra una escena 3D mínima
 - [x] `npm test` y `npm run typecheck` funcionando
 - [x] GitHub Actions: tipos y tests en cada push y pull request
-- [x] Publicación automática en GitHub Pages al actualizar `main` (requiere activar Pages en el repositorio: Settings → Pages → Source: GitHub Actions)
+- [ ] Publicación automática al actualizar `main` (GitHub Pages no es gratis en repositorios privados; ver `docs/preguntas.md`)
 
 ### Fase 1 — Motor de reglas
 
@@ -156,7 +156,7 @@ IFG/
 | H2 | Fase 2 | Informe de balance con 1.000 temporadas |
 | H3 | Fase 3 | Temporada 1 jugable desde los paneles |
 | H4 | Fase 4 | Sede 3D explorable conectada a los paneles |
-| H5 | Fases 5 y 6 | Prototipo completo publicado en GitHub Pages |
+| H5 | Fases 5 y 6 | Prototipo completo publicado en una URL pública |
 
 ## Después del prototipo
 
