@@ -67,11 +67,24 @@ export interface EstadoJuego {
   contadorIds: number;
   /** Acciones especiales de los rivales ya usadas esta temporada. */
   accionesTemporada?: AccionesTemporada;
+  /** Héroes del jugador que el Colmillo intenta sobornar. */
+  sobornos?: Soborno[];
 }
 
 export interface AccionesTemporada {
   vetoUsado: boolean;
   ofertaCoronaHecha: boolean;
+  /** Puesto del jugador al empezar la temporada (para el modo amenaza). */
+  puestoInicial?: number;
+  amenazaAnunciada?: boolean;
+}
+
+export interface Soborno {
+  heroeId: string;
+  /** Salario que hay que pagarle para que se quede. */
+  salarioPedido: number;
+  /** Semana en cuyo cierre se va si no se le retiene. */
+  semanaLimite: number;
 }
 
 export function jugador(estado: EstadoJuego): Gremio {

@@ -10,6 +10,7 @@ import {
 } from '../../src/motor/misiones';
 import { enviarMision, oroDisponibleParaPujar, pujarPorHeroe } from '../../src/motor/partida';
 import { aceptarOferta, ponerEnVenta } from '../../src/motor/ventas';
+import { retenerHeroe } from '../../src/motor/rivales';
 import { Azar } from '../../src/motor/azar';
 import { indiceRango, type Heroe } from '../../src/motor/tipos';
 
@@ -33,6 +34,10 @@ export interface MetricasBot {
 }
 
 export function jugarSemana(estado: EstadoJuego, e: Estrategia, m: MetricasBot): void {
+  // Retiene a los héroes sobornados si puede permitirse la subida de salario.
+  for (const s of [...(estado.sobornos ?? [])]) {
+    if (jugador(estado).oro > 2000) retenerHeroe(estado, s.heroeId);
+  }
   fichar(estado, e, m);
   vender(estado, m);
   mandarMisiones(estado, e);

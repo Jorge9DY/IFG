@@ -23,7 +23,7 @@ import { cierreIA, contextoGremio, pujadorIA, rivalesInteresados, turnoMisionesI
 import { resolverMision, type InformeMision, type MiembroEquipo } from './misiones';
 import { ofertaTotal, resolverSubasta, type Oferta, type Pujador, type ResultadoSubasta } from './pujas';
 import { puntosMision } from './ranking';
-import { ofertaAnualCorona, pujadoresRivales, reiniciarAccionesTemporada, sabotajesColmillo } from './rivales';
+import { ofertaAnualCorona, pujadoresRivales, reiniciarAccionesTemporada, resolverSobornos, sabotajesColmillo } from './rivales';
 import { generarOfertas, liberarHeroe } from './ventas';
 import { aplicarPerdida, cambiarMoral, derivaMoral, sumarAfinidadEquipo } from './vinculos';
 import {
@@ -298,7 +298,8 @@ export function terminarSemana(estado: EstadoJuego): ResumenSemana {
   return conAzar(estado, (azar) => {
     const j = jugador(estado);
 
-    // 0. Sabotajes del Colmillo Carmesí (rumores, robo de misiones recién enviadas).
+    // 0. Sobornos que vencen y sabotajes del Colmillo Carmesí (rumores, robos, nuevos sobornos).
+    for (const id of resolverSobornos(estado, azar)) liberarHeroe(estado, id);
     sabotajesColmillo(estado, azar);
 
     // 1. Misiones del jugador que terminan esta semana.

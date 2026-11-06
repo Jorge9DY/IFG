@@ -2,6 +2,13 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Soborno y modo amenaza
+
+- Soborno del Colmillo: tienta a un héroe Codicioso; si no se le sube el salario un 30% antes del cierre siguiente, se va al Colmillo (`retenerHeroe`, `resolverSobornos`).
+- Modo amenaza: si el jugador sube 2 puestos en la temporada, los rivales pujan un 10% más fuerte y el Colmillo sabotea el doble.
+- El jugador automático retiene a los sobornados si tiene más de 2.000 de oro. Balance sin cambios apreciables (quiebras 12,7% / 25,1%).
+- 5 tests nuevos (65 en total). Falta el botón de retener en la interfaz (bloque C).
+
 ## 2026-11-06 — Acciones especiales de los rivales (turno del agente)
 
 - Nuevo `src/motor/rivales.ts`: Veto del Duque, espionaje de los Tejedores, rumores y robo de misiones del Colmillo, y oferta anual de la Corona por tu mejor héroe. Cifras en `balance.json` (`sabotajes`). 9 tests nuevos (60 en total).

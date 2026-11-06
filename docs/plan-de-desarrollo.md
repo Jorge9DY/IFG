@@ -78,7 +78,7 @@ IFG/
 - [x] `ia.ts`: los 4 perfiles rivales (pujas, misiones abstractas, fichajes)
 - [x] `estado.ts` y `partida.ts`: estado completo, acciones del jugador y `terminarSemana()`
 - [x] Acciones especiales de los rivales: Veto del Duque, espionaje, rumores, robo de misiones y oferta anual de la Corona
-- [ ] Soborno del Colmillo y modo "amenaza" de los rivales cuando el jugador sube 2 puestos
+- [x] Soborno del Colmillo y modo "amenaza" de los rivales cuando el jugador sube 2 puestos
 - [ ] Cesiones, cláusulas de rescisión y mejoras de la sede como acciones del jugador
 
 **Tests con los ejemplos del diseño:**

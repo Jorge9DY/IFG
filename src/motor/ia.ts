@@ -85,13 +85,15 @@ export function pujadorIA(
   bonusExtra = 0,
   /** Prima mínima de la primera ronda (espionaje de los Tejedores). */
   primaMinima = 0,
+  /** Multiplicador de agresividad (modo amenaza). */
+  multiplicador = 1,
 ): Pujador {
   const p = perfil(gremioId);
   const g = gremio(estado, gremioId);
   const valor = valorMercado(heroe);
   const salario = salarioPedido(heroe.rango);
   const tope = Math.max(0, g.oro * 0.4);
-  let prima = Math.min(tope, Math.max(primaMinima, valor * (0.6 + azar.siguiente() * 0.4) * p.agresividad));
+  let prima = Math.min(tope, Math.max(primaMinima, valor * (0.6 + azar.siguiente() * 0.4) * p.agresividad * multiplicador));
   const contexto = contextoGremio(estado, gremioId, heroe, bonusExtra);
   return {
     contexto,

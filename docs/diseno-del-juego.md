@@ -416,14 +416,14 @@ Cada rival es un perfil de pesos simples más 2–3 acciones especiales; así se
 | --- | --- | --- | --- |
 | Corona de Acero | Alta con S y A | Rango actual; ignora potencial | Oferta de compra anual por tu mejor héroe (semana 10, 130% de su valor); "Veto del Duque": 1 vez por temporada, +15 puntos en una puja por un héroe de rango B o superior |
 | Alba Dorada | Media | Reputación; Sanadores y Paladines | Rechaza a héroes con rasgo Temerario; ofrece cesiones si tu reputación es 70 o más |
-| Colmillo Carmesí | Muy alta en la ronda 3 | Agilidad; Exploradores | Desde la semana 5: Rumor (10% por semana, −5 de tu reputación), Robo de misión (15% por semana: te quita una misión enviada esa semana; el equipo vuelve sin recompensa), Soborno (ofrece a tu héroe Codicioso irse; pendiente) |
+| Colmillo Carmesí | Muy alta en la ronda 3 | Agilidad; Exploradores | Desde la semana 5: Rumor (10% por semana, −5 de tu reputación), Robo de misión (15% por semana: te quita una misión enviada esa semana; el equipo vuelve sin recompensa), Soborno (8% por semana: tienta a un héroe Codicioso; si no le subes el salario un 30% antes del cierre siguiente, se va al Colmillo) |
 | Tejedores del Velo | Alta con potencial y elementos raros (Luz y Sombra) | Magia; Potencial | Espionaje: si tiene un Explorador, ve tu oferta de la ronda 1 y la supera un 5%; en el arco 3, manipula el Cristal en el Draft |
 
 Los sabotajes del Colmillo empiezan en la semana 5: antes nadie se fija en el gremio recién llegado. Sin esa regla, las quiebras de la temporada 1 subían al 20–32% (ver `informe-balance.md`).
 
 ### Respuesta al ascenso del jugador
 
-Si el jugador sube 2 puestos en una temporada, los rivales entran en modo "amenaza": +10% de agresividad contra él y 1 sabotaje extra por temporada. Si su reputación supera 70, los sabotajes descubiertos restan reputación al saboteador.
+Si el jugador sube 2 puestos en una temporada, los rivales entran en modo "amenaza": pujan con un 10% más de agresividad contra él y el Colmillo tira dos veces cada sabotaje (rumor, robo y soborno). Si su reputación supera 70, los sabotajes descubiertos restan reputación al saboteador.
 
 ## 14. Progresión, victoria y derrota
 

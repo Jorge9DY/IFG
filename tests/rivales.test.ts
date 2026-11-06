@@ -144,3 +144,69 @@ describe('Oferta anual de la Corona', () => {
     expect(estado.ofertas).toHaveLength(1);
   });
 });
+
+describe('Soborno del Colmillo', () => {
+  function conCodicioso(): { estado: EstadoJuego; id: string } {
+    const estado = partidaConEquipo();
+    const h = heroesDe(estado, estado.jugadorId).find((x) => x.id !== 'h_000_elara')!;
+    h.rasgos = ['Codicioso'];
+    h.contrato!.salario = 50;
+    return { estado, id: h.id };
+  }
+
+  it('tienta a un héroe Codicioso pidiendo un 30% más de salario', async () => {
+    const { estado, id } = conCodicioso();
+    sabotajesColmillo(estado, new AzarSiempre(1));
+    const s = estado.sobornos!.find((x) => x.heroeId === id)!;
+    expect(s.salarioPedido).toBe(65);
+    expect(s.semanaLimite).toBe(estado.partida.semana + 1);
+  });
+
+  it('si se le retiene, sube su salario y se queda', async () => {
+    const { retenerHeroe, resolverSobornos } = await import('../src/motor/rivales');
+    const { estado, id } = conCodicioso();
+    sabotajesColmillo(estado, new AzarSiempre(1));
+    retenerHeroe(estado, id);
+    estado.partida.semana += 1;
+    resolverSobornos(estado, new AzarNunca(1));
+    expect(jugador(estado).plantilla).toContain(id);
+    expect(estado.heroes[id]!.contrato!.salario).toBe(65);
+  });
+
+  it('si no se le retiene, se va al Colmillo en el cierre de la semana límite', async () => {
+    const { resolverSobornos } = await import('../src/motor/rivales');
+    const { estado, id } = conCodicioso();
+    sabotajesColmillo(estado, new AzarSiempre(1));
+    resolverSobornos(estado, new AzarNunca(1));
+    expect(jugador(estado).plantilla).toContain(id); // todavía tiene una semana
+    estado.partida.semana += 1;
+    resolverSobornos(estado, new AzarNunca(1));
+    expect(jugador(estado).plantilla).not.toContain(id);
+    expect(gremio(estado, 'colmillo').plantilla).toContain(id);
+    expect(estado.heroes[id]!.contrato!.gremio).toBe('colmillo');
+  });
+
+  it('nunca soborna a Elara ni a héroes sin el rasgo Codicioso', () => {
+    const estado = partidaConEquipo();
+    for (const h of heroesDe(estado, estado.jugadorId)) h.rasgos = [];
+    sabotajesColmillo(estado, new AzarSiempre(1));
+    expect(estado.sobornos ?? []).toHaveLength(0);
+  });
+});
+
+describe('Modo amenaza', () => {
+  it('se activa al subir 2 puestos y hace pujar más fuerte a los rivales', async () => {
+    const { enAmenaza } = await import('../src/motor/rivales');
+    const estado = crearPartida({ nombre: 'Test', semilla: 4 });
+    expect(enAmenaza(estado)).toBe(false);
+    const objetivo = generarHeroe(new Azar(5), 'objetivo', 'C');
+    const normal = pujadoresRivales(estado, new Azar(7), objetivo, ['alba'], undefined)[0]!.pujar(1, null)!.prima;
+
+    // El jugador sube al 3.er puesto.
+    jugador(estado).prestigio = 75;
+    jugador(estado).reputacion = 100;
+    expect(enAmenaza(estado)).toBe(true);
+    const amenazado = pujadoresRivales(estado, new Azar(7), objetivo, ['alba'], undefined)[0]!.pujar(1, null)!.prima;
+    expect(amenazado).toBeGreaterThan(normal);
+  });
+});
