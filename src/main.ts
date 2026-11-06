@@ -1,18 +1,23 @@
-// Punto de entrada: monta la sede 3D y los paneles de gestión.
+// Punto de entrada: monta la sede 3D y el HUD con los paneles de gestión.
 import { iniciarSede } from './escena3d/sede';
 import { Interfaz } from './ui/paneles';
 
+const $ = (selector: string): HTMLElement => document.querySelector<HTMLElement>(selector)!;
+
 const interfaz = new Interfaz({
-  barra: document.querySelector<HTMLElement>('#barra')!,
-  menu: document.querySelector<HTMLElement>('#menu')!,
-  panel: document.querySelector<HTMLElement>('#panel')!,
+  cabecera: $('#cabecera'),
+  objetivo: $('#objetivo'),
+  menu: $('#menu'),
+  accion: $('#accion'),
+  equipo: $('#equipo'),
+  panel: $('#panel'),
 });
 
-const aviso = document.querySelector<HTMLElement>('#aviso')!;
+const aviso = $('#aviso');
 iniciarSede(document.querySelector<HTMLCanvasElement>('#escena')!, {
   alAcercarse(punto) {
     aviso.hidden = punto === null;
-    if (punto) aviso.textContent = `E: ${punto.accion}`;
+    if (punto) aviso.innerHTML = `<kbd>E</kbd>${punto.accion}`;
   },
   alInteractuar(punto) {
     interfaz.abrirDesdeSede(punto.id);

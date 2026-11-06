@@ -31,7 +31,7 @@ import { construirMejora, infoMejoras } from '../motor/sede';
 import { condicionesCesion, pagarClausula, pedirCesion } from '../motor/traspasos';
 import type { Mejora } from '../motor/tipos';
 import { Azar } from '../motor/azar';
-import { pintarBarra } from './barra';
+import { objetivoActual } from './objetivo';
 import { borrar, cargar, guardar } from './guardado';
 import { esc, num, pct } from './html';
 
@@ -58,10 +58,25 @@ const POSICIONES: { valor: Posicion; nombre: string }[] = [
 const ICONO_VINCULO = { Romance: '♥', Familia: '⌂', Amistad: '✋', Rivalidad: '⚔' } as const;
 
 export interface ElementosInterfaz {
-  barra: HTMLElement;
+  cabecera: HTMLElement;
+  objetivo: HTMLElement;
   menu: HTMLElement;
+  accion: HTMLElement;
+  equipo: HTMLElement;
   panel: HTMLElement;
 }
+
+/** Paneles del menú lateral, en orden; las teclas 1–6 los abren. */
+const MENU: { panel: Panel; texto: string }[] = [
+  { panel: 'misiones', texto: 'Misiones' },
+  { panel: 'mercado', texto: 'Mercado' },
+  { panel: 'plantilla', texto: 'Plantilla' },
+  { panel: 'clasificacion', texto: 'Clasificación' },
+  { panel: 'informe', texto: 'Informe' },
+  { panel: 'sede', texto: 'Elara y la sede' },
+];
+
+const BARRAS_POR_ESTADO: Record<string, number> = { disponible: 3, luto: 2, 'en mision': 3, herido: 1, muerto: 0 };
 
 export class Interfaz {
   estado: EstadoJuego | null = cargar();
@@ -76,8 +91,16 @@ export class Interfaz {
     el.panel.addEventListener('click', (e) => this.alHacerClic(e));
     el.panel.addEventListener('input', (e) => this.alCambiar(e));
     el.menu.addEventListener('click', (e) => this.alHacerClic(e));
+    el.accion.addEventListener('click', (e) => this.alHacerClic(e));
     window.addEventListener('keydown', (e) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
       if (e.key === 'Escape' && this.abierto && this.abierto !== 'nueva' && this.abierto !== 'fin') this.cerrar();
+      const indice = Number(e.key) - 1;
+      const atajo = MENU[indice];
+      if (atajo && this.estado && !this.estado.fin && this.abierto !== 'nueva') {
+        if (this.abierto === atajo.panel) this.cerrar();
+        else this.abrir(atajo.panel);
+      }
     });
     if (!this.estado) this.abrir('nueva');
     else if (this.estado.fin) this.abrir('fin');
@@ -115,20 +138,16 @@ export class Interfaz {
 
   private repintar(): void {
     const estado = this.estado;
-    if (estado) {
-      pintarBarra(this.el.barra, jugador(estado), {
-        temporada: estado.partida.temporada,
-        semana: estado.partida.semana,
-        puesto: puesto(estado, estado.jugadorId),
-      });
-    } else {
-      this.el.barra.innerHTML = '<span class="nombre">Gremio Rango D</span>';
-    }
-    this.el.menu.hidden = !estado || !!estado.fin;
-    this.el.menu.innerHTML = (['plantilla', 'misiones', 'mercado', 'clasificacion', 'informe', 'sede'] as Panel[])
-      .map((p) => `<button data-abrir="${p}" class="${this.abierto === p ? 'activo' : ''}">${TITULOS[p]}</button>`)
-      .concat('<button data-abrir="semana" class="principal">Terminar semana</button>')
-      .join('');
+    const enJuego = !!estado && !estado.fin;
+    this.pintarHud(estado);
+    this.el.menu.hidden = !enJuego;
+    this.el.accion.hidden = !enJuego;
+    this.el.equipo.hidden = !estado;
+    const sugerido = objetivoActual(estado).panel;
+    this.el.menu.innerHTML = MENU.map(
+      (m, i) =>
+        `<button data-abrir="${m.panel}" class="${this.abierto === m.panel || (!this.abierto && sugerido === m.panel) ? 'activo' : ''}">${m.texto}<span class="tecla">${i + 1}</span></button>`,
+    ).join('');
 
     if (!this.abierto) {
       this.el.panel.hidden = true;
@@ -144,6 +163,44 @@ export class Interfaz {
       </div>
       ${this.mensaje ? `<p class="mensaje">${esc(this.mensaje)}</p>` : ''}
       <div class="panel-cuerpo">${this.contenido()}</div>`;
+  }
+
+  /** Las cuatro esquinas: semana, objetivo, acción principal y plantilla. */
+  private pintarHud(estado: EstadoJuego | null): void {
+    if (!estado) {
+      this.el.cabecera.innerHTML = '<div class="titulo"><span class="palabra">Gremio</span><span class="numero">D</span></div>';
+    } else {
+      const j = jugador(estado);
+      this.el.cabecera.innerHTML = `
+        <div class="titulo"><span class="palabra">Semana</span><span class="numero">${estado.partida.semana}</span></div>
+        <span class="etiqueta lugar">Sede · ${esc(j.nombre)}</span>
+        <div class="datos">
+          <span class="pastilla ${j.oro < 500 ? 'mal' : ''}">Oro <b>${num(j.oro)}</b></span>
+          <span class="pastilla">Puesto <b>${puesto(estado, j.id)}.º</b></span>
+          <span class="pastilla">Prestigio <b>${num(j.prestigio)}</b></span>
+          <span class="pastilla">Deuda <b>${num(j.deuda)}</b></span>
+        </div>`;
+    }
+    const o = objetivoActual(estado);
+    this.el.objetivo.innerHTML = `
+      <div class="cabeza"><span class="icono" aria-hidden="true"></span>objetivo</div>
+      <div class="tarea">${esc(o.accion)} <em>${esc(o.meta)}</em></div>
+      <div class="pista">${esc(o.pista)}</div>`;
+    this.el.accion.innerHTML = '<button class="boton-principal" data-abrir="semana">Terminar semana</button>';
+    this.el.equipo.innerHTML = estado
+      ? heroesDe(estado, estado.jugadorId)
+          .map((h) => {
+            const llenas = BARRAS_POR_ESTADO[h.estado] ?? 3;
+            const barras = [0, 1, 2].map((i) => `<i class="${i < llenas ? '' : 'vacia'}"></i>`).join('');
+            const fuera = h.estado !== 'disponible' && h.estado !== 'luto';
+            return `<div class="fila" title="${esc(`${h.nombre} · ${h.clase} · ${h.estado}`)}">
+              <span class="nombre">${esc(h.nombre.split(' ')[0] ?? h.nombre)}${h.estado === 'en mision' ? ' · de misión' : h.estado === 'herido' ? ' · herido' : ''}</span>
+              <span class="barras">${barras}</span>
+              <span class="cara ${fuera ? 'fuera' : ''}">${esc(h.nombre.charAt(0))}</span>
+            </div>`;
+          })
+          .join('')
+      : '';
   }
 
   private contenido(): string {
@@ -326,7 +383,7 @@ export class Interfaz {
       .map((e) => {
         const h = obtenerHeroe(estado, e.heroeId);
         const extra = `<td>${num(valorMercado(h))}<div class="tenue">pide ${num(salarioPedido(h.rango))}/sem.</div></td>
-          <td>${e.draft ? '<span class="etiqueta">Draft</span> ' : ''}<button data-accion="elegir-heroe" data-id="${h.id}">Pujar</button></td>`;
+          <td>${e.draft ? '<span class="etiqueta-draft">Draft</span> ' : ''}<button data-accion="elegir-heroe" data-id="${h.id}">Pujar</button></td>`;
         return this.filaHeroe(estado, h, extra);
       })
       .join('');

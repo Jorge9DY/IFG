@@ -2,6 +2,15 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Nuevo estilo visual (referencia del propietario)
+
+- Fondo negro (#2b2b2b) con la habitación del gremio recortada en el centro como una viñeta.
+- HUD en las cuatro esquinas: semana y lugar, objetivo del momento (qué hacer ahora), botón principal verde "Terminar semana" y plantilla con barras de estado.
+- Menú lateral de etiquetas de papel con atajos 1–6; el menú resalta el panel que resuelve el objetivo.
+- Sede 3D con sombreado de dibujo animado, contornos negros, cámara isométrica fija y personaje rosa con marcador.
+- Tipografías Permanent Marker y Patrick Hand (Google Fonts).
+- Principio de diseño nuevo: juego intuitivo y fácil de usar, al estilo Nintendo.
+
 ## 2026-11-06 — Respuestas del propietario aplicadas
 
 - Pregunta 1 (A): la clasificación cuenta solo la temporada en curso (3 × prestigio ganado + puntos de misión). La distancia con los rivales baja de ~200/550 a ~124/207–271.

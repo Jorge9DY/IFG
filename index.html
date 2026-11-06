@@ -4,15 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gremio Rango D</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Permanent+Marker&display=swap" />
     <link rel="stylesheet" href="./src/ui/estilos.css" />
   </head>
   <body>
-    <canvas id="escena"></canvas>
-    <header id="barra" class="barra"></header>
-    <nav id="menu" class="menu" aria-label="Paneles del gremio"></nav>
-    <section id="panel" class="panel" hidden></section>
-    <div id="aviso" class="aviso" hidden></div>
-    <p class="ayuda">WASD o flechas para moverte · E para interactuar · Esc para cerrar un panel</p>
+    <main class="pantalla">
+      <div class="habitacion"><canvas id="escena"></canvas></div>
+      <header id="cabecera" class="hud cabecera"></header>
+      <section id="objetivo" class="hud objetivo" aria-live="polite"></section>
+      <nav id="menu" class="hud menu" aria-label="Paneles del gremio"></nav>
+      <div id="accion" class="hud accion"></div>
+      <aside id="equipo" class="hud equipo" aria-label="Tu plantilla"></aside>
+      <section id="panel" class="panel" hidden></section>
+      <div id="aviso" class="aviso" hidden></div>
+    </main>
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

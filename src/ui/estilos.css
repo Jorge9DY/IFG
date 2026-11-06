@@ -1,84 +1,172 @@
+/* Estilo dibujado: fondo negro, la habitación recortada en el centro y el HUD en etiquetas
+   de papel blanco con trazo de rotulador, como un cómic. */
 :root {
-  --fondo: #1d1a24;
-  --panel: rgba(20, 17, 28, 0.82);
-  --texto: #f3ece0;
-  --tenue: #b9ad9c;
-  --acento: #e8a04a;
+  --fondo: #2b2b2b;
+  --papel: #ecebe2;
+  --tinta: #161616;
+  --verde: #8ccf3f;
+  --rosa: #ff4d6d;
+  --gris: #9a9a92;
+  --panel: #232323;
+  --rotulador: 'Permanent Marker', 'Comic Sans MS', 'Chalkboard SE', cursive;
+  --mano: 'Patrick Hand', 'Comic Sans MS', 'Chalkboard SE', cursive;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: var(--fondo); color: var(--texto); font-family: system-ui, sans-serif; overflow: hidden; }
-#escena { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
-.barra {
-  position: fixed; top: 0; left: 0; right: 0; display: flex; flex-wrap: wrap; gap: 4px 20px;
-  padding: 10px 16px; background: var(--panel); font-size: 14px;
-}
-.barra strong { color: var(--acento); font-weight: 600; }
-.barra .nombre { font-weight: 700; margin-right: auto; }
-.aviso {
-  position: fixed; left: 50%; bottom: 72px; transform: translateX(-50%);
-  padding: 10px 16px; background: var(--panel); border: 1px solid var(--acento); border-radius: 8px; font-size: 15px;
-}
-.ayuda { position: fixed; left: 16px; bottom: 8px; margin: 0; color: var(--tenue); font-size: 13px; }
+html, body { margin: 0; height: 100%; background: var(--fondo); color: var(--papel); font-family: var(--mano); font-size: 18px; overflow: hidden; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid var(--verde); outline-offset: 3px; }
 
-/* Menú lateral */
-.menu {
-  position: fixed; top: 56px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2;
-}
-button {
-  font: inherit; color: var(--texto); background: rgba(40, 34, 52, 0.9); border: 1px solid #4a4058;
-  border-radius: 8px; padding: 6px 12px; cursor: pointer;
-}
-button:hover:not(:disabled) { border-color: var(--acento); }
-button:disabled { opacity: 0.5; cursor: not-allowed; }
-button.activo { border-color: var(--acento); }
-button.principal { background: var(--acento); color: #21180c; border-color: var(--acento); font-weight: 600; }
-.menu button { text-align: left; min-width: 150px; }
+.pantalla { position: fixed; inset: 0; }
+[hidden] { display: none !important; }
 
-/* Panel */
+/* La habitación: un recorte irregular en el centro, como una viñeta. */
+.habitacion {
+  position: absolute; left: 18%; right: 18%; top: 9%; bottom: 7%;
+  clip-path: polygon(14% 4%, 62% 0%, 88% 6%, 100% 30%, 97% 74%, 82% 98%, 34% 100%, 6% 86%, 0% 42%);
+  background: #3a3d3b;
+}
+#escena { width: 100%; height: 100%; display: block; }
+
+/* Piezas de papel con borde de rotulador. */
+.etiqueta, .menu button, .pastilla {
+  background: var(--papel); color: var(--tinta); border: none;
+  clip-path: polygon(2% 8%, 98% 0%, 100% 88%, 4% 100%);
+  font-family: var(--rotulador); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.hud { position: absolute; z-index: 2; }
+
+/* Arriba a la izquierda: semana y lugar. */
+.cabecera { top: 20px; left: 24px; display: flex; flex-direction: column; gap: 8px; }
+.cabecera .titulo { display: flex; align-items: center; gap: 12px; font-family: var(--rotulador); }
+.cabecera .palabra { font-size: 30px; line-height: 1; transform: rotate(-6deg); }
+.cabecera .numero {
+  font-size: 54px; line-height: 1; background: var(--papel); color: var(--tinta); padding: 2px 14px;
+  border: 4px solid var(--tinta); box-shadow: 4px 4px 0 var(--papel); transform: rotate(4deg);
+}
+.cabecera .lugar { align-self: flex-start; padding: 2px 12px; font-size: 15px; transform: rotate(-2deg); }
+.cabecera .datos { display: flex; flex-wrap: wrap; gap: 6px; max-width: 250px; }
+.pastilla { font-size: 13px; padding: 3px 10px; }
+.pastilla b { color: #3f7d16; }
+.pastilla.mal b { color: #c2183b; }
+
+/* Arriba a la derecha: el objetivo, lo siguiente que hay que hacer. */
+.objetivo { top: 20px; right: 24px; width: min(340px, 30vw); display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.objetivo .cabeza { display: flex; align-items: center; gap: 8px; font-family: var(--rotulador); font-size: 22px; }
+.objetivo .icono {
+  width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
+  border-bottom: 26px solid var(--papel); position: relative;
+}
+.objetivo .icono::after { content: '!'; position: absolute; left: -3px; top: 6px; color: var(--tinta); font-family: var(--rotulador); font-size: 16px; }
+.objetivo .tarea {
+  width: 100%; padding: 6px 16px; font-family: var(--rotulador); font-size: 20px; text-transform: uppercase;
+  background: var(--papel); color: var(--tinta); clip-path: polygon(0 12%, 100% 0, 98% 100%, 3% 90%);
+}
+.objetivo .tarea em { font-style: normal; color: var(--rosa); }
+.objetivo .pista { font-size: 16px; color: var(--gris); text-align: right; }
+
+/* Izquierda: menú de etiquetas. */
+.menu { left: 24px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; }
+.menu button { font-size: 17px; padding: 8px 18px; text-align: left; filter: drop-shadow(3px 3px 0 #000); transition: transform 0.12s; }
+.menu button:nth-child(even) { transform: rotate(-1.5deg); }
+.menu button:nth-child(odd) { transform: rotate(1deg); }
+.menu button:hover, .menu button.activo { transform: translateX(8px) rotate(0); background: var(--verde); }
+.menu button .tecla { font-family: var(--mano); font-size: 14px; color: #555; margin-left: 8px; text-transform: none; }
+
+/* Abajo a la izquierda: la acción principal en verde. */
+.accion { left: 24px; bottom: 26px; }
+.boton-principal {
+  font-family: var(--rotulador); font-size: 28px; text-transform: uppercase; color: var(--tinta);
+  background: var(--papel); border: none; padding: 10px 28px; transform: rotate(-5deg);
+  clip-path: polygon(3% 10%, 100% 0, 96% 92%, 0 100%); position: relative;
+}
+/* Franja verde inclinada detrás del botón principal. */
+.accion::before {
+  content: ''; position: absolute; inset: -14px -10px -10px -22px; background: var(--verde);
+  clip-path: polygon(0 30%, 92% 0, 100% 64%, 6% 100%); z-index: -1;
+}
+.boton-principal:hover { transform: rotate(-5deg) scale(1.05); }
+.boton-principal:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Abajo a la derecha: la plantilla con su estado. */
+.equipo { right: 28px; bottom: 26px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; max-height: 46vh; overflow: auto; }
+.equipo .fila { display: flex; align-items: center; gap: 10px; }
+.equipo .barras { display: flex; gap: 3px; }
+.equipo .barras i { width: 14px; height: 9px; background: var(--verde); transform: skewX(-20deg); }
+.equipo .barras i.vacia { background: #4a4a4a; }
+.equipo .cara {
+  width: 40px; height: 40px; border-radius: 50%; background: var(--papel); color: var(--tinta);
+  display: grid; place-items: center; font-family: var(--rotulador); font-size: 18px; border: 3px solid var(--tinta);
+  outline: 2px solid var(--papel);
+}
+.equipo .cara.fuera { opacity: 0.45; }
+.equipo .nombre { font-size: 15px; color: var(--gris); }
+
+/* Panel lateral: aparece desde la derecha sin tapar la habitación del todo. */
 .panel {
-  position: fixed; top: 56px; right: 12px; bottom: 40px; width: min(860px, calc(100% - 200px)); z-index: 3;
-  display: flex; flex-direction: column; background: rgba(22, 18, 30, 0.96); border: 1px solid #4a4058; border-radius: 12px;
+  position: absolute; z-index: 4; top: 16px; right: 16px; bottom: 16px; width: min(560px, calc(100% - 32px));
+  display: flex; flex-direction: column; background: var(--panel); border: 3px solid var(--papel);
+  box-shadow: 8px 8px 0 #000; border-radius: 4px;
 }
-.panel-cabecera { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #3a3246; }
-.panel-cabecera h2 { margin: 0; font-size: 18px; }
-.panel-cuerpo { overflow: auto; padding: 12px 16px 16px; }
-.panel h3 { font-size: 15px; margin: 18px 0 8px; color: var(--acento); }
-.panel p { line-height: 1.45; }
-.mensaje { margin: 10px 16px 0; padding: 8px 12px; border-left: 3px solid var(--acento); background: rgba(232, 160, 74, 0.1); }
-.tenue { color: var(--tenue); font-size: 12.5px; }
-.resumen { font-size: 14px; }
-.aviso-texto { color: var(--acento); }
-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #332b3e; vertical-align: top; }
-th { color: var(--tenue); font-weight: 500; }
+.panel-cabecera { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+.panel-cabecera h2 { margin: 0; font-family: var(--rotulador); font-weight: 400; font-size: 26px; text-transform: uppercase; }
+.panel-cabecera button { background: var(--papel); color: var(--tinta); border: none; font-family: var(--rotulador); font-size: 18px; padding: 4px 12px; clip-path: polygon(4% 6%, 100% 0, 96% 100%, 0 92%); }
+.panel-cuerpo { overflow: auto; padding: 4px 16px 16px; }
+.panel h3 { font-family: var(--rotulador); font-weight: 400; font-size: 18px; margin: 18px 0 8px; color: var(--verde); text-transform: uppercase; }
+.panel p { line-height: 1.35; margin: 8px 0; }
+.mensaje { margin: 0 16px; padding: 8px 12px; background: var(--verde); color: var(--tinta); font-size: 17px; clip-path: polygon(0 6%, 100% 0, 99% 100%, 1% 94%); }
+.tenue { color: var(--gris); font-size: 15px; }
+.resumen { font-size: 18px; }
+.aviso-texto { color: var(--verde); }
+table { width: 100%; border-collapse: collapse; font-size: 16px; }
+th, td { text-align: left; padding: 6px 6px; border-bottom: 2px dashed #3d3d3d; vertical-align: top; }
+th { color: var(--gris); font-weight: 400; font-size: 14px; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-tr.propio td { color: var(--acento); font-weight: 600; }
+tr.propio td { color: var(--verde); }
 .lista { padding-left: 18px; margin: 0; }
 .lista li { margin-bottom: 8px; }
-.lista button { margin-left: 6px; padding: 2px 8px; font-size: 12.5px; }
-td button { margin-top: 4px; padding: 2px 8px; font-size: 12.5px; }
-.rango { display: inline-block; min-width: 22px; text-align: center; border-radius: 4px; font-weight: 700; font-size: 12px; padding: 1px 4px; color: #1a1420; }
-.rS { background: #f2c94c; } .rA { background: #b18cf0; } .rB { background: #6fa8f0; }
-.rC { background: #74c98a; } .rD { background: #a7a2ad; } .rF { background: #b0855a; }
-.etiqueta { font-size: 11px; color: #21180c; background: var(--acento); border-radius: 4px; padding: 1px 6px; }
-.tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
-.tarjeta { text-align: left; }
-.campo { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--tenue); margin: 8px 0; }
-.campo.casilla { flex-direction: row; align-items: center; color: var(--texto); }
-input, select { font: inherit; color: var(--texto); background: #2a2334; border: 1px solid #4a4058; border-radius: 6px; padding: 5px 8px; }
-.fila { display: flex; flex-wrap: wrap; gap: 12px; }
-.puja { border: 1px solid #4a4058; border-radius: 10px; padding: 4px 12px 12px; margin-bottom: 12px; }
-.elara { margin: 0; padding: 4px 16px; border-left: 3px solid #d9643a; background: rgba(217, 100, 58, 0.08); }
-
-@media (max-width: 720px) {
-  .menu { top: auto; bottom: 34px; left: 8px; right: 8px; flex-direction: row; overflow-x: auto; }
-  .menu button { min-width: auto; white-space: nowrap; }
-  .panel { left: 8px; right: 8px; width: auto; top: 96px; bottom: 84px; }
+.panel-cuerpo button {
+  background: var(--papel); color: var(--tinta); border: none; padding: 3px 10px; font-size: 15px;
+  clip-path: polygon(3% 8%, 100% 0, 97% 100%, 0 90%); margin: 2px 4px 2px 0;
 }
+.panel-cuerpo button:hover:not(:disabled) { background: var(--verde); }
+.panel-cuerpo button:disabled { opacity: 0.45; cursor: not-allowed; }
+.panel-cuerpo button.principal, .panel-cuerpo button.activo { background: var(--verde); font-family: var(--rotulador); font-size: 18px; padding: 6px 16px; }
+.rango { display: inline-block; min-width: 24px; text-align: center; font-family: var(--rotulador); font-size: 14px; padding: 0 4px; color: var(--tinta); transform: rotate(-4deg); }
+.rS { background: #f2c94c; } .rA { background: #b18cf0; } .rB { background: #6fa8f0; }
+.rC { background: #8ccf3f; } .rD { background: #c4c2b8; } .rF { background: #c99a6b; }
+.etiqueta-draft { font-family: var(--rotulador); font-size: 12px; color: var(--tinta); background: var(--rosa); padding: 1px 6px; }
+.tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.panel-cuerpo .tarjeta { text-align: left; font-size: 16px; padding: 8px 10px; }
+.campo { display: flex; flex-direction: column; gap: 4px; font-size: 16px; color: var(--gris); margin: 8px 0; }
+.campo.casilla { flex-direction: row; align-items: center; color: var(--papel); }
+input, select { font: inherit; font-size: 16px; color: var(--tinta); background: var(--papel); border: 2px solid var(--tinta); padding: 3px 8px; }
+.fila { display: flex; flex-wrap: wrap; gap: 10px; }
+.puja { border: 2px dashed var(--gris); padding: 4px 12px 12px; margin-bottom: 12px; }
+.elara { margin: 0; padding: 4px 16px; border-left: 4px solid #f2a33a; }
+.alerta { border: 3px solid var(--rosa); padding: 0 12px 8px; margin-bottom: 12px; }
+.alerta h3 { color: var(--rosa); }
 
-/* El aviso de interacción no se ve mientras hay un panel abierto. */
+/* Aviso de interacción sobre la habitación. */
+.aviso {
+  position: absolute; z-index: 3; left: 50%; bottom: 5%; transform: translateX(-50%) rotate(-2deg);
+  background: var(--papel); color: var(--tinta); padding: 6px 16px; font-family: var(--rotulador); font-size: 18px;
+  clip-path: polygon(2% 10%, 100% 0, 98% 100%, 0 88%);
+}
+.aviso kbd { font-family: var(--rotulador); background: var(--verde); padding: 0 6px; margin-right: 6px; }
 .panel:not([hidden]) ~ .aviso { display: none; }
 
-.alerta { border: 1px solid #d9643a; border-radius: 10px; padding: 0 12px 8px; margin-bottom: 12px; background: rgba(217, 100, 58, 0.08); }
-.alerta h3 { color: #f08a5d; }
+@media (max-width: 900px) {
+  html, body { font-size: 16px; }
+  .habitacion { left: 4%; right: 4%; top: 18%; bottom: 24%; }
+  .menu { top: auto; bottom: 90px; left: 12px; right: 12px; transform: none; flex-direction: row; overflow-x: auto; padding-bottom: 6px; }
+  .menu button { white-space: nowrap; font-size: 14px; }
+  .objetivo { width: 52vw; right: 12px; top: 12px; }
+  .cabecera { left: 12px; top: 12px; }
+  .cabecera .numero { font-size: 38px; }
+  .cabecera .datos { display: none; }
+  .equipo { display: none; }
+  .accion { left: 12px; bottom: 18px; }
+  .boton-principal { font-size: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
