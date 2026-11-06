@@ -39,7 +39,7 @@ No se pasa a la siguiente fase sin superar su puerta (biblia, sección 17). El r
 - [x] Héroes con poder, potencial, experiencia, reputación y lealtad; la experiencia sube el poder hasta el potencial
 - [x] Sueldos semanales el día 7 que crecen con poder y reputación
 - [x] Ranking = Fuerza (5 mejores) + Prestigio; actualización semanal y cierre de temporada con premio
-- [x] Reclutamiento básico (provisional): candidatos modestos que se renuevan cada semana
+- [x] Sin reclutamiento aparte: solo se ficha en la Prueba y comprando en el mercado (decisión del propietario)
 - [x] Interfaz de cinco elementos (sección 3) sobre la sede 3D
 - [x] Simulador con dos estrategias e informe de balance
 - [x] Condición de victoria: cerrar una temporada en el n.º 1

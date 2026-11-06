@@ -147,7 +147,7 @@ export function iniciarSede(canvas: HTMLCanvasElement, eventos: EventosSede): ()
   contorno(recepcionista, 0.08);
   escena.add(recepcionista);
   obstaculos.push({ min: new THREE.Vector2(3.85, -4.55), max: new THREE.Vector2(4.55, -3.85) });
-  punto('recepcion', 'Recepción', 'Reclutar héroes', 4.2, -3.4);
+  punto('recepcion', 'Recepción', 'Mejorar instalaciones', 4.2, -3.4);
   caja('#2b2b2b', [0.2, 2.2, 1.4], -7.75, -2); // puerta de los dormitorios
   punto('dormitorios', 'Dormitorios', 'Ver tus héroes', -7, -2);
   caja('#4e6b5a', [0.2, 1.4, 1.8], 7.75, 1); // pizarra de la Asociación

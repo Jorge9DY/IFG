@@ -2,6 +2,14 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Sin reclutamiento y sin aviso flotante en la sede
+
+- Decisión del propietario: se elimina el reclutamiento. Fuera de la Prueba de los Novatos solo se ficha comprando a otros gremios en el mercado. Quitados la pestaña Reclutar, los reclutas del motor y sus cifras. La recepción de la sede 3D abre ahora las instalaciones.
+- Bug visual: el aviso «E · acción» de la sede tapaba el botón del Mercado. Eliminado; los anillos cian siguen marcando los puntos y E los usa.
+- Confirmado el orden de pago de sueldos (los más poderosos primero).
+- Guardado versión 5. Simulador: el ambicioso gana el 8% en 4 temporadas (antes, 5%).
+- Pendiente de diseñar con el propietario: feedback al volver de misión, experiencia y subidas de poder (propuesta en `preguntas.md`, pregunta 13).
+
 ## 2026-11-06 — Decisiones del propietario: impagos, curación, inventario y oro más caro
 
 - Victoria: cerrar una temporada en el n.º 1 (ya era así; ahora es decisión aceptada en la biblia).

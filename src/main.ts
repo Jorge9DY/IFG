@@ -13,12 +13,9 @@ const interfaz = new Interfaz({
   panel: $('#panel'),
 });
 
-const aviso = $('#aviso');
 iniciarSede(document.querySelector<HTMLCanvasElement>('#escena')!, {
-  alAcercarse(punto) {
-    aviso.hidden = punto === null;
-    if (punto) aviso.innerHTML = `<kbd>E</kbd>${punto.accion}`;
-  },
+  // Sin aviso flotante: tapaba el botón del Mercado. Los anillos cian marcan los puntos y E los usa.
+  alAcercarse() {},
   alInteractuar(punto) {
     interfaz.abrirDesdeSede(punto.id);
   },

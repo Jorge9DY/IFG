@@ -62,13 +62,6 @@
     "incrementoMinimo": 50,
     "redondeo": 50
   },
-  "reclutas": {
-    "_nota": "Reclutamiento básico fuera de la Prueba (provisional): candidatos modestos que se renuevan cada semana.",
-    "porSemana": 3,
-    "poder": [8, 25],
-    "potencial": ["F", "D", "D", "C", "C", "B"],
-    "factorCoste": 1.0
-  },
   "instalaciones": {
     "_nota": "Sección 4: la sede da plazas y prestigio; los ojeadores estrechan el rango de potencial. Niveles y costes provisionales; más caros por decisión del propietario para que el oro siga apretando.",
     "sede": { "plazas": [5, 7, 9, 11, 13, 15, 18], "coste": [3000, 8000, 15000, 25000, 40000, 60000] },

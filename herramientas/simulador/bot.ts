@@ -4,7 +4,7 @@ import { sueldosDe } from '../../src/motor/economia';
 import { heroe, heroesDe, jugador, rivales, type EstadoJuego } from '../../src/motor/estado';
 import { valor } from '../../src/motor/heroes';
 import { infoInstalacion, mejorar, plazasLibres } from '../../src/motor/instalaciones';
-import { comprar, condicionesCompra, condicionesRecluta, ofertaVenta, reclutar, vender } from '../../src/motor/mercado';
+import { comprar, condicionesCompra, ofertaVenta, vender } from '../../src/motor/mercado';
 import { poderEquipo, probabilidadExito } from '../../src/motor/misiones';
 import { lanzarMision, pujarNovato, siguienteCandidato } from '../../src/motor/partida';
 import { motivoNoPujar, siguientePrecio } from '../../src/motor/subasta';
@@ -16,7 +16,7 @@ export interface Estrategia {
   probMinima: number;
   /** Lo máximo que paga por un novato, como fracción de su valor. */
   pujaMaxima: number;
-  /** Semanas de sueldos que guarda antes de invertir en instalaciones o reclutas. */
+  /** Semanas de sueldos que guarda antes de invertir en instalaciones o compras. */
   reservaSemanas: number;
   /** Vende al más flojo cuando la plantilla está llena y llega un novato mejor. */
   rota: boolean;
@@ -29,14 +29,13 @@ export interface MetricasBot {
   misiones: number;
   exitos: number;
   fichajesNovatos: number;
-  reclutas: number;
   ventas: number;
   mejoras: number;
   compras: number;
 }
 
 export function metricasVacias(): MetricasBot {
-  return { misiones: 0, exitos: 0, fichajesNovatos: 0, reclutas: 0, ventas: 0, mejoras: 0, compras: 0 };
+  return { misiones: 0, exitos: 0, fichajesNovatos: 0, ventas: 0, mejoras: 0, compras: 0 };
 }
 
 /** Decisiones del día: invertir y lanzar misiones (de la más alta a la más baja). */
@@ -49,16 +48,6 @@ export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): vo
     if (necesita && !info.bloqueo && info.coste !== null && j.oro - info.coste >= reserva() + 1500) {
       mejorar(estado, j.id, tipo);
       m.mejoras++;
-    }
-  }
-  if (j.plantilla.length < 4) {
-    for (const id of [...estado.reclutas]) {
-      const c = condicionesRecluta(estado, id);
-      if (!c.bloqueo && j.oro - c.precio >= reserva()) {
-        reclutar(estado, id);
-        m.reclutas++;
-        break;
-      }
     }
   }
   if (e.rota) comprarRefuerzo(estado, reserva(), m);

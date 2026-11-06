@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { jugador } from '../src/motor/estado';
 import { infoInstalacion, mejorar, plazas } from '../src/motor/instalaciones';
-import { comprar, condicionesCompra, condicionesRecluta, ofertaVenta, reclutar, vender } from '../src/motor/mercado';
+import { comprar, condicionesCompra, ofertaVenta, vender } from '../src/motor/mercado';
 import { calcularRanking, fuerza, prestigio } from '../src/motor/ranking';
 import { accionJugador, cerrarSubasta, type Subasta } from '../src/motor/subasta';
 import { fichar, heroe, partida } from './fabrica';
@@ -60,7 +60,7 @@ describe('subasta por turnos', () => {
   });
 });
 
-describe('mercado y reclutamiento', () => {
+describe('mercado', () => {
   it('compra un héroe de un rival que vende', () => {
     const estado = partida();
     const id = estado.gremios.dragon!.plantilla[0]!;
@@ -87,16 +87,6 @@ describe('mercado y reclutamiento', () => {
     vender(estado, id);
     expect(jugador(estado).oro).toBe(oro + oferta!.precio);
     expect(estado.gremios[oferta!.compradorId]!.plantilla).toContain(id);
-  });
-
-  it('recluta a un candidato de la semana', () => {
-    const estado = partida();
-    const id = estado.reclutas[0]!;
-    jugador(estado).oro = 100_000;
-    expect(condicionesRecluta(estado, id).bloqueo).toBeNull();
-    reclutar(estado, id);
-    expect(jugador(estado).plantilla).toContain(id);
-    expect(estado.reclutas).not.toContain(id);
   });
 });
 

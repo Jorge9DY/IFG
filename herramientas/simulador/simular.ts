@@ -77,7 +77,6 @@ export function informe(resultados: ResultadoPartida[], e: Estrategia): string {
     ['Misiones lanzadas', m((x) => x.misiones)],
     ['Tasa de éxito', pct(media(resultados.map((r) => r.metricas.exitos)), media(resultados.map((r) => r.metricas.misiones)))],
     ['Novatos fichados', m((x) => x.fichajesNovatos)],
-    ['Reclutas', m((x) => x.reclutas)],
     ['Ventas', m((x) => x.ventas)],
     ['Compras en el mercado', m((x) => x.compras)],
     ['Mejoras de instalaciones', m((x) => x.mejoras)],

@@ -1,13 +1,11 @@
-// Mercado de héroes (biblia, sección 7) y reclutamiento básico (sección 4).
-// Precios, frecuencia de ofertas y reclutamiento fuera de la Prueba están [Abierto]: versión provisional.
+// Mercado de héroes (biblia, sección 7): la única forma de fichar fuera de la Prueba de los Novatos es
+// comprar a otros gremios. Precios y frecuencia de ofertas están [Abierto]: versión provisional.
 
 import balance from '../datos/balance.json';
-import type { Azar } from './azar';
-import { dueño, gremio, heroe as obtenerHeroe, jugador, nuevoId, registrar, type EstadoJuego } from './estado';
-import { generarHeroe, valor } from './heroes';
+import { dueño, gremio, heroe as obtenerHeroe, jugador, registrar, type EstadoJuego } from './estado';
+import { valor } from './heroes';
 import { plazasLibres } from './instalaciones';
 import { comprador } from './rivales';
-import type { Letra } from './tipos';
 
 const V = balance.valor;
 
@@ -77,42 +75,4 @@ export function vender(estado: EstadoJuego, heroeId: string): Oferta {
   g.oro -= oferta.precio;
   registrar(estado, 'venta', `${h.nombre} se va a ${g.nombre} por ${oferta.precio} de oro.`);
   return oferta;
-}
-
-// ---------------------------------------------------------------------------
-// Reclutamiento básico
-// ---------------------------------------------------------------------------
-
-/** Candidatos modestos que se pueden reclutar esta semana. Sustituye a los de la semana anterior. */
-export function generarReclutas(estado: EstadoJuego, azar: Azar): void {
-  const r = balance.reclutas;
-  for (const id of estado.reclutas) delete estado.heroes[id];
-  estado.reclutas = [];
-  for (let i = 0; i < r.porSemana; i++) {
-    const h = generarHeroe(azar, nuevoId(estado, 'h'), { poder: r.poder as [number, number], potencial: r.potencial as Letra[] });
-    estado.heroes[h.id] = h;
-    estado.reclutas.push(h.id);
-  }
-}
-
-export function costeRecluta(estado: EstadoJuego, heroeId: string): number {
-  return redondear(valor(obtenerHeroe(estado, heroeId)) * balance.reclutas.factorCoste);
-}
-
-export function condicionesRecluta(estado: EstadoJuego, heroeId: string): Condiciones {
-  const precio = costeRecluta(estado, heroeId);
-  if (!estado.reclutas.includes(heroeId)) return { precio, bloqueo: 'Ya no está disponible' };
-  if (plazasLibres(estado, estado.jugadorId) <= 0) return { precio, bloqueo: 'No te quedan plazas: mejora la sede' };
-  if (jugador(estado).oro < precio) return { precio, bloqueo: 'No tienes oro suficiente' };
-  return { precio, bloqueo: null };
-}
-
-export function reclutar(estado: EstadoJuego, heroeId: string): void {
-  const c = condicionesRecluta(estado, heroeId);
-  if (c.bloqueo) throw new Error(c.bloqueo);
-  const j = jugador(estado);
-  j.oro -= c.precio;
-  j.plantilla.push(heroeId);
-  estado.reclutas = estado.reclutas.filter((id) => id !== heroeId);
-  registrar(estado, 'fichaje', `Reclutas a ${obtenerHeroe(estado, heroeId).nombre} por ${c.precio} de oro.`);
 }

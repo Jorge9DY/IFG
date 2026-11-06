@@ -22,7 +22,6 @@ describe('partida', () => {
     expect(j.plantilla).toHaveLength(balance.jugador.heroes);
     expect(puesto(estado, j.id)).toBe(5);
     expect(estado.tablon).toHaveLength(3);
-    expect(estado.reclutas).toHaveLength(balance.reclutas.porSemana);
   });
 
   it('es determinista y serializable', () => {
@@ -90,20 +89,18 @@ describe('partida', () => {
     expect(() => finalizarDia(estado)).toThrow();
   });
 
-  it('al terminar la Prueba se actualiza el ranking y empieza el día 8 con reclutas nuevos', () => {
+  it('al terminar la Prueba se actualiza el ranking y empieza el día 8', () => {
     const estado = partida();
     avanzarHasta(estado, 7);
     finalizarDia(estado);
-    const reclutas = [...estado.reclutas];
     const semana = terminarPrueba(estado);
     expect(estado.dia).toBe(8);
     expect(estado.fase).toBe('gestion');
     expect(semana.ranking).toHaveLength(5);
     expect(semana.temporada).toBeNull();
-    expect(estado.reclutas).not.toEqual(reclutas);
     // Los novatos que nadie fichó desaparecen.
     const fichados = Object.values(estado.gremios).flatMap((g) => g.plantilla);
-    for (const id of Object.keys(estado.heroes)) expect(fichados.includes(id) || estado.reclutas.includes(id)).toBe(true);
+    for (const id of Object.keys(estado.heroes)) expect(fichados.includes(id)).toBe(true);
   });
 
   it('el jugador puede fichar un novato pujando por turnos', () => {

@@ -56,7 +56,7 @@ No es solo administrar una empresa: es levantar una organización legendaria con
 
 1. Empieza el día: el jugador ve el estado del gremio y el resumen del día anterior.
 2. Decide cómo ganar dinero: misiones o venta de héroes.
-3. Decide en qué invertir: reclutar, comprar héroes o mejorar instalaciones.
+3. Decide en qué invertir: pujar por novatos, comprar héroes o mejorar instalaciones.
 4. Gestiona el mercado.
 5. Atiende los acontecimientos que de verdad requieren su intervención.
 6. Pulsa «Finalizar día» y el mundo se resuelve (ver Resolución diaria).
@@ -80,7 +80,7 @@ Motivo: sin temporadas no hay presión de tiempo ni un final claro. Pagar sueldo
 | --- | --- | --- |
 | Arriba izquierda | Oro actual | Dinero disponible. |
 | Arriba derecha | Finalizar día | Avanzar al día siguiente. |
-| Centro izquierda | Gestionar gremio | Reclutar héroes y mejorar instalaciones. |
+| Centro izquierda | Gestionar gremio | Inventario de héroes y mejorar instalaciones. |
 | Centro derecha | Lanzar misiones | Tablón con las tres misiones. |
 | Centro inferior | Mercado de héroes | Comprar a otros gremios o vender los propios. |
 
@@ -101,7 +101,6 @@ Moneda única: **oro**. (En el diseño original aparece también «monedas»; se
 | Ingreso | Recompensas de misiones | \[Aceptado\] |
 | Ingreso | Venta de héroes a otros gremios | \[Aceptado\] |
 | Ingreso | Premio de fin de temporada según posición | \[Aceptado\] |
-| Gasto | Reclutar héroes | \[Aceptado\] |
 | Gasto | Comprar héroes en el mercado | \[Aceptado\] |
 | Gasto | Mejorar instalaciones | \[Aceptado\] |
 | Gasto | Pujas en la Prueba de los Novatos | \[Aceptado\] |
@@ -114,7 +113,7 @@ Los sueldos son el gasto fijo semanal del gremio. El diseño ya los daba por hec
 - Cada héroe tiene un sueldo que crece con su poder y su reputación.
 - Se pagan el día 7, antes de la Prueba de los Novatos.
 - Tener plantilla cuesta: acumular héroes sin usarlos deja de ser gratis.
-- **\[Aceptado\]** No poder pagar: el héroe que no cobra pierde lealtad y avisa; si pasa varias semanas seguidas sin cobrar (*ilustrativo:* 2), se va a otro gremio. Cobrar reinicia la cuenta. Orden de pago cuando no llega para todos: los más poderosos primero (provisional).
+- **\[Aceptado\]** No poder pagar: el héroe que no cobra pierde lealtad y avisa; si pasa varias semanas seguidas sin cobrar (*ilustrativo:* 2), se va a otro gremio. Cobrar reinicia la cuenta. Orden de pago cuando no llega para todos: los más poderosos primero.
 - **\[Aceptado\]** Sueldos altos: tener plantilla debe costar de verdad durante toda la partida.
 
 ### Decisiones tipo
@@ -122,7 +121,7 @@ Los sueldos son el gasto fijo semanal del gremio. El diseño ya los daba por hec
 - Mandar al mejor héroe a una misión peligrosa o reservarlo.
 - Comprar un héroe mediocre que tapa un hueco o ahorrar para un novato prometedor.
 - Vender a un héroe valioso para pagar una mejora o conservarlo.
-- Mejorar instalaciones o reclutar.
+- Mejorar instalaciones o fichar.
 
 ### Instalaciones
 
@@ -195,6 +194,8 @@ Peso de cada componente: aproximadamente igual al principio; se ajustará al equ
 ## 7. Mercado de héroes
 
 **\[Aceptado\]** El mercado permite comprar héroes de otros gremios y vender los propios; es una decisión estratégica y emocional a la vez.
+
+**\[Aceptado\]** Fuera de la Prueba de los Novatos, comprar en el mercado es la única forma de fichar: no hay reclutamiento aparte.
 
 Un héroe puede valer por lo que rinde hoy, por su potencial o por el interés que despierta en otros. Vender a alguien con una historia en el gremio debe doler.
 
@@ -566,7 +567,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 - [x] Condición de victoria: cerrar una temporada en el n.º 1.
 - [x] Fórmula de éxito de misión, lesiones y recuperación (base provisional aceptada de momento; curación con oro).
 - [ ] Cifras equilibradas: recompensas, sueldos, costes de reclutamiento y premios de temporada.
-- [ ] Reclutamiento básico: cómo aparecen héroes fuera de la Prueba de los Novatos.
+- [x] No hay reclutamiento aparte: fuera de la Prueba de los Novatos, solo se ficha comprando a otros gremios en el mercado.
 - [x] Qué pasa si no puedes pagar los sueldos: tras varias semanas sin cobrar, el héroe se va.
 
 ### Fase 2
@@ -590,6 +591,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-06 | Decisiones del propietario: se elimina el reclutamiento; fuera de la Prueba de los Novatos solo se ficha comprando a otros gremios en el mercado. Confirmado el orden de pago de sueldos (los más poderosos primero). |
 | 2026-11-06 | Decisiones del propietario tras probar el prototipo: victoria al cerrar una temporada en el n.º 1; un héroe que no cobra varias semanas seguidas se va a otro gremio; sueldos e instalaciones más caros para que el oro siga apretando; inventario de héroes con su estado en Gestionar gremio; curar lesionados con oro; la fórmula de éxito y lesiones vale de momento. |
 | 2026-11-06 | Aprobadas y pasadas a \[Aceptado\]: sueldos semanales el día 7, varias misiones al día con equipos de 1/2/3 héroes y tablón diario, ranking Fuerza (top 5) + Prestigio, ranking semanal, temporadas de 4 semanas con premio, subasta por turnos con límite oculto de los rivales, potencial en rango con ojeadores, regla de no castigar lo inevitable, hoja de ruta por fases, consecuencias de fracasar misiones (menos recompensa y lesiones) y marcha voluntaria de un héroe ignorado reiteradamente. |
 | 2026-11-06 | Biblia creada a partir del documento de diseño original. Moneda unificada como oro. |

@@ -22,7 +22,6 @@ import {
   type FilaRanking,
 } from './estado';
 import { generarHeroe, letraPotencialNovato } from './heroes';
-import { generarReclutas } from './mercado';
 import { generarTablon, resolverMision, type InformeMision } from './misiones';
 import { calcularRanking, premioTemporada } from './ranking';
 import { ajustarPlantilla, eligeMisiones, invertir } from './rivales';
@@ -48,7 +47,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
   const semilla = opciones.semilla ?? Math.floor(Math.random() * 2 ** 31);
   const J = balance.jugador;
   const estado: EstadoJuego = {
-    version: 4,
+    version: 5,
     semilla,
     azar: semilla,
     dia: 1,
@@ -58,7 +57,6 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
     jugadorId: 'jugador',
     tablon: [],
     enCurso: [],
-    reclutas: [],
     prueba: null,
     ranking: [],
     registro: [],
@@ -109,7 +107,6 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
       }
     }
     estado.tablon = generarTablon(azar, () => nuevoId(estado, 'm'));
-    generarReclutas(estado, azar);
   });
   estado.ranking = calcularRanking(estado);
   registrar(estado, 'temporada', `Empieza la temporada 1. ${jugador(estado).nombre} es el último del ranking.`);
@@ -230,8 +227,6 @@ function avanzarDia(estado: EstadoJuego, azar: Azar): void {
   estado.dia += 1;
   estado.fase = 'gestion';
   estado.tablon = generarTablon(azar, () => nuevoId(estado, 'm'));
-  // Cada semana llegan reclutas nuevos.
-  if ((estado.dia - 1) % balance.calendario.diasPorSemana === 0) generarReclutas(estado, azar);
   if (estado.registro.length > MAX_REGISTRO) estado.registro = estado.registro.slice(-MAX_REGISTRO);
 }
 

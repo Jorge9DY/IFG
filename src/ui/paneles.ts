@@ -6,7 +6,7 @@ import { condicionesCuracion, curar, sueldosDe } from '../motor/economia';
 import { diasParaPrueba, esDia7, heroe as obtenerHeroe, heroesDe, jugador, misionDe, puesto, rivales, type EstadoJuego } from '../motor/estado';
 import { esDestacado, letraDe, rangoPotencial, sueldo, textoPotencial } from '../motor/heroes';
 import { NOMBRE_INSTALACION, infoInstalacion, mejorar, plazas, type Instalacion } from '../motor/instalaciones';
-import { comprar, condicionesCompra, condicionesRecluta, ofertaVenta, reclutar, vender } from '../motor/mercado';
+import { comprar, condicionesCompra, ofertaVenta, vender } from '../motor/mercado';
 import { poderEquipo, probabilidadExito } from '../motor/misiones';
 import {
   crearPartida,
@@ -29,7 +29,7 @@ import { borrar, cargar, guardar } from './guardado';
 import { esc, num, pct } from './html';
 
 export type Panel = 'nueva' | 'misiones' | 'mercado' | 'gremio' | 'prueba' | 'dia' | 'semana' | 'victoria';
-type PestanaGremio = 'heroes' | 'reclutar' | 'instalaciones' | 'ranking';
+type PestanaGremio = 'heroes' | 'instalaciones' | 'ranking';
 
 const TITULOS: Record<Panel, string> = {
   nueva: 'Gremio de héroes',
@@ -114,7 +114,7 @@ export class Interfaz {
     if (punto === 'puerta') return this.finalizarElDia();
     if (punto === 'tablon') return this.abrirMisiones();
     if (punto === 'mostrador') return this.abrir('mercado');
-    const pestana: Record<string, PestanaGremio> = { recepcion: 'reclutar', dormitorios: 'heroes', pizarra: 'ranking' };
+    const pestana: Record<string, PestanaGremio> = { recepcion: 'instalaciones', dormitorios: 'heroes', pizarra: 'ranking' };
     if (pestana[punto]) {
       this.pestanaGremio = pestana[punto]!;
       this.abrir('gremio');
@@ -160,7 +160,7 @@ export class Interfaz {
         .filter(Boolean)
         .join(' · ');
       const sinCobrar = todos.some((h) => h.semanasSinCobrar > 0) ? '<em class="alerta-texto">Hay héroes sin cobrar</em>' : '';
-      this.el.menu.innerHTML = `<button class="boton-grande gastar" data-abrir="gremio" data-pestana="heroes" ${bloqueo}><span class="signo">−</span>Gestionar gremio<small>Héroes: ${resumen}</small><small>Reclutar y mejorar instalaciones</small>${sinCobrar}</button>`;
+      this.el.menu.innerHTML = `<button class="boton-grande gastar" data-abrir="gremio" data-pestana="heroes" ${bloqueo}><span class="signo">−</span>Gestionar gremio<small>Héroes: ${resumen}</small><small>Mejorar instalaciones</small>${sinCobrar}</button>`;
       this.el.equipo.innerHTML = `<button class="boton-grande ganar" data-abrir="misiones" ${bloqueo}><span class="signo">+</span>Lanzar misiones<small>${estado.tablon.length} en el tablón · ${libres} ${libres === 1 ? 'héroe libre' : 'héroes libres'}</small></button>`;
       this.el.accion.innerHTML = `<button class="boton-grande mercado" data-abrir="mercado" ${bloqueo}>Mercado de héroes<small>Compra a otros gremios o vende a los tuyos</small></button>`;
     }
@@ -346,26 +346,12 @@ export class Interfaz {
   }
 
   private panelGremio(estado: EstadoJuego): string {
-    const nombres: Record<PestanaGremio, string> = { heroes: 'Héroes', reclutar: 'Reclutar', instalaciones: 'Instalaciones', ranking: 'Ranking' };
+    const nombres: Record<PestanaGremio, string> = { heroes: 'Héroes', instalaciones: 'Instalaciones', ranking: 'Ranking' };
     const pestañas = `<div class="pestanas">${(Object.keys(nombres) as PestanaGremio[])
       .map((p) => `<button data-accion="pestana-gremio" data-id="${p}" class="${this.pestanaGremio === p ? 'activo' : ''}">${nombres[p]}</button>`)
       .join('')}</div>`;
     const j = jugador(estado);
     switch (this.pestanaGremio) {
-      case 'reclutar': {
-        const cartas = estado.reclutas
-          .map((id) => {
-            const c = condicionesRecluta(estado, id);
-            return this.carta(
-              estado,
-              obtenerHeroe(estado, id),
-              `<button class="principal" data-accion="reclutar" data-id="${id}" ${c.bloqueo ? 'disabled' : ''}>Reclutar por ${num(c.precio)}</button>${c.bloqueo ? `<span class="tenue">${esc(c.bloqueo)}</span>` : ''}`,
-            );
-          })
-          .join('');
-        return `${pestañas}<p class="tenue">Aventureros modestos que buscan gremio. Llegan nuevos cada semana. Los grandes talentos se disputan en la Prueba de los Novatos.</p>
-          <div class="cartas">${cartas || '<p class="tenue">Esta semana no queda nadie. Vuelve la semana que viene.</p>'}</div>`;
-      }
       case 'instalaciones': {
         const filas = (['sede', 'ojeadores'] as Instalacion[])
           .map((tipo) => {
@@ -643,13 +629,6 @@ export class Interfaz {
         const h = obtenerHeroe(estado, id);
         const oferta = vender(estado, id);
         this.mensaje = `${h.nombre} se va a ${estado.gremios[oferta.compradorId]?.nombre ?? ''} por ${num(oferta.precio)} de oro.`;
-        this.guardar();
-        return this.repintar();
-      }
-      case 'reclutar': {
-        const h = obtenerHeroe(estado, id);
-        reclutar(estado, id);
-        this.mensaje = `${h.nombre} se une a tu gremio.`;
         this.guardar();
         return this.repintar();
       }

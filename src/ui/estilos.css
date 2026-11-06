@@ -171,13 +171,6 @@ input, select { font: inherit; font-size: 14px; color: var(--texto); background:
 .alerta { border: 1px solid var(--alerta); padding: 0 12px 8px; margin-bottom: 12px; }
 .alerta h3 { color: var(--alerta); }
 
-/* Aviso de interacción, como un bocadillo de diálogo. */
-.aviso {
-  position: absolute; z-index: 3; left: 50%; bottom: 5%; transform: translateX(-50%);
-  background: var(--caja); color: var(--texto); padding: 7px 16px; font-size: 14px; border: 1px solid var(--linea);
-}
-.aviso kbd { font-family: var(--titulo); font-weight: 700; color: var(--cian); border: 1px solid var(--cian); padding: 0 6px; margin-right: 8px; }
-.panel:not([hidden]) ~ .aviso { display: none; }
 
 @media (max-width: 900px) {
   .habitacion { left: 4%; right: 4%; top: 18%; bottom: 24%; }
@@ -397,8 +390,6 @@ summary { cursor: pointer; color: var(--tenue); font-size: 13px; }
   .boton-dia { font-size: 16px; padding: 8px 12px; }
   .tres, .subasta { grid-template-columns: 1fr; }
 }
-/* El aviso de la sede va por encima del botón Mercado y nunca bloquea clics. */
-.aviso { bottom: 120px; pointer-events: none; }
 
 .boton-grande { padding-right: 48px; }
 .boton-grande .signo { top: 50%; transform: translateY(-50%); right: 16px; font-size: 34px; }

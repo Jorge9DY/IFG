@@ -42,7 +42,7 @@ export interface PruebaNovatos {
 export type Fase = 'gestion' | 'prueba' | 'victoria';
 
 export interface EstadoJuego {
-  version: 4;
+  version: 5;
   semilla: number;
   /** Estado del generador aleatorio, para continuar la misma secuencia. */
   azar: number;
@@ -55,8 +55,6 @@ export interface EstadoJuego {
   /** Tablón del día: una misión de cada rango (las lanzadas desaparecen hasta el día siguiente). */
   tablon: Mision[];
   enCurso: MisionEnCurso[];
-  /** Candidatos que se pueden reclutar esta semana fuera de la Prueba. */
-  reclutas: string[];
   prueba: PruebaNovatos | null;
   /** Ranking oficial: se actualiza al terminar el día 7 de cada semana. */
   ranking: FilaRanking[];
@@ -90,7 +88,7 @@ export function rivales(estado: EstadoJuego): Gremio[] {
   return Object.values(estado.gremios).filter((g) => !g.esJugador);
 }
 
-/** Gremio al que pertenece un héroe, o null si no tiene (novato o recluta). */
+/** Gremio al que pertenece un héroe, o null si no tiene (novato). */
 export function dueño(estado: EstadoJuego, heroeId: string): Gremio | null {
   return Object.values(estado.gremios).find((g) => g.plantilla.includes(heroeId)) ?? null;
 }

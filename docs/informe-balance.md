@@ -17,7 +17,7 @@ Tras aplicar las decisiones del propietario (sueldos más altos, instalaciones m
 | Puesto medio al cerrar la temporada 2 | 4,9 | 4,4 |
 | Puesto medio al cerrar la temporada 3 | 4,5 | 3,6 |
 | Puesto medio al cerrar la temporada 4 | 4,2 | 3,2 |
-| Victoria en 4 temporadas o menos | 0% | 5% |
+| Victoria en 4 temporadas o menos | 0% | 5% (8% sin reclutamiento) |
 | Semanas con sueldos impagados (de 16) | 0,1 | 0,2 |
 | Tasa de éxito en misiones | 88% | 87% |
 | Novatos fichados | 6,1 | 8,8 |
