@@ -135,7 +135,7 @@ export function iniciarSede(canvas: HTMLCanvasElement, eventos: EventosSede): ()
 
   caja('#e9e4d6', [2.2, 1.6, 0.2], -3, -5.75); // tablón de anuncios
   punto('tablon', 'Tablón de anuncios', 'Ver misiones', -3, -5.2);
-  caja('#e0457b', [3.5, 1, 0.9], 0, 3.2); // mostrador
+  caja('#3b3e41', [3.5, 1, 0.9], 0, 3.2); // mostrador
   punto('mostrador', 'Mostrador', 'Abrir mercado', 0, 2.2);
   caja('#3b3f3d', [1.8, 1.4, 0.8], 5.5, -5.4); // chimenea
   const elara = new THREE.Mesh(
@@ -157,7 +157,7 @@ export function iniciarSede(canvas: HTMLCanvasElement, eventos: EventosSede): ()
   caja('#9aa5a0', [1.6, 0.8, 1.6], 3.5, 0); // mesa vacía
 
   // Marcadores en el suelo para ver los puntos de interacción.
-  const materialMarca = new THREE.MeshBasicMaterial({ color: '#8ccf3f', transparent: true, opacity: 0.6 });
+  const materialMarca = new THREE.MeshBasicMaterial({ color: '#3fd8e8', transparent: true, opacity: 0.7 });
   for (const p of puntos) {
     const marca = new THREE.Mesh(new THREE.RingGeometry(0.35, 0.5, 32), materialMarca);
     marca.rotation.x = -Math.PI / 2;
@@ -169,15 +169,15 @@ export function iniciarSede(canvas: HTMLCanvasElement, eventos: EventosSede): ()
   const jugador = new THREE.Group();
   const cuerpo = new THREE.Mesh(
     new THREE.CapsuleGeometry(RADIO_JUGADOR, 1, 4, 12),
-    toon('#e0457b'),
+    toon('#7d8a4a'),
   );
   cuerpo.position.y = 0.85;
   cuerpo.castShadow = true;
   contorno(cuerpo, 0.08);
   // Visor verde y triángulo marcador sobre la cabeza.
-  const visor = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.14, 0.12), new THREE.MeshBasicMaterial({ color: '#8ccf3f' }));
+  const visor = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.14, 0.12), new THREE.MeshBasicMaterial({ color: '#3fd8e8' }));
   visor.position.set(0, 1.3, RADIO_JUGADOR - 0.04);
-  const marcador = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.45, 3), new THREE.MeshBasicMaterial({ color: '#ff4d6d' }));
+  const marcador = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.45, 3), new THREE.MeshBasicMaterial({ color: '#eceef0' }));
   marcador.rotation.x = Math.PI;
   marcador.position.y = 2.35;
   contorno(marcador, 0.06);

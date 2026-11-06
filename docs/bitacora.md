@@ -2,6 +2,13 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Estilo táctico (segunda referencia del propietario)
+
+- Se mantiene la disposición: fondo negro, habitación pequeña en el centro, menús a los lados.
+- Nuevo aspecto: grises, líneas blancas finas, cajas negras translúcidas, acentos cian, oliva y naranja; tipografías Rajdhani y Noto Sans.
+- Emblema propio del gremio (llama en un triángulo), código de operación «temporada-semana», objetivo sobre barra naranja entre 「」, menú como lista de respuestas con atajos <1>–<6>, rangos en hexágonos.
+- Escena con colores desaturados: personaje oliva con visor cian y marcadores cian.
+
 ## 2026-11-06 — Nuevo estilo visual (referencia del propietario)
 
 - Fondo negro (#2b2b2b) con la habitación del gremio recortada en el centro como una viñeta.

@@ -168,12 +168,12 @@ export class Interfaz {
   /** Las cuatro esquinas: semana, objetivo, acción principal y plantilla. */
   private pintarHud(estado: EstadoJuego | null): void {
     if (!estado) {
-      this.el.cabecera.innerHTML = '<div class="titulo"><span class="palabra">Gremio</span><span class="numero">D</span></div>';
+      this.el.cabecera.innerHTML = '<div class="titulo"><svg class="emblema" viewBox="0 0 46 42" aria-hidden="true"><path d="M23 2 44 40H2Z" fill="none" stroke="#eceef0" stroke-width="2"/><path d="M23 14c4 6 7 9 7 14a7 7 0 0 1-14 0c0-3 2-5 3-7 1 3 2 4 4 4-2-4-1-8 0-11Z" fill="#eceef0"/></svg><div><div class="palabra">Gremio</div><div class="numero">D</div></div></div>';
     } else {
       const j = jugador(estado);
       this.el.cabecera.innerHTML = `
-        <div class="titulo"><span class="palabra">Semana</span><span class="numero">${estado.partida.semana}</span></div>
-        <span class="etiqueta lugar">Sede · ${esc(j.nombre)}</span>
+        <div class="titulo"><svg class="emblema" viewBox="0 0 46 42" aria-hidden="true"><path d="M23 2 44 40H2Z" fill="none" stroke="#eceef0" stroke-width="2"/><path d="M23 14c4 6 7 9 7 14a7 7 0 0 1-14 0c0-3 2-5 3-7 1 3 2 4 4 4-2-4-1-8 0-11Z" fill="#eceef0"/></svg><div><div class="palabra">Temporada ${estado.partida.temporada} · Semana</div><div class="numero">${estado.partida.temporada}-${estado.partida.semana}</div></div></div>
+        <span class="lugar texto-contorno">${esc(j.nombre)} · Sede</span>
         <div class="datos">
           <span class="pastilla ${j.oro < 500 ? 'mal' : ''}">Oro <b>${num(j.oro)}</b></span>
           <span class="pastilla">Puesto <b>${puesto(estado, j.id)}.º</b></span>
@@ -186,7 +186,7 @@ export class Interfaz {
       <div class="cabeza"><span class="icono" aria-hidden="true"></span>objetivo</div>
       <div class="tarea">${esc(o.accion)} <em>${esc(o.meta)}</em></div>
       <div class="pista">${esc(o.pista)}</div>`;
-    this.el.accion.innerHTML = '<button class="boton-principal" data-abrir="semana">Terminar semana</button>';
+    this.el.accion.innerHTML = `<button class="boton-principal" data-abrir="semana">Terminar semana<small>${estado ? `Semana ${estado.partida.semana} de 20` : ''}</small></button>`;
     this.el.equipo.innerHTML = estado
       ? heroesDe(estado, estado.jugadorId)
           .map((h) => {
