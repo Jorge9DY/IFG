@@ -96,12 +96,13 @@ IFG/
 - [x] 1.000 temporadas con semillas distintas
 - [x] Informe en Markdown con las métricas: [informe-balance.md](informe-balance.md)
 - [x] Primer ajuste (IA de los rivales, riesgo de muerte)
-- [ ] Decisiones pendientes del informe de balance (distancia con los rivales, economía a mitad de temporada)
+- [x] Decisiones del propietario aplicadas: clasificación por temporada, manutención por héroe y objetivo de muertes 0,3–1
+- [ ] Simulación de varias temporadas (cuando exista la temporada 2) para medir si se puede llegar al 1.º en 5
 
 | Métrica | Objetivo inicial |
 | --- | --- |
 | Quiebras en la temporada 1 (jugador automático) | 10–25% |
-| Muertes por temporada (modo normal) | 1–3 |
+| Muertes por temporada (modo normal) | 0,3–1 |
 | Puesto medio al final de la temporada 1 | 4.º–5.º |
 | Semanas con oro por debajo de 500 | Al menos 3 por temporada |
 | Fichajes ganados por la Llama Menguante | 3–6 por temporada |

@@ -65,7 +65,7 @@ export function informe(resultados: ResultadoTemporada[], titulo: string, descri
   const filas: [string, string, string][] = [
     ['Quiebras en la temporada 1', pct(quiebras.length, n), '10–25%'],
     ['Semana media de la quiebra', quiebras.length ? f1(media(quiebras.map((r) => r.semanaFin))) : '—', '—'],
-    ['Muertes por temporada', f1(media(resultados.map((r) => r.muertes))), '1–3'],
+    ['Muertes por temporada', f1(media(resultados.map((r) => r.muertes))), '0,3–1'],
     ['Puesto medio al final (sin quiebra)', completas.length ? f1(media(completas.map((r) => r.puestoFinal))) : '—', '4.º–5.º'],
     ['Semanas con oro por debajo de 500', f1(media(resultados.map((r) => r.semanasOroBajo))), '≥ 3'],
     ['Fichajes ganados', f1(media(resultados.map((r) => r.fichajes))), '3–6'],

@@ -7,6 +7,7 @@ import {
   gremio,
   heroesDe,
   limiteDeuda,
+  manutencionDe,
   puesto,
   registrar,
   salariosDe,
@@ -176,6 +177,6 @@ export function cierreIA(estado: EstadoJuego, gremioId: string, huboExito: boole
   const g = gremio(estado, gremioId);
   const e = balance.economia;
   g.oro += e.patrocinioPorPrestigio * g.prestigio + e.patrocinioPorReputacion * g.reputacion;
-  g.oro -= e.licencia + e.mantenimiento + salariosDe(estado, gremioId);
+  g.oro -= e.licencia + e.mantenimiento + salariosDe(estado, gremioId) + manutencionDe(estado, gremioId);
   if (!huboExito) g.prestigio = Math.max(0, g.prestigio - e.decaimientoPrestigio);
 }

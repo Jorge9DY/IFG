@@ -119,6 +119,13 @@ export function heroesDe(estado: EstadoJuego, gremioId: string): Heroe[] {
   return gremio(estado, gremioId).plantilla.map((id) => heroe(estado, id));
 }
 
+/** Comida y equipo de la plantilla: un gasto semanal por héroe según su rango. */
+export function manutencionDe(estado: EstadoJuego, gremioId: string): number {
+  const tabla = balance.economia.manutencionPorRango;
+  // Elara es la dueña del gremio: ni cobra salario ni cuenta como gasto de manutención.
+  return heroesDe(estado, gremioId).reduce((t, h) => t + (h.id === 'h_000_elara' ? 0 : tabla[h.rango]), 0);
+}
+
 export function salariosDe(estado: EstadoJuego, gremioId: string): number {
   return heroesDe(estado, gremioId).reduce((t, h) => t + (h.contrato?.salario ?? 0), 0);
 }

@@ -306,7 +306,7 @@ Al volver, un informe narrativo de 3–5 líneas generado con plantillas cuenta 
 
 ## 10. Economía y balance
 
-El gremio empieza con 3.000 de oro, 40.000 de deuda y unos gastos fijos de 1.000 por semana: sin misiones exitosas se queda sin oro hacia la semana 4 y la Asociación le retira la licencia en la semana 7.
+El gremio empieza con 3.500 de oro, 40.000 de deuda y unos gastos fijos de 1.000 por semana más la manutención de los héroes: sin misiones exitosas se queda sin oro hacia la semana 5 y la Asociación le retira la licencia en la semana 8.
 
 ### Ingresos y gastos
 
@@ -320,6 +320,7 @@ El gremio empieza con 3.000 de oro, 40.000 de deuda y unos gastos fijos de 1.000
 | Mantenimiento de la sede | Gasto semanal | 200 (+100 por mejora construida) |
 | Cuota de la deuda | Gasto semanal | 500 hasta saldar los 40.000 |
 | Salarios | Gasto semanal | Suma de la plantilla (Elara no cobra) |
+| Manutención (comida y equipo) | Gasto semanal | Por héroe según rango: F y D 20 · C 25 · B 30 · A 35 · S 40 (Elara no cuenta) |
 
 ### Deuda y quiebra
 
@@ -345,14 +346,14 @@ Semana 1: el jugador ficha a 2 agentes libres de rango D (Brann, tanque, prima 4
 
 | Semana | Oro inicial | Fichajes | Misiones | Patrocinio | Gastos fijos + salarios | Oro final |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 3.000 | −750 | 0 | +300 | −1.055 | 1.495 |
-| 2 | 1.495 | 0 | +1.600 (éxito C, +2 prestigio) | +315 | −1.055 | 2.355 |
-| 3 | 2.355 | 0 | 0 (nueva misión C) | +315 | −1.055 | 1.615 |
-| 4 (si fracasa) | 1.615 | 0 | 0 (−2 prestigio) | +290 | −1.055 | 850 |
+| 1 | 3.500 | −750 | 0 | +300 | −1.095 | 1.955 |
+| 2 | 1.955 | 0 | +1.600 (éxito C, +2 prestigio) | +315 | −1.095 | 2.775 |
+| 3 | 2.775 | 0 | 0 (nueva misión C) | +315 | −1.095 | 1.995 |
+| 4 (si fracasa) | 1.995 | 0 | 0 (−2 prestigio) | +290 | −1.095 | 1.190 |
 
-El patrocinio varía porque el prestigio cambia: +2 por la misión con éxito, −0,5 por cada semana sin éxitos y −2 por el fracaso. Orden del cierre semanal: patrocinio, gastos, control de quiebra y, por último, decaimiento del prestigio.
+El patrocinio varía porque el prestigio cambia: +2 por la misión con éxito, −0,5 por cada semana sin éxitos y −2 por el fracaso. Los gastos incluyen 40 de manutención de Brann y Lio. Orden del cierre semanal: patrocinio, gastos, control de quiebra y, por último, decaimiento del prestigio.
 
-Un solo fracaso deja al gremio a 1 semana del primer aviso. El margen obliga a combinar misiones F/D de 1 semana con las de 2 semanas y a vender o fichar barato en las primeras semanas. Es la tensión buscada para la temporada 1.
+Dos fracasos seguidos dejan al gremio a punto del primer aviso. El margen obliga a combinar misiones F/D de 1 semana con las de 2 semanas y a vender o fichar barato en las primeras semanas. Es la tensión buscada para la temporada 1.
 
 ## 11. Prestigio, reputación y ranking
 
@@ -369,10 +370,10 @@ El prestigio mide lo fuerte y famoso que es el gremio; la reputación mide lo bi
 ### Puntos de Gremio y ranking
 
 ```latex
-\text{Puntos de Gremio} = 3 \times \text{Prestigio} + \text{Reputación} + \text{Puntos de misión de la temporada}
+\text{Puntos de Gremio} = 3 \times \text{Prestigio ganado en la temporada} + \text{Puntos de misión de la temporada}
 ```
 
-Puntos de misión por éxito: F 1 · D 2 · C 4 · B 7 · A 12 · S 20. El ranking se recalcula cada semana y se muestra en la pantalla de Clasificación; los puestos al cierre de la semana 20 deciden premios, misiones visibles y el orden del próximo Draft.
+Cada temporada es una carrera nueva: el prestigio acumulado antes no cuenta, solo el ganado (o perdido) desde la semana 1. La reputación no suma puntos; pesa en pujas, patrocinio y aliados. Puntos de misión por éxito: F 1 · D 2 · C 4 · B 7 · A 12 · S 20. El ranking se recalcula cada semana y se muestra en la pantalla de Clasificación; los puestos al cierre de la semana 20 deciden premios, misiones visibles y el orden del próximo Draft.
 
 **Orden del Draft:** el 5.º elige primero qué candidato "marca" (+10 en su puntuación con ese candidato). Así el peor gremio tiene una herramienta para competir, pero los rivales siguen pujando.
 
@@ -586,4 +587,7 @@ La semilla aleatoria guardada en la partida permite repetir tiradas al depurar e
 - El jugador elige el nombre y el aspecto del protagonista.
 - La Llama Menguante no tiene especialidad: ficha héroes de cualquier clase y raza.
 - El Modo Clemente (sin muertes) entra en el prototipo.
+- Clasificación: solo cuenta lo conseguido en la temporada en curso (pregunta 1, opción A).
+- Economía: gasto semanal de manutención por héroe; oro inicial 3.500 para compensarlo (pregunta 2, opción A).
+- Muertes: unas 0,3–1 por temporada con un juego sensato; la muerte es rara y pesa (pregunta 3).
 - Stack: TypeScript + Vite + Three.js. La sede del gremio es un espacio 3D por el que se mueve el protagonista.

@@ -5,11 +5,14 @@ import {
   heroe as obtenerHeroe,
   heroesDe,
   jugador,
+  manutencionDe,
   puesto,
   salariosDe,
   tabla,
   type EstadoJuego,
 } from '../motor/estado';
+import { gastosSemanales } from '../motor/economia';
+import { prestigioGanado } from '../motor/ranking';
 import { salarioPedido, valorMercado } from '../motor/heroes';
 import { contextoGremio } from '../motor/ia';
 import { POSICION_NATURAL, sumaCombate, vistaPreviaMision, type MiembroEquipo } from '../motor/misiones';
@@ -384,11 +387,11 @@ export class Interfaz {
     const filas = tabla(estado)
       .map((f) => {
         const g = estado.gremios[f.gremioId]!;
-        return `<tr class="${g.esJugador ? 'propio' : ''}"><td>${f.puesto}.º</td><td>${esc(g.nombre)}</td><td class="num">${num(Math.round(f.puntos))}</td><td class="num">${num(g.prestigio)}</td><td class="num">${num(g.reputacion)}</td><td class="num">${g.plantilla.length}</td></tr>`;
+        return `<tr class="${g.esJugador ? 'propio' : ''}"><td>${f.puesto}.º</td><td>${esc(g.nombre)}</td><td class="num">${num(Math.round(f.puntos))}</td><td class="num">${num(g.puntosMisionTemporada)}</td><td class="num">${prestigioGanado(g) >= 0 ? '+' : ''}${num(prestigioGanado(g))}</td><td class="num">${num(g.prestigio)}</td><td class="num">${g.plantilla.length}</td></tr>`;
       })
       .join('');
-    return `<table><thead><tr><th></th><th>Gremio</th><th>Puntos</th><th>Prestigio</th><th>Reputación</th><th>Héroes</th></tr></thead><tbody>${filas}</tbody></table>
-      <p class="tenue">Puntos de Gremio = 3 × prestigio + reputación + puntos de misión de la temporada.</p>`;
+    return `<table><thead><tr><th></th><th>Gremio</th><th>Puntos</th><th>Misiones</th><th>Prestigio ganado</th><th>Prestigio</th><th>Héroes</th></tr></thead><tbody>${filas}</tbody></table>
+      <p class="tenue">Cada temporada es una carrera nueva: Puntos de Gremio = 3 × prestigio ganado en la temporada + puntos de misión (F 1 · D 2 · C 4 · B 7 · A 12 · S 20).</p>`;
   }
 
   private panelInforme(estado: EstadoJuego): string {
@@ -407,7 +410,7 @@ export class Interfaz {
 
   private panelSemana(estado: EstadoJuego): string {
     const j = jugador(estado);
-    const gastos = balance.economia.licencia + balance.economia.mantenimiento + balance.economia.mantenimientoPorMejora * j.mejoras.length + Math.min(balance.economia.cuotaDeuda, j.deuda) + salariosDe(estado, j.id);
+    const gastos = gastosSemanales(j, salariosDe(estado, j.id), manutencionDe(estado, j.id)).total;
     const libres = heroesDe(estado, j.id).filter((h) => h.estado === 'disponible').length;
     return `<p>Al cerrar la semana se resuelven las misiones que vuelven, los rivales juegan su turno y se pagan unos <strong>${num(gastos)}</strong> de oro en gastos.</p>
       ${libres >= 3 && estado.tablon.length ? `<p class="aviso-texto">Tienes ${libres} héroes sin misión.</p>` : ''}

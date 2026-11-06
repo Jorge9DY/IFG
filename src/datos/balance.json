@@ -216,7 +216,7 @@
     "prestigioAmbicioso": 60
   },
   "economia": {
-    "oroInicial": 3000,
+    "oroInicial": 3500,
     "deudaInicial": 40000,
     "licencia": 300,
     "mantenimiento": 200,
@@ -232,11 +232,19 @@
       12000,
       6000,
       0
-    ]
+    ],
+    "manutencionPorRango": {
+      "S": 40,
+      "A": 35,
+      "B": 30,
+      "C": 25,
+      "D": 20,
+      "F": 20
+    }
   },
   "ranking": {
-    "pesoPrestigio": 3,
-    "pesoReputacion": 1
+    "pesoPrestigioGanado": 3,
+    "pesoReputacion": 0
   },
   "generacion": {
     "edad": [

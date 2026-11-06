@@ -2,7 +2,7 @@
 
 Decisiones de diseño que el agente no debe tomar por su cuenta. Responde debajo de cada pregunta (o en el chat) y el agente lo aplicará.
 
-## 1. ¿Cómo debe alcanzar el jugador a los rivales en el ranking?
+## 1. ¿Cómo debe alcanzar el jugador a los rivales en el ranking? — RESUELTA
 
 Con las reglas actuales el jugador acaba siempre 5.º y la distancia no se cierra ni en 5 temporadas (detalle en `informe-balance.md`). Opciones:
 
@@ -10,9 +10,9 @@ Con las reglas actuales el jugador acaba siempre 5.º y la distancia no se cierr
 - B. Prestigio de los rivales con tope más bajo o decaimiento más rápido.
 - C. Acceso antes a misiones de rango alto.
 
-Respuesta:
+Respuesta: A. Aplicada: Puntos de Gremio = 3 × prestigio ganado en la temporada + puntos de misión.
 
-## 2. ¿Cómo mantener la tensión económica a mitad de temporada?
+## 2. ¿Cómo mantener la tensión económica a mitad de temporada? — RESUELTA
 
 Tras la semana 6 el oro crece sin parar (unos 11.000 al final de la temporada). Opciones:
 
@@ -20,13 +20,13 @@ Tras la semana 6 el oro crece sin parar (unos 11.000 al final de la temporada). 
 - B. Subir los salarios un 30%.
 - C. Reducir el oro de las misiones C y B un 20%.
 
-Respuesta:
+Respuesta: A. Aplicada: manutención por héroe (20–40 según rango, Elara no cuenta) y oro inicial 3.500 para no disparar las quiebras.
 
-## 3. ¿Cuántas muertes por temporada queremos?
+## 3. ¿Cuántas muertes por temporada queremos? — RESUELTA
 
 Con un juego sensato hay unas 0,4–0,6 muertes por temporada. ¿Está bien así (la muerte es rara y pesa más) o deberían ser 1–3?
 
-Respuesta:
+Respuesta: están bien como están (0,4–0,6). Objetivo nuevo: 0,3–1 muertes por temporada.
 
 ## 4. ¿Dónde publicamos el juego? — RESUELTA
 

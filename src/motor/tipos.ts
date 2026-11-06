@@ -93,6 +93,8 @@ export interface Gremio {
   plantillaMax: number;
   mejoras: Mejora[];
   puntosMisionTemporada: number;
+  /** Prestigio al empezar la temporada: la clasificación cuenta solo el ganado desde entonces. */
+  prestigioInicioTemporada?: number;
   cierresNegativos: number;
   muertesTemporadaPasada: number;
 }

@@ -10,7 +10,7 @@ function llamaInicial(): Gremio {
     id: 'llama',
     nombre: 'Llama Menguante',
     esJugador: true,
-    oro: 3000,
+    oro: 3500,
     deuda: 40000,
     prestigio: 10,
     reputacion: 40,
@@ -19,6 +19,7 @@ function llamaInicial(): Gremio {
     plantillaMax: 6,
     mejoras: [],
     puntosMisionTemporada: 0,
+    prestigioInicioTemporada: 10,
     cierresNegativos: 0,
     muertesTemporadaPasada: 0,
   };
@@ -31,25 +32,34 @@ describe('Economía (sección 10)', () => {
     expect(gastosSemanales(g, 0).total).toBe(1000);
   });
 
-  it('simulación de las 4 primeras semanas: 1.495 → 2.355 → 1.615 → 850', () => {
+  it('la manutención depende del rango y Elara no cuenta', async () => {
+    const { crearPartida } = await import('../src/motor/partida');
+    const { manutencionDe } = await import('../src/motor/estado');
+    const estado = crearPartida({ nombre: 'M', semilla: 2 });
+    expect(manutencionDe(estado, 'llama')).toBe(0);
+    expect(gastosSemanales(llamaInicial(), 55, 40).total).toBe(1095);
+  });
+
+  it('simulación de las 4 primeras semanas: 1.955 → 2.775 → 1.995 → 1.190', () => {
     const g = llamaInicial();
     const salarios = 30 + 25; // Brann y Lio
+    const manutencion = 20 + 20; // dos héroes de rango D (Elara no cuenta)
 
     // Semana 1: fichajes de Brann (400) y Lio (350); misión C en curso.
     g.oro -= 750;
-    expect(cierreSemanal(g, salarios, false).oroFinal).toBe(1495);
+    expect(cierreSemanal(g, salarios, false, manutencion).oroFinal).toBe(1955);
 
     // Semana 2: vuelve la misión C con éxito.
     g.oro += 1600;
     g.prestigio += 2;
-    expect(cierreSemanal(g, salarios, true).oroFinal).toBe(2355);
+    expect(cierreSemanal(g, salarios, true, manutencion).oroFinal).toBe(2775);
 
     // Semana 3: nueva misión C en curso.
-    expect(cierreSemanal(g, salarios, false).oroFinal).toBe(1615);
+    expect(cierreSemanal(g, salarios, false, manutencion).oroFinal).toBe(1995);
 
     // Semana 4: la misión fracasa (−2 de prestigio).
     g.prestigio -= 2;
-    expect(cierreSemanal(g, salarios, false).oroFinal).toBe(850);
+    expect(cierreSemanal(g, salarios, false, manutencion).oroFinal).toBe(1190);
     expect(g.deuda).toBe(38000);
   });
 
@@ -64,12 +74,20 @@ describe('Economía (sección 10)', () => {
 });
 
 describe('Ranking (sección 11)', () => {
-  it('Puntos de Gremio = 3 × prestigio + reputación + puntos de misión', () => {
-    expect(puntosGremio({ ...llamaInicial(), puntosMisionTemporada: 4 })).toBe(74);
+  it('Puntos de Gremio = 3 × prestigio ganado en la temporada + puntos de misión', () => {
+    expect(puntosGremio({ ...llamaInicial(), puntosMisionTemporada: 4 })).toBe(4);
+    expect(puntosGremio({ ...llamaInicial(), prestigio: 15, puntosMisionTemporada: 4 })).toBe(19);
+    expect(puntosGremio({ ...llamaInicial(), prestigio: 8 })).toBe(-6);
+  });
+
+  it('el prestigio acumulado de temporadas anteriores no cuenta', () => {
+    const veterano = { ...llamaInicial(), id: 'v', prestigio: 100, prestigioInicioTemporada: 100 };
+    const novato = { ...llamaInicial(), id: 'n', prestigio: 14, puntosMisionTemporada: 2 };
+    expect(clasificacion([veterano, novato]).map((f) => f.gremioId)).toEqual(['n', 'v']);
   });
 
   it('ordena de más a menos puntos', () => {
-    const corona = { ...llamaInicial(), id: 'corona', nombre: 'Corona de Acero', prestigio: 90, reputacion: 50 };
+    const corona = { ...llamaInicial(), id: 'corona', nombre: 'Corona de Acero', prestigio: 90, prestigioInicioTemporada: 80, reputacion: 50 };
     const filas = clasificacion([llamaInicial(), corona]);
     expect(filas.map((f) => f.gremioId)).toEqual(['corona', 'llama']);
     expect(filas[0]?.puesto).toBe(1);

@@ -2,6 +2,14 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Respuestas del propietario aplicadas
+
+- Pregunta 1 (A): la clasificación cuenta solo la temporada en curso (3 × prestigio ganado + puntos de misión). La distancia con los rivales baja de ~200/550 a ~124/207–271.
+- Pregunta 2 (A): manutención semanal por héroe (20–40 según rango; Elara no cuenta). Para no disparar las quiebras, oro inicial 3.500.
+- Pregunta 3: las muertes se quedan como están; objetivo 0,3–1 por temporada.
+- Resultado: quiebras 12,9% (prudente) y 28,2% (arriesgado). Informe de balance reescrito; diseño (secciones 10 y 11) y tests actualizados (80 tests).
+- Interfaz: la clasificación muestra puntos de misión y prestigio ganado; la estimación de gastos incluye la manutención.
+
 ## 2026-11-06 — Interfaz de mejoras, cláusulas, cesiones y sobornos
 
 - Panel de Elara: tabla de mejoras de la sede con coste, efecto y botón Construir.

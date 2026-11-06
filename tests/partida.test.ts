@@ -7,10 +7,10 @@ import { simularTemporada } from '../herramientas/simulador/simular';
 describe('Creación de la partida', () => {
   const estado = crearPartida({ nombre: 'Prueba', semilla: 7 });
 
-  it('el jugador empieza solo con Elara, 3.000 de oro y 40.000 de deuda', () => {
+  it('el jugador empieza solo con Elara, 3.500 de oro y 40.000 de deuda', () => {
     const j = jugador(estado);
     expect(j.plantilla).toEqual(['h_000_elara']);
-    expect(j.oro).toBe(3000);
+    expect(j.oro).toBe(3500);
     expect(j.deuda).toBe(40000);
   });
 

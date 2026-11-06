@@ -9,6 +9,7 @@ import {
   heroe as obtenerHeroe,
   heroesDe,
   jugador,
+  manutencionDe,
   nuevoId,
   puesto,
   registrar,
@@ -127,6 +128,7 @@ export function crearPartida(opciones: OpcionesPartida): EstadoJuego {
         plantillaMax: 13,
         mejoras: [],
         puntosMisionTemporada: 0,
+        prestigioInicioTemporada: datos.prestigio,
         cierresNegativos: 0,
         muertesTemporadaPasada: 0,
       };
@@ -317,7 +319,7 @@ export function terminarSemana(estado: EstadoJuego): ResumenSemana {
     fichajesIA(estado, azar, semana === 1);
 
     // 3. Cierre económico del jugador.
-    const cierre = cierreSemanal(j, salariosDe(estado, j.id), huboExito);
+    const cierre = cierreSemanal(j, salariosDe(estado, j.id), huboExito, manutencionDe(estado, j.id));
     if (cierre.aviso) registrar(estado, 'economia', `Aviso de la Asociación: el gremio está en números rojos (${cierre.oroFinal} de oro).`);
 
     // 4. Recuperación, luto y moral.

@@ -16,6 +16,7 @@ export function estadoInicialJugador(): Gremio {
     plantillaMax: 6,
     mejoras: [],
     puntosMisionTemporada: 0,
+    prestigioInicioTemporada: 10,
     cierresNegativos: 0,
     muertesTemporadaPasada: 0,
   };
