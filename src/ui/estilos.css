@@ -191,3 +191,89 @@ input, select { font: inherit; font-size: 14px; color: var(--texto); background:
   .boton-principal { min-width: 0; font-size: 17px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ---------- Cartas de héroe ---------- */
+.cartas { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.carta {
+  display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; min-width: 0;
+  background: rgba(255, 255, 255, 0.03); border: 1px solid var(--linea-suave);
+}
+.carta:hover { border-color: var(--linea); }
+.carta.caro { opacity: 0.55; }
+.carta.en-venta { border-color: var(--naranja); }
+.carta header { display: flex; align-items: center; gap: 8px; }
+.carta .quien { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.carta .quien strong { font-family: var(--titulo); font-weight: 700; font-size: 16px; letter-spacing: 0.03em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.carta .quien .tenue { font-size: 12px; }
+.estado-chip { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 6px; border: 1px solid var(--linea-suave); color: var(--tenue); white-space: nowrap; }
+.e-herido, .e-muerto { border-color: var(--alerta); color: var(--alerta); }
+.e-en-mision { border-color: var(--cian); color: var(--cian); }
+.e-luto { border-color: var(--naranja); color: var(--naranja); }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+.stat { display: grid; grid-template-columns: 30px 1fr 24px; align-items: center; gap: 6px; font-size: 11px; color: var(--tenue); letter-spacing: 0.06em; }
+.stat i { height: 5px; background: linear-gradient(90deg, var(--texto) var(--v), #34373a var(--v)); }
+.stat.principal span, .stat.principal b { color: var(--cian); }
+.stat.principal i { background: linear-gradient(90deg, var(--cian) var(--v), #34373a var(--v)); }
+.stat b { text-align: right; font-family: var(--titulo); font-size: 13px; color: var(--texto); font-variant-numeric: tabular-nums; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { font-size: 11px; padding: 1px 6px; border: 1px solid var(--linea-suave); color: var(--texto); cursor: help; }
+.chip.moral { color: var(--tenue); cursor: default; }
+.chip.vinculo { border-color: rgba(63, 216, 232, 0.5); }
+.carta footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; padding-top: 6px; border-top: 1px solid var(--linea-suave); }
+.precio { font-size: 12px; color: var(--tenue); }
+.precio b, .cifra { color: var(--texto); font-family: var(--titulo); font-size: 15px; font-weight: 700; }
+
+/* ---------- Pestañas y botones agrupados ---------- */
+.pestanas { display: flex; flex-wrap: wrap; gap: 0; margin: 4px 0 10px; border-bottom: 1px solid var(--linea-suave); }
+.panel-cuerpo .pestanas button { border: none; border-bottom: 2px solid transparent; margin: 0; padding: 8px 14px; font-family: var(--titulo); font-weight: 600; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tenue); }
+.panel-cuerpo .pestanas button.activo { color: var(--texto); border-bottom-color: var(--cian); box-shadow: none; background: transparent; }
+.panel-cuerpo .pestanas.pequenas button { font-size: 12px; padding: 6px 10px; }
+.botones { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; margin-top: 10px; }
+
+/* ---------- Misiones ---------- */
+.panel-cuerpo .tarjeta.mision { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; }
+.tarjeta.mision .linea { display: flex; align-items: center; gap: 6px; }
+.dificultad { align-self: flex-start; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 1px 8px; border: 1px solid; }
+.d-facil { color: #8fd98a; border-color: #8fd98a; }
+.d-asequible { color: var(--cian); border-color: var(--cian); }
+.d-arriesgada { color: #e8b04f; border-color: #e8b04f; }
+.d-muy-dificil { color: var(--alerta); border-color: var(--alerta); }
+.d-sin-equipo { color: var(--tenue); border-color: var(--linea-suave); }
+
+/* ---------- Formación ---------- */
+.formacion, .puja { border: 1px solid var(--linea); background: rgba(255, 255, 255, 0.03); padding: 12px; margin: 8px 0 14px; }
+.formacion-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.medidor { display: flex; flex-direction: column; align-items: center; min-width: 96px; padding: 6px 10px; border: 1px solid; }
+.medidor b { font-family: var(--titulo); font-size: 30px; line-height: 1; }
+.medidor span { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; }
+.columnas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.columna { min-height: 90px; padding: 6px; border: 1px dashed var(--linea-suave); display: flex; flex-direction: column; gap: 6px; }
+.columna h4 { margin: 0 0 2px; font-family: var(--titulo); font-weight: 600; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--tenue); text-align: center; }
+.columna .vacio { text-align: center; margin: auto 0; }
+.ficha { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: 'r q k' 'm m m'; gap: 4px 6px; align-items: center; padding: 6px; background: var(--caja); border: 1px solid var(--linea-suave); }
+.ficha.fuera-de-sitio { border-color: #e8b04f; }
+.ficha .rango { grid-area: r; }
+.ficha .quien { grid-area: q; display: flex; flex-direction: column; min-width: 0; }
+.ficha .quien strong { font-size: 13px; }
+.ficha .quien .tenue { font-size: 11px; }
+.ficha .riesgo { grid-area: k; font-size: 11px; color: var(--alerta); }
+.ficha .mover { grid-area: m; display: flex; gap: 2px; justify-content: flex-end; }
+.panel-cuerpo .ficha .mover button { padding: 0 8px; font-size: 13px; margin: 0; }
+.minis { display: flex; flex-wrap: wrap; gap: 6px; }
+.panel-cuerpo button.mini { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; }
+
+/* ---------- Puja ---------- */
+.opciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; margin-top: 10px; }
+.panel-cuerpo button.opcion { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 10px; margin: 0; }
+.opcion strong { font-family: var(--titulo); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; }
+.opcion span { font-size: 12px; color: var(--tenue); }
+.confianza { font-size: 11px !important; letter-spacing: 0.08em; text-transform: uppercase; }
+.c-muy-probable { color: #8fd98a !important; border-color: #8fd98a; }
+.c-probable { color: var(--cian) !important; border-color: var(--cian); }
+.c-incierta { color: #e8b04f !important; border-color: #e8b04f; }
+.c-dificil, .c-imposible { color: var(--alerta) !important; border-color: var(--alerta); }
+details { margin-top: 10px; }
+summary { cursor: pointer; color: var(--tenue); font-size: 13px; }
+.oferta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; margin-bottom: 6px; background: var(--caja); border: 1px solid var(--linea-suave); }
+.oferta p { margin: 0; }
+.oferta .botones { margin: 0; }

@@ -23,7 +23,7 @@ import {
   pujarPorHeroe,
   terminarSemana,
 } from '../motor/partida';
-import { ofertaTotal, puntuacionOferta } from '../motor/pujas';
+import { ofertaTotal, puntuacionOferta, type Oferta } from '../motor/pujas';
 import type { Heroe, Posicion } from '../motor/tipos';
 import { aceptarOferta, contraofertar, ponerEnVenta, quitarDeVenta } from '../motor/ventas';
 import { retenerHeroe } from '../motor/rivales';
@@ -32,6 +32,18 @@ import { condicionesCesion, pagarClausula, pedirCesion } from '../motor/traspaso
 import type { Mejora } from '../motor/tipos';
 import { Azar } from '../motor/azar';
 import { objetivoActual } from './objetivo';
+import {
+  AYUDA_RASGO,
+  TEXTO_CONFIANZA,
+  TEXTO_DIFICULTAD,
+  equipoRecomendado,
+  evaluarOferta,
+  heroesLibres,
+  nivelDificultad,
+  ofertasSugeridas,
+  oroParaPujar,
+  probabilidadConMejorEquipo,
+} from './ayudas';
 import { borrar, cargar, guardar } from './guardado';
 import { esc, num, pct } from './html';
 
@@ -85,6 +97,8 @@ export class Interfaz {
   private equipo = new Map<string, Posicion>();
   private heroeMercado: string | null = null;
   private gremioRival = 'alba';
+  private pestanaMercado: 'libres' | 'rivales' = 'libres';
+  private ofertaPuja: Oferta | null = null;
   private mensaje = '';
 
   constructor(private readonly el: ElementosInterfaz) {
@@ -261,183 +275,234 @@ export class Interfaz {
         .join('')}</tbody></table>`;
   }
 
-  private filaHeroe(estado: EstadoJuego, h: Heroe, extra = ''): string {
+  /** Carta de héroe: lo esencial a la vista y el detalle plegado. */
+  private carta(estado: EstadoJuego, h: Heroe, pie: string, extraClase = ''): string {
+    const s = h.stats;
+    const barra = (nombre: string, valor: number, principal: boolean): string =>
+      `<div class="stat ${principal ? 'principal' : ''}" title="${nombre} ${valor}/100"><span>${nombre}</span><i style="--v:${valor}%"></i><b>${valor}</b></div>`;
+    const principal = { Tanque: 'DEF', Guerrero: 'POD', Mago: 'MAG', Sanador: 'MAG', Explorador: 'AGI', Soporte: 'MAG' }[h.clase];
     const vinculos = h.vinculos
       .filter((v) => !v.oculto || estado.partida.despertares >= 1)
       .map((v) => {
         const otro = estado.heroes[v.con];
-        return otro ? `<span title="${esc(`${v.tipo} con ${otro.nombre}`)}">${ICONO_VINCULO[v.tipo]}</span>` : '';
+        return otro ? `<span class="chip vinculo" title="${esc(`${v.tipo} con ${otro.nombre}`)}">${ICONO_VINCULO[v.tipo]} ${esc(otro.nombre.split(' ')[0] ?? '')}</span>` : '';
       })
       .join('');
-    const potencial = h.potencialVisible ? ` <span class="tenue">(pot. ${h.potencial})</span>` : '';
-    const s = h.stats;
-    return `<tr>
-      <td><strong>${esc(h.nombre)}</strong> ${vinculos}<div class="tenue">${esc(h.raza)} · ${esc(h.edad)} años${h.rasgos.length ? ' · ' + esc(h.rasgos.join(', ')) : ''}</div></td>
-      <td><span class="rango r${h.rango}">${h.rango}</span>${potencial}</td>
-      <td>${esc(h.clase)}<div class="tenue">${esc(h.elemento)}</div></td>
-      <td class="num">${s.poder}/${s.defensa}/${s.magia}/${s.agilidad}<div class="tenue">suma ${sumaCombate(h)}</div></td>
-      <td class="num">${s.moral}</td>
-      <td>${esc(h.estado)}${h.semanasFuera ? ` (${h.semanasFuera} sem.)` : ''}</td>
-      ${extra}
-    </tr>`;
+    const rasgos = h.rasgos.map((r) => `<span class="chip" title="${esc(AYUDA_RASGO[r] ?? r)}">${esc(r)}</span>`).join('');
+    const estadoTexto = h.estado === 'disponible' ? '' : `<span class="estado-chip e-${h.estado.replace(' ', '-')}">${esc(h.estado)}${h.semanasFuera ? ` · ${h.semanasFuera} sem.` : ''}</span>`;
+    const potencial = h.potencialVisible && h.potencial !== h.rango ? `<span class="tenue" title="Potencial: hasta dónde puede crecer">→ ${h.potencial}</span>` : '';
+    return `<article class="carta ${extraClase}">
+      <header>
+        <span class="rango r${h.rango}">${h.rango}</span>${potencial}
+        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${esc(h.clase)} · ${esc(h.elemento)} · ${esc(h.edad)} años</span></div>
+        ${estadoTexto}
+      </header>
+      <div class="stats">
+        ${barra('POD', s.poder, principal === 'POD')}${barra('DEF', s.defensa, principal === 'DEF')}${barra('MAG', s.magia, principal === 'MAG')}${barra('AGI', s.agilidad, principal === 'AGI')}
+      </div>
+      <div class="chips"><span class="chip moral" title="Moral: multiplica su rendimiento">Moral ${s.moral}</span>${rasgos}${vinculos}</div>
+      <footer>${pie}</footer>
+    </article>`;
   }
 
   private panelPlantilla(estado: EstadoJuego): string {
     const j = jugador(estado);
-    const filas = heroesDe(estado, j.id)
+    const cartas = heroesDe(estado, j.id)
       .map((h) => {
         const enVenta = estado.enVenta.some((t) => t.heroeId === h.id);
         const cesion = (estado.cesiones ?? []).find((c) => c.heroeId === h.id);
-        const accion =
-          h.id === 'h_000_elara'
-            ? '<td></td>'
-            : cesion
-              ? `<td>${num(h.contrato?.salario ?? 0)}<div class="tenue">Cedido por ${esc(estado.gremios[cesion.origenId]?.nombre ?? '')} hasta la semana ${cesion.semanaFin}</div></td>`
-              : `<td>${num(h.contrato?.salario ?? 0)}<div>${
-                enVenta
-                  ? `<button data-accion="quitar-venta" data-id="${h.id}">Quitar de venta</button>`
-                  : `<button data-accion="vender" data-id="${h.id}">Poner en venta (${num(valorMercado(h))})</button>`
-              }</div></td>`;
-        return this.filaHeroe(estado, h, accion);
+        const sueldo = `<span class="precio">${h.id === 'h_000_elara' ? 'Maestra del gremio' : `Salario <b>${num(h.contrato?.salario ?? 0)}</b>/sem.`}</span>`;
+        let boton = '';
+        if (cesion) boton = `<span class="tenue">Cedido hasta la semana ${cesion.semanaFin}</span>`;
+        else if (h.id !== 'h_000_elara') {
+          boton = enVenta
+            ? `<button data-accion="quitar-venta" data-id="${h.id}">Quitar de venta</button>`
+            : `<button data-accion="vender" data-id="${h.id}" title="Los gremios harán ofertas al cerrar la semana">Vender · ${num(valorMercado(h))}</button>`;
+        }
+        return this.carta(estado, h, sueldo + boton, enVenta ? 'en-venta' : '');
       })
       .join('');
     const ofertas = estado.ofertas
       .map((o) => {
         const h = obtenerHeroe(estado, o.heroeId);
         const comprador = estado.gremios[o.compradorId]?.nombre ?? o.compradorId;
-        return `<li>${esc(comprador)} ofrece <strong>${num(o.precio)}</strong> por ${esc(h.nombre)} (valor ${num(valorMercado(h))})
-          <button data-accion="aceptar-oferta" data-id="${o.id}">Aceptar</button>
-          <button data-accion="contraofertar" data-id="${o.id}" data-precio="${Math.round(o.precio * 1.15)}">Pedir ${num(Math.round(o.precio * 1.15))}</button></li>`;
+        const subida = Math.round(o.precio * 1.15);
+        return `<div class="oferta"><p><strong>${esc(comprador)}</strong> ofrece <b class="cifra">${num(o.precio)}</b> por ${esc(h.nombre)} <span class="tenue">(vale ${num(valorMercado(h))})</span></p>
+          <div class="botones"><button class="principal" data-accion="aceptar-oferta" data-id="${o.id}">Vender</button>
+          <button data-accion="contraofertar" data-id="${o.id}" data-precio="${subida}" title="35% de que se retiren">Pedir ${num(subida)}</button></div></div>`;
       })
       .join('');
     const sobornos = (estado.sobornos ?? [])
       .map((s) => {
         const h = estado.heroes[s.heroeId];
         if (!h) return '';
-        return `<li><strong>${esc(h.nombre)}</strong> se irá al Colmillo Carmesí al cierre de la semana ${s.semanaLimite} si no le subes el salario de ${num(h.contrato?.salario ?? 0)} a ${num(s.salarioPedido)}.
-          <button data-accion="retener" data-id="${h.id}">Retener</button></li>`;
+        return `<div class="oferta"><p><strong>${esc(h.nombre)}</strong> se irá al Colmillo Carmesí al cierre de la semana ${s.semanaLimite} si no le subes el salario de ${num(h.contrato?.salario ?? 0)} a <b class="cifra">${num(s.salarioPedido)}</b>.</p>
+          <div class="botones"><button class="principal" data-accion="retener" data-id="${h.id}">Retener</button></div></div>`;
       })
       .join('');
-    return `${sobornos ? `<div class="alerta"><h3>Intento de soborno</h3><ul class="lista">${sobornos}</ul></div>` : ''}
-      <p class="tenue">${j.plantilla.length}/${j.plantillaMax} héroes · salarios ${num(salariosDe(estado, j.id))} por semana · stats Poder/Defensa/Magia/Agilidad</p>
-      <table><thead><tr><th>Héroe</th><th>Rango</th><th>Clase</th><th>Stats</th><th>Moral</th><th>Estado</th><th>Salario</th></tr></thead><tbody>${filas}</tbody></table>
-      <h3>Ofertas recibidas</h3>${ofertas ? `<ul class="lista">${ofertas}</ul>` : '<p class="tenue">Ninguna. Pon héroes en venta y los gremios harán ofertas al cerrar la semana.</p>'}`;
+    return `${sobornos ? `<div class="alerta"><h3>Intento de soborno</h3>${sobornos}</div>` : ''}
+      ${ofertas ? `<h3>Ofertas recibidas</h3>${ofertas}` : ''}
+      <p class="tenue">${j.plantilla.length} de ${j.plantillaMax} héroes · salarios ${num(salariosDe(estado, j.id))} por semana. Pasa el ratón por un rasgo para ver qué hace.</p>
+      <div class="cartas">${cartas}</div>`;
   }
 
   private panelMisiones(estado: EstadoJuego): string {
     const enCurso = estado.enCurso
       .filter((c) => c.gremioId === estado.jugadorId)
-      .map((c) => `<li>Rango ${c.mision.rango} (${esc(c.mision.etiqueta)}) · vuelve al cierre de la semana ${c.semanaFin} · ${c.equipo.map((p) => esc(obtenerHeroe(estado, p.heroeId).nombre)).join(', ')}</li>`)
+      .map((c) => `<li><span class="rango r${c.mision.rango}">${c.mision.rango}</span> ${esc(c.mision.etiqueta)} · vuelve al cierre de la semana ${c.semanaFin} · ${c.equipo.map((p) => esc(obtenerHeroe(estado, p.heroeId).nombre.split(' ')[0] ?? '')).join(', ')}</li>`)
       .join('');
     const tarjetas = estado.tablon
-      .map(
-        (m) => `<button class="tarjeta ${this.misionId === m.id ? 'activo' : ''}" data-accion="elegir-mision" data-id="${m.id}">
-          <span class="rango r${m.rango}">${m.rango}</span> ${esc(m.etiqueta)} · ${esc(m.elemento)}
-          <div class="tenue">Poder ${num(m.poderRecomendado)} · ${m.duracion} sem. · ${num(m.recompensa.oro)} oro · +${m.recompensa.prestigio} prestigio</div>
-        </button>`,
-      )
+      .map((m) => {
+        const prob = probabilidadConMejorEquipo(estado, m);
+        const nivel = nivelDificultad(prob);
+        return `<button class="tarjeta mision ${this.misionId === m.id ? 'activo' : ''}" data-accion="elegir-mision" data-id="${m.id}">
+          <span class="linea"><span class="rango r${m.rango}">${m.rango}</span> <strong>${esc(m.etiqueta)}</strong> <span class="tenue">· ${esc(m.elemento)}</span></span>
+          <span class="linea"><b class="cifra">${num(m.recompensa.oro)}</b> oro · +${m.recompensa.prestigio} prestigio · ${m.duracion} sem.</span>
+          <span class="dificultad d-${nivel}">${TEXTO_DIFICULTAD[nivel]}${prob === null ? '' : ` · ${pct(prob)}`}</span>
+        </button>`;
+      })
       .join('');
     return `${enCurso ? `<h3>En curso</h3><ul class="lista">${enCurso}</ul>` : ''}
-      <h3>Tablón (semana ${estado.partida.semana})</h3>
-      <div class="tarjetas">${tarjetas || '<p class="tenue">No quedan misiones esta semana.</p>'}</div>
-      ${this.formacion(estado)}`;
+      ${this.formacion(estado)}
+      <h3>Tablón · semana ${estado.partida.semana}</h3>
+      <p class="tenue">La dificultad se calcula con tu mejor equipo disponible.</p>
+      <div class="tarjetas">${tarjetas || '<p class="tenue">No quedan misiones esta semana.</p>'}</div>`;
   }
 
   private formacion(estado: EstadoJuego): string {
     const mision = estado.tablon.find((m) => m.id === this.misionId);
-    if (!mision) return '<p class="tenue">Elige una misión para formar el equipo.</p>';
-    const disponibles = heroesDe(estado, estado.jugadorId).filter((h) => h.estado === 'disponible' || h.estado === 'luto');
-    for (const id of [...this.equipo.keys()]) if (!disponibles.some((h) => h.id === id)) this.equipo.delete(id);
+    if (!mision) return '';
+    const libres = heroesLibres(estado);
+    for (const id of [...this.equipo.keys()]) if (!libres.some((h) => h.id === id)) this.equipo.delete(id);
     const miembros: MiembroEquipo[] = [...this.equipo].map(([id, posicion]) => ({ heroe: obtenerHeroe(estado, id), posicion }));
     const j = jugador(estado);
-    const vista = vistaPreviaMision(mision, miembros, {
-      despertarII: estado.partida.despertares >= 2,
-      enfermeria: j.mejoras.includes('Enfermeria'),
-    });
+    const vista = vistaPreviaMision(mision, miembros, { despertarII: estado.partida.despertares >= 2, enfermeria: j.mejoras.includes('Enfermeria') });
     const riesgo = new Map(vista.riesgos.map((r) => [r.heroeId, r.riesgo]));
-    const filas = disponibles
-      .map((h) => {
-        const pos = this.equipo.get(h.id) ?? '';
-        const opciones = ['<option value="">— no va —</option>']
-          .concat(POSICIONES.map((p) => `<option value="${p.valor}" ${pos === p.valor ? 'selected' : ''}>${p.nombre}${POSICION_NATURAL[h.clase] === p.valor ? ' ★' : ''}</option>`))
-          .join('');
-        const r = riesgo.get(h.id);
-        return `<tr><td><strong>${esc(h.nombre)}</strong> <span class="rango r${h.rango}">${h.rango}</span><div class="tenue">${esc(h.clase)} · ${esc(h.elemento)}${h.estado === 'luto' ? ' · de luto' : ''}</div></td>
-          <td><select data-accion="posicion" data-id="${h.id}">${opciones}</select></td>
-          <td class="num">${r === undefined ? '' : `${r.toFixed(1)}%`}</td></tr>`;
-      })
+    const columna = (pos: Posicion, nombre: string): string => {
+      const aqui = miembros.filter((m) => m.posicion === pos);
+      const fichas = aqui
+        .map((m) => {
+          const natural = POSICION_NATURAL[m.heroe.clase] === pos;
+          const r = riesgo.get(m.heroe.id) ?? 0;
+          return `<div class="ficha ${natural ? '' : 'fuera-de-sitio'}">
+            <span class="rango r${m.heroe.rango}">${m.heroe.rango}</span>
+            <span class="quien"><strong>${esc(m.heroe.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${esc(m.heroe.clase)}${natural ? '' : ' · fuera de su sitio −20%'}</span></span>
+            <span class="riesgo" title="Riesgo de muerte si la misión fracasa">${estado.partida.modoClemente ? '—' : `${r.toFixed(0)}%`}</span>
+            <span class="mover">
+              <button data-accion="mover" data-id="${m.heroe.id}" data-dir="-1" aria-label="Mover a la izquierda" ${pos === 'vanguardia' ? 'disabled' : ''}>‹</button>
+              <button data-accion="mover" data-id="${m.heroe.id}" data-dir="1" aria-label="Mover a la derecha" ${pos === 'retaguardia' ? 'disabled' : ''}>›</button>
+              <button data-accion="quitar" data-id="${m.heroe.id}" aria-label="Quitar del equipo">×</button>
+            </span>
+          </div>`;
+        })
+        .join('');
+      return `<div class="columna"><h4>${nombre}</h4>${fichas || '<p class="tenue vacio">Vacío</p>'}</div>`;
+    };
+    const fuera = libres
+      .filter((h) => !this.equipo.has(h.id))
+      .map((h) => `<button class="mini" data-accion="añadir" data-id="${h.id}" ${this.equipo.size >= 5 ? 'disabled' : ''}><span class="rango r${h.rango}">${h.rango}</span> ${esc(h.nombre.split(' ')[0] ?? '')} <span class="tenue">${esc(h.clase)}</span></button>`)
       .join('');
     const tam = this.equipo.size;
     const valido = tam >= 3 && tam <= 5;
-    const modo = estado.partida.modoClemente ? ' (Modo Clemente: nadie muere)' : '';
-    return `<h3>Formación: misión ${mision.rango} contra ${esc(mision.elemento)}</h3>
-      <p class="tenue">★ = posición natural. Riesgo de muerte si la misión fracasa${modo}.</p>
-      <table><thead><tr><th>Héroe</th><th>Posición</th><th>Riesgo</th></tr></thead><tbody>${filas}</tbody></table>
-      <p class="resumen">Equipo ${tam}/5 · Poder ${num(Math.round(vista.poder))} de ${num(mision.poderRecomendado)} recomendado · <strong>Éxito ${pct(vista.probabilidad)}</strong></p>
-      <button data-accion="enviar" class="principal" ${valido ? '' : 'disabled'}>${valido ? 'Enviar equipo' : 'Elige de 3 a 5 héroes'}</button>`;
+    const nivel = tam ? nivelDificultad(vista.probabilidad) : 'sin-equipo';
+    return `<section class="formacion">
+      <div class="formacion-cabecera">
+        <div><span class="rango r${mision.rango}">${mision.rango}</span> <strong>${esc(mision.etiqueta)}</strong> contra <strong>${esc(mision.elemento)}</strong>
+          <div class="tenue">Poder ${num(Math.round(vista.poder))} de ${num(mision.poderRecomendado)} recomendado</div></div>
+        <div class="medidor d-${nivel}"><b>${tam ? pct(vista.probabilidad) : '—'}</b><span>${tam ? 'de éxito' : 'elige héroes'}</span></div>
+      </div>
+      <div class="columnas">${columna('vanguardia', 'Vanguardia')}${columna('centro', 'Centro')}${columna('retaguardia', 'Retaguardia')}</div>
+      <div class="botones">
+        <button data-accion="recomendado">Equipo recomendado</button>
+        <button data-accion="vaciar" ${tam ? '' : 'disabled'}>Vaciar</button>
+        <button data-accion="enviar" class="principal" ${valido ? '' : 'disabled'}>${valido ? `Enviar ${tam} héroes` : `Faltan ${Math.max(0, 3 - tam)} héroes`}</button>
+      </div>
+      ${fuera ? `<p class="tenue">Pulsa un héroe para añadirlo en su posición natural:</p><div class="minis">${fuera}</div>` : ''}
+    </section>`;
   }
 
   private panelMercado(estado: EstadoJuego): string {
-    const disponible = oroDisponibleParaPujar(estado);
-    const filas = estado.mercado
-      .map((e) => {
-        const h = obtenerHeroe(estado, e.heroeId);
-        const extra = `<td>${num(valorMercado(h))}<div class="tenue">pide ${num(salarioPedido(h.rango))}/sem.</div></td>
-          <td>${e.draft ? '<span class="etiqueta-draft">Draft</span> ' : ''}<button data-accion="elegir-heroe" data-id="${h.id}">Pujar</button></td>`;
-        return this.filaHeroe(estado, h, extra);
+    const disponible = oroParaPujar(estado);
+    const pestañas = `<div class="pestanas">
+      <button data-accion="pestana-mercado" data-id="libres" class="${this.pestanaMercado === 'libres' ? 'activo' : ''}">Héroes libres · ${estado.mercado.length}</button>
+      <button data-accion="pestana-mercado" data-id="rivales" class="${this.pestanaMercado === 'rivales' ? 'activo' : ''}">Otros gremios</button>
+    </div>`;
+    if (this.pestanaMercado === 'rivales') return pestañas + this.otrosGremios(estado);
+    const cartas = estado.mercado
+      .map((e) => obtenerHeroe(estado, e.heroeId))
+      .sort((a, b) => valorMercado(a) - valorMercado(b))
+      .map((h) => {
+        const entrada = estado.mercado.find((e) => e.heroeId === h.id)!;
+        const valor = valorMercado(h);
+        const alcance = valor * 0.9 <= disponible;
+        const pie = `<span class="precio">Vale <b>${num(valor)}</b> · pide ${num(salarioPedido(h.rango))}/sem.</span>
+          ${entrada.draft ? '<span class="etiqueta-draft" title="Al cerrar la semana 1 los demás gremios se llevan a los que queden">Draft</span>' : ''}
+          <button class="${this.heroeMercado === h.id ? 'activo' : ''}" data-accion="elegir-heroe" data-id="${h.id}" ${alcance ? '' : 'disabled title="No tienes oro suficiente"'}>Fichar</button>`;
+        return this.carta(estado, h, pie, alcance ? '' : 'caro');
       })
       .join('');
-    return `<p class="tenue">Puedes ofrecer hasta <strong>${num(disponible)}</strong> de oro de prima (tu oro menos 4 semanas de salarios).</p>
+    return `${pestañas}
       ${this.formularioPuja(estado)}
-      <table><thead><tr><th>Héroe</th><th>Rango</th><th>Clase</th><th>Stats</th><th>Moral</th><th>Estado</th><th>Valor</th><th></th></tr></thead><tbody>${filas}</tbody></table>
-      ${this.otrosGremios(estado)}`;
+      <p class="tenue">Puedes ofrecer hasta <b>${num(disponible)}</b> de oro (tu oro menos 4 semanas de salarios). Ordenados del más barato al más caro.</p>
+      <div class="cartas">${cartas || '<p class="tenue">No hay héroes libres esta semana.</p>'}</div>`;
   }
 
   private otrosGremios(estado: EstadoJuego): string {
     const rivales = Object.values(estado.gremios).filter((g) => !g.esJugador);
     const pestañas = rivales
       .map((g) => `<button data-accion="ver-gremio" data-id="${g.id}" class="${this.gremioRival === g.id ? 'activo' : ''}">${esc(g.nombre)}</button>`)
-      .join(' ');
-    const filas = heroesDe(estado, this.gremioRival)
-      .sort((a, b) => sumaCombate(b) - sumaCombate(a))
+      .join('');
+    const cartas = heroesDe(estado, this.gremioRival)
+      .sort((a, b) => sumaCombate(a) - sumaCombate(b))
       .map((h) => {
         const cesion = condicionesCesion(estado, h.id);
-        const extra = `<td>${num(h.contrato?.clausula ?? 0)}<div class="tenue">cláusula</div></td>
-          <td><button data-accion="clausula" data-id="${h.id}">Pagar cláusula</button>
-          ${cesion.bloqueo ? '' : `<button data-accion="cesion" data-id="${h.id}">Cesión 4 sem. (${num(cesion.coste)})</button>`}</td>`;
-        return this.filaHeroe(estado, h, extra);
+        const pie = `<span class="precio">Cláusula <b>${num(h.contrato?.clausula ?? 0)}</b></span>
+          <button data-accion="clausula" data-id="${h.id}" title="Ficha al momento si su puntuación con tu gremio llega a 60">Pagar cláusula</button>
+          ${cesion.bloqueo ? '' : `<button data-accion="cesion" data-id="${h.id}" title="Pagas su salario y su gremio cobra el 20% del oro de sus misiones">Cesión 4 sem. · ${num(cesion.coste)}</button>`}`;
+        return this.carta(estado, h, pie);
       })
       .join('');
-    return `<h3>Héroes de otros gremios</h3>
-      <p class="tenue">Pagar la cláusula ficha al héroe si su puntuación con tu gremio llega a 60. En una cesión pagas su salario y su gremio se queda el 20% del oro de sus misiones. Nadie cede héroes de rango A o S (salvo el Alba si tu reputación es 70 o más).</p>
-      <div class="fila">${pestañas}</div>
-      <table><thead><tr><th>Héroe</th><th>Rango</th><th>Clase</th><th>Stats</th><th>Moral</th><th>Estado</th><th>Cláusula</th><th></th></tr></thead><tbody>${filas}</tbody></table>`;
+    return `<p class="tenue">Paga la cláusula para fichar a un héroe al momento, o pídelo cedido unas semanas. Nadie cede héroes de rango A o S.</p>
+      <div class="pestanas pequenas">${pestañas}</div>
+      <div class="cartas">${cartas}</div>`;
   }
 
   private formularioPuja(estado: EstadoJuego): string {
     const entrada = estado.mercado.find((e) => e.heroeId === this.heroeMercado);
     if (!entrada) return '';
     const h = obtenerHeroe(estado, entrada.heroeId);
-    const valor = valorMercado(h);
-    const prima = Math.min(Math.round(valor * 1.1), oroDisponibleParaPujar(estado));
-    const salario = salarioPedido(h.rango);
-    return `<div class="puja" data-heroe="${h.id}">
-      <h3>Puja por ${esc(h.nombre)} (${h.rango}, ${esc(h.clase)})</h3>
-      <div class="fila">
-        <label class="campo">Prima <input id="prima" type="number" min="0" step="50" value="${prima}" /></label>
-        <label class="campo">Salario semanal <input id="salario" type="number" min="0" step="5" value="${salario}" /></label>
-        <label class="campo">Temporadas <select id="duracion"><option>1</option><option selected>2</option><option>3</option></select></label>
+    const sugeridas = ofertasSugeridas(estado, h);
+    const elegida = this.ofertaPuja ?? sugeridas[0]?.oferta ?? { prima: 0, salario: salarioPedido(h.rango), duracion: 2 };
+    const evaluada = evaluarOferta(estado, h, elegida);
+    const botones = sugeridas
+      .map((o) => `<button class="opcion ${o.oferta.prima === elegida.prima && o.oferta.salario === elegida.salario ? 'activo' : ''}" data-accion="oferta-sugerida" data-prima="${o.oferta.prima}" data-salario="${o.oferta.salario}">
+          <strong>${o.nombre}</strong><span>${num(o.oferta.prima)} + ${num(o.oferta.salario)}/sem.</span><span class="confianza c-${o.confianza}">${TEXTO_CONFIANZA[o.confianza]}</span></button>`)
+      .join('');
+    return `<section class="puja">
+      <div class="formacion-cabecera">
+        <div><span class="rango r${h.rango}">${h.rango}</span> <strong>Fichar a ${esc(h.nombre)}</strong>
+          <div class="tenue">Puja a ciegas en hasta 3 rondas contra los gremios interesados.</div></div>
+        <div class="medidor c-${evaluada.confianza}"><b>${num(Math.round(evaluada.puntuacion))}</b><span>${TEXTO_CONFIANZA[evaluada.confianza]}</span></div>
       </div>
-      <p id="desglose" class="resumen">${this.desglose(estado, h, prima, salario)}</p>
-      <button data-accion="pujar" class="principal">Pujar (3 rondas a ciegas)</button>
-    </div>`;
+      <div class="opciones">${botones || '<p class="tenue">No tienes oro suficiente para una oferta razonable.</p>'}</div>
+      <details>
+        <summary>Ajustar la oferta a mano</summary>
+        <div class="fila">
+          <label class="campo">Prima <input id="prima" type="number" min="0" step="50" value="${elegida.prima}" /></label>
+          <label class="campo">Salario semanal <input id="salario" type="number" min="0" step="5" value="${elegida.salario}" /></label>
+          <label class="campo">Temporadas <select id="duracion"><option>1</option><option selected>2</option><option>3</option></select></label>
+        </div>
+        <p id="desglose" class="tenue">${this.desglose(estado, h, elegida.prima, elegida.salario)}</p>
+      </details>
+      <div class="botones"><button data-accion="cancelar-puja">Cancelar</button><button data-accion="pujar" class="principal" ${elegida.prima > 0 ? '' : 'disabled'}>Pujar ${num(elegida.prima)}</button></div>
+    </section>`;
   }
 
   private desglose(estado: EstadoJuego, h: Heroe, prima: number, salario: number): string {
     const total = ofertaTotal({ prima, salario, duracion: 2 });
     const d = puntuacionOferta(total, valorMercado(h), contextoGremio(estado, estado.jugadorId, h), h.rasgos);
     if (!d.elegible) return 'Este héroe es Ambicioso: no ficha por gremios fuera del Top 3 con poco prestigio.';
-    return `Tu puntuación: <strong>${num(d.total)}</strong> · dinero ${num(Math.round(d.D))} · prestigio ${num(d.P)} · reputación ${num(d.R)} · vínculos ${num(d.V)} · titular ${num(d.E)} · riesgo −${num(d.X)}`;
+    return `Puntuación ${num(d.total)} = dinero ${num(Math.round(d.D * 0.45))} + prestigio ${num(d.P * 0.2)} + reputación ${num(d.R * 0.15)} + vínculos ${num(d.V)} + puesto titular ${num(d.E)} − riesgo ${num(d.X)}`;
   }
 
   private panelClasificacion(estado: EstadoJuego): string {
@@ -523,9 +588,52 @@ export class Interfaz {
     }
     if (!estado) return;
     switch (accion) {
-      case 'elegir-mision':
+      case 'elegir-mision': {
+        // La formación empieza con el equipo recomendado; el jugador solo ajusta si quiere.
         this.misionId = id;
         this.equipo.clear();
+        const mision = estado.tablon.find((m) => m.id === id);
+        if (mision) for (const m of equipoRecomendado(estado, mision)) this.equipo.set(m.heroe.id, m.posicion);
+        return this.repintar();
+      }
+      case 'recomendado': {
+        const mision = estado.tablon.find((m) => m.id === this.misionId);
+        this.equipo.clear();
+        if (mision) for (const m of equipoRecomendado(estado, mision)) this.equipo.set(m.heroe.id, m.posicion);
+        if (this.equipo.size < 3) this.mensaje = 'Necesitas al menos 3 héroes libres para formar un equipo.';
+        return this.repintar();
+      }
+      case 'vaciar':
+        this.equipo.clear();
+        return this.repintar();
+      case 'añadir': {
+        if (this.equipo.size >= 5) {
+          this.mensaje = 'Un equipo tiene como máximo 5 héroes.';
+          return this.repintar();
+        }
+        this.equipo.set(id, POSICION_NATURAL[obtenerHeroe(estado, id).clase]);
+        return this.repintar();
+      }
+      case 'quitar':
+        this.equipo.delete(id);
+        return this.repintar();
+      case 'mover': {
+        const orden: Posicion[] = ['vanguardia', 'centro', 'retaguardia'];
+        const actual = orden.indexOf(this.equipo.get(id) ?? 'centro');
+        const nueva = orden[Math.max(0, Math.min(2, actual + Number(objetivo.dataset.dir ?? 0)))];
+        if (nueva) this.equipo.set(id, nueva);
+        return this.repintar();
+      }
+      case 'pestana-mercado':
+        this.pestanaMercado = id === 'rivales' ? 'rivales' : 'libres';
+        this.heroeMercado = null;
+        return this.repintar();
+      case 'oferta-sugerida':
+        this.ofertaPuja = { prima: Number(objetivo.dataset.prima ?? 0), salario: Number(objetivo.dataset.salario ?? 0), duracion: 2 };
+        return this.repintar();
+      case 'cancelar-puja':
+        this.heroeMercado = null;
+        this.ofertaPuja = null;
         return this.repintar();
       case 'enviar':
         if (!this.misionId) return;
@@ -536,6 +644,8 @@ export class Interfaz {
         return this.tras('misiones', false);
       case 'elegir-heroe':
         this.heroeMercado = id;
+        this.ofertaPuja = null;
+        this.el.panel.querySelector('.panel-cuerpo')?.scrollTo({ top: 0 });
         return this.repintar();
       case 'pujar': {
         if (!this.heroeMercado) return;
@@ -551,6 +661,7 @@ export class Interfaz {
             ? `${h.nombre} ha elegido ${ganador}.`
             : `${h.nombre} no ha aceptado ninguna oferta.`;
         this.heroeMercado = null;
+        this.ofertaPuja = null;
         return this.tras('mercado', false);
       }
       case 'vender': {
@@ -612,20 +723,6 @@ export class Interfaz {
     const el = evento.target as HTMLElement;
     const estado = this.estado;
     if (!estado) return;
-    if (el instanceof HTMLSelectElement && el.dataset.accion === 'posicion') {
-      const id = el.dataset.id ?? '';
-      if (el.value) {
-        if (!this.equipo.has(id) && this.equipo.size >= 5) {
-          this.mensaje = 'Un equipo tiene como máximo 5 héroes.';
-        } else {
-          this.equipo.set(id, el.value as Posicion);
-        }
-      } else {
-        this.equipo.delete(id);
-      }
-      this.repintar();
-      return;
-    }
     if (el.id === 'prima' || el.id === 'salario') {
       const h = this.heroeMercado ? estado.heroes[this.heroeMercado] : undefined;
       const destino = document.querySelector('#desglose');
@@ -633,6 +730,8 @@ export class Interfaz {
         const prima = Number(document.querySelector<HTMLInputElement>('#prima')?.value ?? 0);
         const salario = Number(document.querySelector<HTMLInputElement>('#salario')?.value ?? 0);
         destino.innerHTML = this.desglose(estado, h, prima, salario);
+        const boton = this.el.panel.querySelector<HTMLButtonElement>('[data-accion=pujar]');
+        if (boton) boton.textContent = `Pujar ${num(prima)}`;
       }
     }
   }

@@ -14,6 +14,11 @@ Todo lo que se sube a este repositorio (archivos, commits, mensajes de commit, r
 - Antes de cada commit revisa `git diff --staged` buscando cualquiera de lo anterior. CI ejecuta además un escáner de secretos (gitleaks); si falla, no se sube nada hasta corregirlo.
 - Si descubres que se subió algo sensible, no intentes taparlo con otro commit: avisa en `docs/preguntas.md` y en el resumen para que el propietario lo revoque.
 
+## Diseño de la experiencia
+
+- El juego debe ser intuitivo y fácil de usar, al estilo Nintendo, sin perder profundidad: cada pantalla propone una opción razonable por defecto (equipo recomendado, ofertas sugeridas, objetivo del momento) y deja el detalle plegado para quien lo quiera.
+- Disposición fija: fondo negro, la habitación del gremio pequeña en el centro, menús a los lados. Estética táctica sobria: grises, líneas finas, cajas translúcidas y acentos cian, oliva y naranja.
+
 ## Arquitectura (no romperla)
 
 - `src/motor/`: reglas puras. No importa nada de `src/ui/`, `src/escena3d/` ni del navegador (ni `window` ni `document`).

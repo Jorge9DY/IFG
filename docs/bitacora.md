@@ -2,6 +2,14 @@
 
 Entradas más recientes primero.
 
+## 2026-11-06 — Interfaz intuitiva sin perder profundidad
+
+- Cartas de héroe en mercado, plantilla y otros gremios: rango, clase, elemento, barras de stats (la principal en cian), moral, rasgos con explicación al pasar el ratón y vínculos.
+- Mercado con pestañas (héroes libres / otros gremios) y puja en un clic: ofertas Justa, Generosa y Todo lo posible con su probabilidad estimada; el ajuste manual sigue disponible plegado.
+- Misiones con etiqueta de dificultad (Fácil, Asequible, Arriesgada, Muy difícil) calculada con tu mejor equipo.
+- Formación visual en tres columnas: el equipo recomendado aparece ya colocado (el más modesto que llega al 80%, para no gastar a los mejores), se mueve con ‹ › y se quita con ×; medidor grande de éxito y riesgo por héroe.
+- Nuevo `src/ui/ayudas.ts` con 9 tests (89 en total).
+
 ## 2026-11-06 — Estilo táctico (segunda referencia del propietario)
 
 - Se mantiene la disposición: fondo negro, habitación pequeña en el centro, menús a los lados.
