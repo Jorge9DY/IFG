@@ -11,9 +11,9 @@
   },
   "misiones": {
     "_nota": "Sección 5 de la biblia. Duración, recompensa y equipo según la tabla (ilustrativas). Dificultad, experiencia, lesiones y recompensa al fracasar: provisionales.",
-    "bajo": { "duracion": 1, "recompensa": 500, "equipo": 1, "dificultad": 20, "experiencia": 10, "reputacion": 1, "lesionExito": 0, "lesionFracaso": 20, "diasLesion": [1, 2] },
-    "medio": { "duracion": 2, "recompensa": 1500, "equipo": 2, "dificultad": 55, "experiencia": 20, "reputacion": 2, "lesionExito": 5, "lesionFracaso": 35, "diasLesion": [2, 3] },
-    "alto": { "duracion": 3, "recompensa": 4000, "equipo": 3, "dificultad": 125, "experiencia": 35, "reputacion": 4, "lesionExito": 10, "lesionFracaso": 50, "diasLesion": [3, 5] },
+    "bajo": { "duracion": 1, "recompensa": 500, "equipo": 1, "dificultad": 24, "experiencia": 10, "reputacion": 1, "lesionExito": 0, "lesionFracaso": 20, "diasLesion": [1, 2] },
+    "medio": { "duracion": 2, "recompensa": 1500, "equipo": 2, "dificultad": 65, "experiencia": 20, "reputacion": 2, "lesionExito": 5, "lesionFracaso": 35, "diasLesion": [2, 3] },
+    "alto": { "duracion": 3, "recompensa": 4000, "equipo": 3, "dificultad": 150, "experiencia": 35, "reputacion": 4, "lesionExito": 10, "lesionFracaso": 50, "diasLesion": [3, 5] },
     "variacionDificultad": 0.15,
     "exito": { "base": 75, "pendiente": 100, "minimo": 5, "maximo": 95 },
     "fraccionRecompensaFracaso": 0.25,
@@ -69,6 +69,24 @@
     "sede": { "plazas": [5, 7, 9, 11, 13, 15, 18], "coste": [3000, 8000, 15000, 25000, 40000, 60000] },
     "ojeadores": { "anchura": [4, 3, 2, 1], "coste": [3000, 9000, 20000] }
   },
+  "clases": {
+    "_nota": "Decisión del propietario: cuatro clases con un solo efecto pasivo cada una. Cifras provisionales.",
+    "lista": ["Guerrero", "Mago", "Explorador", "Sanador"],
+    "lesionGuerrero": 0.5,
+    "lesionMago": 1.5,
+    "poderMagoEnAlto": 1.15,
+    "lesionCompanerosSanador": 0.5,
+    "diasMenosExplorador": 1,
+    "duracionMinimaExplorador": 3,
+    "bonusPorClase": 5,
+    "bonusCombinacion": 5,
+    "probClaseRival": 50,
+    "prioridadClaseRival": 1.3
+  },
+  "retos": {
+    "_nota": "Decisión del propietario: un maestro rival te reta a un duelo de héroes de una clase y un rango. Apuesta en oro; si ganas, oro y prestigio. Cifras provisionales.",
+    "apuestaPorRango": [300, 500, 800, 1200, 1800, 2500]
+  },
   "categorias": {
     "_nota": "Decisión del propietario: el tablón crece con el gremio. La categoría sube por prestigio y nunca baja. Umbrales y multiplicadores provisionales.",
     "letras": ["D", "C", "B", "A", "S"],
@@ -88,7 +106,8 @@
     "heroesFuerza": 5,
     "prestigioPorNivelInstalacion": 20,
     "prestigioPorMisionAlta": 2,
-    "prestigioPorNovatoDestacado": 15
+    "prestigioPorNovatoDestacado": 15,
+    "prestigioPorReto": 8
   },
   "temporada": {
     "premios": [8000, 5000, 3000, 1500, 0]

@@ -3,6 +3,7 @@
   "rivales": [
     {
       "id": "dragon",
+      "clase": "Guerrero",
       "nombre": "Dragón Carmesí",
       "personalidad": "Arrogante",
       "estrategia": "Héroes muy poderosos, instalaciones mediocres.",
@@ -19,6 +20,7 @@
     },
     {
       "id": "corona",
+      "clase": "Mago",
       "nombre": "Corona Dorada",
       "personalidad": "Ambiciosa",
       "estrategia": "Invierte en prestigio e instalaciones.",
@@ -35,6 +37,7 @@
     },
     {
       "id": "sombras",
+      "clase": "Explorador",
       "nombre": "Sombras Negras",
       "personalidad": "Calculadora",
       "estrategia": "Compra talento barato antes que nadie.",
@@ -51,6 +54,7 @@
     },
     {
       "id": "esperanza",
+      "clase": "Sanador",
       "nombre": "Última Esperanza",
       "personalidad": "Tradicional",
       "estrategia": "Conserva a sus veteranos.",
@@ -66,9 +70,31 @@
       "perfil": { "prioridad": "barato", "agresividad": 0.7, "mejora": 0.4, "vende": false }
     }
   ],
-  "titulosMisiones": {
-    "bajo": ["Limpiar ratas gigantes del granero", "Escoltar al panadero hasta el pueblo", "Recuperar un collar en el pantano", "Ahuyentar a unos goblins del camino"],
-    "medio": ["Cazar al lobo de dos cabezas", "Proteger una caravana de especias", "Explorar la cripta del molino", "Rescatar a un mercader secuestrado"],
-    "alto": ["Derrotar al ogro de la colina negra", "Sellar la grieta del bosque maldito", "Recuperar la reliquia del templo hundido", "Expulsar a la banda del barón sin tierra"]
+  "tiposMision": {
+    "_nota": "Decisión del propietario: cada tipo de misión favorece a una clase (misiones de un héroe) o a una combinación de clases (misiones de grupo).",
+    "bajo": [
+      { "tipo": "Caza", "clases": ["Guerrero"], "titulos": ["Limpiar ratas gigantes del granero", "Ahuyentar a unos goblins del camino", "Abatir al jabalí que asusta al pueblo"] },
+      { "tipo": "Encantamiento", "clases": ["Mago"], "titulos": ["Romper la maldición de un pozo", "Descifrar una runa en la muralla", "Apagar un fuego fatuo en el cementerio"] },
+      { "tipo": "Rastreo", "clases": ["Explorador"], "titulos": ["Recuperar un collar en el pantano", "Encontrar a un niño perdido en el bosque", "Seguir las huellas de un ladrón"] },
+      { "tipo": "Socorro", "clases": ["Sanador"], "titulos": ["Atender a los enfermos de la aldea", "Purificar el agua del molino", "Cuidar a los heridos de una caravana"] }
+    ],
+    "medio": [
+      { "tipo": "Escolta", "clases": ["Guerrero", "Sanador"], "titulos": ["Proteger una caravana de especias", "Escoltar a un peregrino hasta el santuario"] },
+      { "tipo": "Exploración", "clases": ["Explorador", "Mago"], "titulos": ["Explorar la cripta del molino", "Cartografiar las cuevas de cristal"] },
+      { "tipo": "Rescate", "clases": ["Explorador", "Sanador"], "titulos": ["Rescatar a un mercader secuestrado", "Sacar a unos mineros atrapados"] },
+      { "tipo": "Cacería mayor", "clases": ["Guerrero", "Mago"], "titulos": ["Cazar al lobo de dos cabezas", "Abatir al grifo del desfiladero"] }
+    ],
+    "alto": [
+      { "tipo": "Mazmorra", "clases": ["Guerrero", "Mago", "Sanador"], "titulos": ["Recuperar la reliquia del templo hundido", "Limpiar la mazmorra del rey loco"] },
+      { "tipo": "Expedición", "clases": ["Explorador", "Mago", "Sanador"], "titulos": ["Sellar la grieta del bosque maldito", "Cruzar el desierto de ceniza"] },
+      { "tipo": "Asedio", "clases": ["Guerrero", "Guerrero", "Mago"], "titulos": ["Expulsar a la banda del barón sin tierra", "Romper el asedio de la torre del norte"] },
+      { "tipo": "Cacería legendaria", "clases": ["Guerrero", "Explorador", "Mago"], "titulos": ["Derrotar al ogro de la colina negra", "Seguir al wyvern hasta su nido"] }
+    ]
+  },
+  "frasesReto": {
+    "dragon": "¿Crees que tu gremio de últimos tiene algo que hacer contra el mío? Demuéstralo.",
+    "corona": "La Corona no pierde el tiempo con cualquiera. Considéralo un honor.",
+    "sombras": "He visto a tus héroes. Apuesto a que el mío es mejor.",
+    "esperanza": "Un duelo limpio, como en los viejos tiempos. Que gane el mejor."
   }
 }

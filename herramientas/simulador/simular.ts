@@ -80,6 +80,7 @@ export function informe(resultados: ResultadoPartida[], e: Estrategia): string {
     ['Ventas', m((x) => x.ventas)],
     ['Compras en el mercado', m((x) => x.compras)],
     ['Ascensiones intentadas', m((x) => x.ascensiones)],
+    ['Retos aceptados / ganados', `${m((x) => x.retos)} / ${m((x) => x.retosGanados)}`],
     ['Mejoras de instalaciones', m((x) => x.mejoras)],
     ['Oro final', Math.round(media(resultados.map((r) => r.oroFinal))).toString()],
     ['Fuerza final (top 5)', f1(media(resultados.map((r) => r.fuerzaFinal)))],

@@ -10,8 +10,10 @@ import { diasParaPrueba, esDia7, heroe as obtenerHeroe, heroesDe, jugador, misio
 import { alLimite, esDestacado, letraDe, rango, rangoPotencial, sueldo, textoPotencial } from '../motor/heroes';
 import { NOMBRE_INSTALACION, infoInstalacion, mejorar, plazas, type Instalacion } from '../motor/instalaciones';
 import { comprar, condicionesCompra, ofertaVenta, vender } from '../motor/mercado';
-import { poderEquipo, probabilidadExito } from '../motor/misiones';
+import { clasesCubiertas, duracionMision, probabilidadMision } from '../motor/misiones';
+import { fraseReto, heroesParaReto, motivoNoAceptar, aceptarReto, rechazarReto } from '../motor/retos';
 import {
+  conAzar,
   crearPartida,
   finalizarDia,
   lanzarMision,
@@ -43,6 +45,14 @@ const TITULOS: Record<Panel, string> = {
   dia: 'Resumen del día',
   semana: 'Ranking de la semana',
   victoria: '¡Número uno!',
+};
+
+const ICONO_CLASE: Record<string, string> = { Guerrero: '⚔', Mago: '✦', Explorador: '➶', Sanador: '✚' };
+const EFECTO_CLASE: Record<string, string> = {
+  Guerrero: 'Guerrero: se lesiona menos.',
+  Mago: 'Mago: más poder en misiones de rango alto, pero se lesiona más.',
+  Explorador: 'Explorador: el equipo vuelve un día antes de las misiones de rango alto.',
+  Sanador: 'Sanador: sus compañeros se lesionan menos.',
 };
 
 const RANGO: Record<RangoMision, { nombre: string; riesgo: string }> = {
@@ -167,7 +177,8 @@ export class Interfaz {
       const sinCobrar = todos.some((h) => h.semanasSinCobrar > 0) ? '<em class="alerta-texto">Hay héroes sin cobrar</em>' : '';
       this.el.menu.innerHTML = `<button class="boton-grande gastar" data-abrir="gremio" data-pestana="heroes" ${bloqueo}><span class="signo">−</span>Gestionar gremio<small>Héroes: ${resumen}</small><small>Mejorar instalaciones</small>${sinCobrar}</button>`;
       this.el.equipo.innerHTML = `<button class="boton-grande ganar" data-abrir="misiones" ${bloqueo}><span class="signo">+</span>Lanzar misiones<small>${estado.tablon.length} en el tablón · ${libres} ${libres === 1 ? 'héroe libre' : 'héroes libres'}</small></button>`;
-      this.el.accion.innerHTML = `<button class="boton-grande mercado" data-abrir="mercado" ${bloqueo}>Mercado de héroes<small>Compra a otros gremios o vende a los tuyos</small></button>`;
+      const retoPendiente = estado.reto && !estado.reto.resultado ? '<em class="alerta-texto">¡Un maestro rival te reta!</em>' : '';
+      this.el.accion.innerHTML = `<button class="boton-grande mercado" data-abrir="mercado" ${bloqueo}>Mercado de héroes<small>Compra a otros gremios o vende a los tuyos</small>${retoPendiente}</button>`;
     }
 
     if (!this.abierto) {
@@ -219,6 +230,10 @@ export class Interfaz {
     return `<span class="rango potencial r${max}" title="Potencial: hasta dónde puede crecer. La instalación de ojeadores estrecha el rango.">${esc(textoPotencial(h, jugador(estado).nivelOjeadores))}</span>`;
   }
 
+  private claseChip(clase: string, extra = ''): string {
+    return `<span class="clase-chip c-${clase} ${extra}" title="${esc(EFECTO_CLASE[clase] ?? '')}">${ICONO_CLASE[clase] ?? ''} ${clase}</span>`;
+  }
+
   private rangoChip(letra: string): string {
     return `<span class="rango-chip r${letra}" title="Rango según su poder: F, D, C, B, A, S">Rango ${letra}</span>`;
   }
@@ -238,7 +253,7 @@ export class Interfaz {
     return `<article class="carta ${extraClase}">
       <header>
         ${this.potencial(estado, h)}
-        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">Reputación ${h.reputacion} · Lealtad ${h.lealtad}</span></div>
+        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} Reputación ${h.reputacion} · Lealtad ${h.lealtad}</span></div>
         ${estadoTexto}
       </header>
       <div class="poder"><b>${num(h.poder)}</b><span>Poder · ${this.rangoChip(rango(h))}</span><p>Sueldo ${num(sueldo(h))} de oro por semana</p></div>
@@ -279,6 +294,7 @@ export class Interfaz {
         return `<button class="tarjeta-mision t-${m.rango}" data-accion="elegir-mision" data-id="${m.id}">
           <span class="nivel">${r.nombre}</span>
           <span class="titulo-mision">${esc(m.titulo)}</span>
+          <span class="tipo-mision">${esc(m.tipo)} · ideal: ${m.clases.map((c) => `${ICONO_CLASE[c] ?? ''} ${c}`).join(' + ')}</span>
           <span class="oro-mision">+${num(m.recompensa)}<small>oro</small></span>
           <span class="tenue">${m.duracion} ${m.duracion === 1 ? 'día' : 'días'} · ${m.equipo} ${m.equipo === 1 ? 'héroe' : 'héroes'} · ${r.riesgo}</span>
           <span class="dificultad d-${nivelDificultad(prob)}">${prob === null ? 'Sin héroes libres' : `${pct(prob)} de éxito`}</span>
@@ -301,13 +317,16 @@ export class Interfaz {
     const libres = heroesLibres(estado).sort((a, b) => b.poder - a.poder);
     this.equipo = this.equipo.filter((id) => libres.some((h) => h.id === id));
     const equipo = this.equipo.map((id) => obtenerHeroe(estado, id));
-    const prob = equipo.length ? probabilidadExito(poderEquipo(equipo), mision.dificultad) : null;
+    const prob = equipo.length ? probabilidadMision(mision, equipo) : null;
+    const { cubiertas, faltan } = clasesCubiertas(mision, equipo);
+    const duracion = equipo.length ? duracionMision(mision, equipo) : mision.duracion;
+    const clases = `<div class="clases-mision"><span class="tenue">${esc(mision.tipo)}: ideal</span>${cubiertas.map((c) => this.claseChip(c, 'cubierta')).join('')}${faltan.map((c) => this.claseChip(c, 'falta')).join('')}<span class="tenue">+${balance.clases.bonusPorClase}% de éxito por cada una${mision.clases.length > 1 ? `, +${balance.clases.bonusCombinacion}% más con todas` : ''}</span></div>`;
     const fichas = libres
       .map((h) => {
         const va = this.equipo.includes(h.id);
         return `<button class="ficha-heroe ${va ? 'va' : ''}" data-accion="alternar" data-id="${h.id}" aria-pressed="${va}">
           ${this.potencial(estado, h)}
-          <span class="quien"><strong>${esc(h.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">poder ${num(h.poder)}</span></span>
+          <span class="quien"><strong>${esc(h.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${ICONO_CLASE[h.clase] ?? ''} ${h.clase} · poder ${num(h.poder)}</span></span>
           <span class="marca">${va ? '✓' : '+'}</span>
         </button>`;
       })
@@ -320,13 +339,46 @@ export class Interfaz {
     const motivo = motivoNoLanzar(estado, mision.id, this.equipo);
     return `<div class="cabecera-mision">
         <div><span class="nivel t-${mision.rango}">${r.nombre}</span> <strong>${esc(mision.titulo)}</strong>
-          <div class="tenue">+${num(mision.recompensa)} oro · ${mision.duracion} ${mision.duracion === 1 ? 'día' : 'días'} · elige <strong>${mision.equipo}</strong> ${mision.equipo === 1 ? 'héroe' : 'héroes'}. Ya te proponemos un equipo.</div></div>
+          <div class="tenue">+${num(mision.recompensa)} oro · ${duracion} ${duracion === 1 ? 'día' : 'días'}${duracion < mision.duracion ? ' (el Explorador ahorra uno)' : ''} · elige <strong>${mision.equipo}</strong> ${mision.equipo === 1 ? 'héroe' : 'héroes'}. Ya te proponemos un equipo.</div></div>
         <div class="medidor d-${nivelDificultad(prob)}"><b>${prob === null ? '—' : pct(prob)}</b><span>de éxito</span></div>
       </div>
+      ${clases}
       <div class="fichas">${fichas || '<p class="tenue">No tienes héroes libres.</p>'}</div>
       ${ocupados ? `<p class="tenue">No disponibles: ${ocupados}. <button data-accion="ir-heroes">Ver héroes</button></p>` : ''}
       <p class="tenue">Si fracasa, cobras menos y alguien puede lesionarse.</p>
       <div class="botones"><button data-accion="otra-mision">Volver al tablón</button><button data-accion="lanzar" class="principal" ${motivo ? `disabled title="${esc(motivo)}"` : ''}>Lanzar misión</button></div>`;
+  }
+
+  /** Reto del maestro rival: arriba del mercado, porque a veces hay que comprar al héroe para responder. */
+  private bloqueReto(estado: EstadoJuego): string {
+    const r = estado.reto;
+    if (!r) return '';
+    const g = estado.gremios[r.gremioId];
+    const nombreClase = r.clase.toLowerCase();
+    if (r.resultado) {
+      const x = r.resultado;
+      const texto = {
+        victoria: `¡Ganas! ${esc(x.nombreJugador)} (${x.poderJugador}) vence a ${esc(x.nombreRival)} (${x.poderRival}): +${num(r.apuesta)} de oro y prestigio.`,
+        derrota: `Pierdes. ${esc(x.nombreRival)} (${x.poderRival}) vence a ${esc(x.nombreJugador)} (${x.poderJugador}): −${num(r.apuesta)} de oro.`,
+        empate: `Empate: ${esc(x.nombreJugador)} y ${esc(x.nombreRival)} tienen ${x.poderRival} de poder. Nadie paga.`,
+      }[x.desenlace];
+      return `<section class="reto r-${x.desenlace}"><h3>Reto de ${esc(g?.nombre ?? '')}</h3><p>${texto}</p></section>`;
+    }
+    const mios = heroesParaReto(estado);
+    const botones = mios
+      .map((h) => {
+        const motivo = motivoNoAceptar(estado, h.id);
+        return `<button class="principal" data-accion="reto-aceptar" data-id="${h.id}" ${motivo ? `disabled title="${esc(motivo)}"` : ''}>Enviar a ${esc(h.nombre.split(' ')[0] ?? '')} (poder ${h.poder})</button>`;
+      })
+      .join('');
+    const faltan = r.diaLimite - estado.dia;
+    return `<section class="reto">
+      <h3>Reto de ${esc(g?.nombre ?? '')}</h3>
+      <p class="frase">«${esc(fraseReto(r.gremioId))}»</p>
+      <p>¿Tienes un <strong>${nombreClase} de rango ${r.rango}</strong> más fuerte que el suyo? Eliges a tu héroe sin ver el suyo; él saca a uno de su mismo rango. Apuesta: <strong>${num(r.apuesta)}</strong> de oro. Si ganas, te la llevas y ganas prestigio.</p>
+      <p class="tenue">Plazo: ${faltan === 0 ? 'hoy' : `${faltan + 1} días`}. Rechazarlo no cuesta nada.</p>
+      <div class="botones">${botones || `<span class="tenue">No tienes ningún ${nombreClase} de rango ${r.rango}. Puedes comprar uno aquí abajo.</span>`}<button data-accion="reto-rechazar">Rechazar</button></div>
+    </section>`;
   }
 
   private panelMercado(estado: EstadoJuego): string {
@@ -334,6 +386,7 @@ export class Interfaz {
       <button data-accion="pestana-mercado" data-id="comprar" class="${this.pestanaMercado === 'comprar' ? 'activo' : ''}">Comprar</button>
       <button data-accion="pestana-mercado" data-id="vender" class="${this.pestanaMercado === 'vender' ? 'activo' : ''}">Vender</button>
     </div>`;
+    const reto = this.bloqueReto(estado);
     if (this.pestanaMercado === 'vender') {
       const cartas = heroesDe(estado, estado.jugadorId)
         .map((h) => {
@@ -345,7 +398,7 @@ export class Interfaz {
           return this.carta(estado, h, pie);
         })
         .join('');
-      return `${pestañas}<p class="tenue">Vende un héroe para conseguir oro al instante. Piénsalo: quien se va no vuelve.</p><div class="cartas">${cartas || '<p class="tenue">No tienes héroes.</p>'}</div>`;
+      return `${reto}${pestañas}<p class="tenue">Vende un héroe para conseguir oro al instante. Piénsalo: quien se va no vuelve.</p><div class="cartas">${cartas || '<p class="tenue">No tienes héroes.</p>'}</div>`;
     }
     const selector = rivales(estado)
       .map((g) => `<button data-accion="ver-gremio" data-id="${g.id}" class="${this.gremioRival === g.id ? 'activo' : ''}">${esc(g.nombre)}</button>`)
@@ -363,7 +416,7 @@ export class Interfaz {
         ),
       )
       .join('');
-    return `${pestañas}<div class="pestanas pequenas">${selector}</div>
+    return `${reto}${pestañas}<div class="pestanas pequenas">${selector}</div>
       ${rival ? `<p class="tenue">${esc(rival.nombre)} · ${esc(rival.personalidad ?? '')}: ${esc(rival.estrategia ?? '')}</p>` : ''}
       <div class="cartas">${cartas}</div>`;
   }
@@ -431,7 +484,7 @@ export class Interfaz {
         : '';
       return `<div class="fila-heroe e-${h.estado.replace(' ', '-')}">
         ${this.potencial(estado, h)}
-        <div class="quien"><strong>${esc(h.nombre)} ${this.rangoChip(rango(h))}</strong><span class="tenue">Poder ${h.poder} · sueldo ${num(sueldo(h))} · lealtad ${h.lealtad}</span>${this.barraXp(h)}${aviso}</div>
+        <div class="quien"><strong>${esc(h.nombre)} ${this.rangoChip(rango(h))}</strong><span class="tenue">${this.claseChip(h.clase)} Poder ${h.poder} · sueldo ${num(sueldo(h))} · lealtad ${h.lealtad}</span>${this.barraXp(h)}${aviso}</div>
         <div class="situacion"><span class="estado-chip e-${h.estado.replace(' ', '-')}">${h.estado === 'en mision' ? 'de misión' : h.estado}</span><span class="tenue">${detalle}</span></div>
         <div class="accion-fila">${accion}</div>
       </div>`;
@@ -590,7 +643,8 @@ export class Interfaz {
       ? `<div class="resultado"><b>Fin de la temporada ${r.temporada.numero}</b><span>Terminas ${r.temporada.puesto}.º · premio +${num(r.temporada.premio)} oro</span></div>`
       : '';
     const ascenso = r.categoriaNueva ? `<div class="resultado ascenso-categoria"><b>¡Categoría ${r.categoriaNueva}!</b><span>La Asociación asciende a tu gremio: desde mañana el tablón ofrece misiones más difíciles y mejor pagadas.</span></div>` : '';
-    return `<p><strong>${titular}</strong> Eres ${actual}.º.</p>${ascenso}${temporada}${this.tablaRanking(estado, r.ranking)}
+    const reto = estado.reto && !estado.reto.resultado ? `<div class="resultado reto-aviso"><b>Nuevo reto</b><span>El maestro de ${esc(estado.gremios[estado.reto.gremioId]?.nombre ?? '')} te reta con un ${estado.reto.clase.toLowerCase()} de rango ${estado.reto.rango}. Respóndele en el Mercado de héroes.</span></div>` : '';
+    return `<p><strong>${titular}</strong> Eres ${actual}.º.</p>${ascenso}${reto}${temporada}${this.tablaRanking(estado, r.ranking)}
       <div class="botones"><button class="principal" data-accion="${r.victoria ? 'ver-victoria' : 'cerrar'}">Seguir</button></div>`;
   }
 
@@ -701,6 +755,17 @@ export class Interfaz {
       case 'mejorar':
         mejorar(estado, estado.jugadorId, id as Instalacion);
         this.mensaje = `¡${NOMBRE_INSTALACION[id as Instalacion]} mejorada!`;
+        this.guardar();
+        return this.repintar();
+      case 'reto-aceptar': {
+        const r = conAzar(estado, (azar) => aceptarReto(estado, azar, id));
+        this.mensaje = r.desenlace === 'victoria' ? '¡Has ganado el reto!' : r.desenlace === 'derrota' ? 'Has perdido el reto.' : 'Empate en el reto.';
+        this.guardar();
+        return this.repintar();
+      }
+      case 'reto-rechazar':
+        rechazarReto(estado);
+        this.mensaje = 'Has rechazado el reto.';
         this.guardar();
         return this.repintar();
       case 'preparar-ascension':

@@ -5,7 +5,9 @@ import { heroe, heroesDe, jugador, rivales, type EstadoJuego } from '../../src/m
 import { valor } from '../../src/motor/heroes';
 import { infoInstalacion, mejorar, plazasLibres } from '../../src/motor/instalaciones';
 import { comprar, condicionesCompra, ofertaVenta, vender } from '../../src/motor/mercado';
-import { poderEquipo, probabilidadExito } from '../../src/motor/misiones';
+import { probabilidadMision } from '../../src/motor/misiones';
+import { aceptarReto, heroesParaReto, motivoNoAceptar } from '../../src/motor/retos';
+import { Azar } from '../../src/motor/azar';
 import { lanzarMision, pujarNovato, siguienteCandidato } from '../../src/motor/partida';
 import { motivoNoPujar, siguientePrecio } from '../../src/motor/subasta';
 import { equipoRecomendado } from '../../src/ui/ayudas';
@@ -34,10 +36,12 @@ export interface MetricasBot {
   mejoras: number;
   compras: number;
   ascensiones: number;
+  retos: number;
+  retosGanados: number;
 }
 
 export function metricasVacias(): MetricasBot {
-  return { misiones: 0, exitos: 0, fichajesNovatos: 0, ventas: 0, mejoras: 0, compras: 0, ascensiones: 0 };
+  return { misiones: 0, exitos: 0, fichajesNovatos: 0, ventas: 0, mejoras: 0, compras: 0, ascensiones: 0, retos: 0, retosGanados: 0 };
 }
 
 /** Decisiones del día: invertir y lanzar misiones (de la más alta a la más baja). */
@@ -62,11 +66,20 @@ export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): vo
       }
     }
   }
+  // Retos: responde con su héroe más fuerte de la clase y el rango pedidos si cubre la apuesta.
+  const candidato = heroesParaReto(estado).sort((a, b) => b.poder - a.poder)[0];
+  if (candidato && !motivoNoAceptar(estado, candidato.id) && j.oro - (estado.reto?.apuesta ?? 0) >= reserva()) {
+    const azar = new Azar(estado.azar);
+    const r = aceptarReto(estado, azar, candidato.id);
+    estado.azar = azar.obtenerEstado();
+    m.retos++;
+    if (r.desenlace === 'victoria') m.retosGanados++;
+  }
   if (e.rota) comprarRefuerzo(estado, reserva(), m);
   for (const mision of [...estado.tablon].sort((a, b) => b.recompensa - a.recompensa)) {
     const equipo = equipoRecomendado(estado, mision);
     if (equipo.length === 0) continue;
-    if (probabilidadExito(poderEquipo(equipo), mision.dificultad) >= e.probMinima) {
+    if (probabilidadMision(mision, equipo) >= e.probMinima) {
       lanzarMision(estado, mision.id, equipo.map((h) => h.id));
       m.misiones++;
     }

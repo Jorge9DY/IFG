@@ -3,7 +3,7 @@
 import balance from '../datos/balance.json';
 import nombres from '../datos/nombres.json';
 import type { Azar } from './azar';
-import { LETRAS, type Heroe, type Letra } from './tipos';
+import { CLASES, LETRAS, type Clase, type Heroe, type Letra } from './tipos';
 
 const L = balance.letras;
 
@@ -33,14 +33,18 @@ export interface OpcionesHeroe {
   /** Letras posibles del potencial (se elige una al azar). */
   potencial: readonly Letra[];
   reputacion?: [number, number];
+  /** Clase fija; si no se da, una al azar. */
+  clase?: Clase;
 }
 
 export function generarHeroe(azar: Azar, id: string, o: OpcionesHeroe): Heroe {
   const poder = azar.entero(o.poder[0], o.poder[1]);
   const potencial = Math.max(poder, potencialEnLetra(azar, azar.elegir(o.potencial)));
+  const clase = o.clase ?? azar.elegir(CLASES);
   return {
     id,
     nombre: `${azar.elegir(nombres.nombres)} ${azar.elegir(nombres.apellidos)}`,
+    clase,
     poder,
     potencial,
     sesgoOjeo: azar.siguiente(),

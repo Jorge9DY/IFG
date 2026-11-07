@@ -44,7 +44,7 @@ export function iniciarAscension(estado: EstadoJuego, heroeId: string): void {
   jugador(estado).oro -= c.coste;
   h.estado = 'en mision';
   estado.enCurso.push({
-    mision: { id: nuevoId(estado, 'm'), rango: 'alto', titulo: `Ascensión de ${h.nombre}`, dificultad: 0, duracion: A.duracion, recompensa: 0, equipo: 1 },
+    mision: { id: nuevoId(estado, 'm'), rango: 'alto', tipo: 'Ascensión', clases: [], titulo: `Ascensión de ${h.nombre}`, dificultad: 0, duracion: A.duracion, recompensa: 0, equipo: 1 },
     gremioId: estado.jugadorId,
     equipo: [heroeId],
     diaVuelta: estado.dia + A.duracion - 1,

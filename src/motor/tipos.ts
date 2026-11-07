@@ -5,10 +5,15 @@ export type Letra = (typeof LETRAS)[number];
 
 export type EstadoHeroe = 'libre' | 'en mision' | 'lesionado';
 
+/** Decisión del propietario: cuatro clases, con un solo efecto pasivo cada una. */
+export const CLASES = ['Guerrero', 'Mago', 'Explorador', 'Sanador'] as const;
+export type Clase = (typeof CLASES)[number];
+
 /** Sección 9: estadísticas de un héroe. Personalidad, relaciones e historia llegan en las fases 3 y 4. */
 export interface Heroe {
   id: string;
   nombre: string;
+  clase: Clase;
   /** Capacidad de combate actual. */
   poder: number;
   /** Techo de crecimiento (poder máximo). Oculto: el jugador ve un rango de letras. */
@@ -34,6 +39,10 @@ export const RANGOS_MISION: readonly RangoMision[] = ['bajo', 'medio', 'alto'];
 export interface Mision {
   id: string;
   rango: RangoMision;
+  /** Tipo de misión (Caza, Escolta, Mazmorra…). */
+  tipo: string;
+  /** Clases que favorece: una en las de un héroe, una combinación en las de grupo. */
+  clases: Clase[];
   titulo: string;
   dificultad: number;
   duracion: number;
@@ -63,6 +72,10 @@ export interface Gremio {
   misionesAltas: number;
   /** Novatos destacados fichados en la Prueba (prestigio). */
   novatosDestacados: number;
+  /** Retos de maestros ganados (prestigio). */
+  retosGanados?: number;
+  /** Clase en la que se especializa un rival: puja más por ella. */
+  clase?: Clase;
   /** Categoría del gremio (D–S): sube con el prestigio, nunca baja, y marca el nivel del tablón. */
   categoria?: Letra;
   /** Solo los rivales. */

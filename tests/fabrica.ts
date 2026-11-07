@@ -6,6 +6,7 @@ import type { Heroe } from '../src/motor/tipos';
 export function heroe(datos: Partial<Heroe> & Pick<Heroe, 'id'>): Heroe {
   return {
     nombre: datos.id,
+    clase: 'Guerrero',
     poder: 30,
     potencial: 60,
     sesgoOjeo: 0.5,

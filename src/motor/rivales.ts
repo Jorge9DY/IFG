@@ -8,7 +8,7 @@ import { gremio, heroesDe, registrar, type EstadoJuego } from './estado';
 import { esDestacado, valor } from './heroes';
 import { categoria, multiplicadores } from './categorias';
 import { infoInstalacion, mejorar, plazasLibres, type Instalacion } from './instalaciones';
-import { probabilidadExito } from './misiones';
+import { generarTablon, probabilidadMision } from './misiones';
 import { RANGOS_MISION, type Gremio, type Heroe, type Mision, type PerfilRival } from './tipos';
 
 const R = balance.rivales;
@@ -35,7 +35,9 @@ export function prioridad(g: Gremio, h: Heroe): number {
     default:
       base = 0.6;
   }
-  return base * p.agresividad;
+  // Un gremio especializado puja más fuerte por los héroes de su clase (biblia, sección 8).
+  const clase = g.clase && h.clase === g.clase ? balance.clases.prioridadClaseRival : 1;
+  return base * p.agresividad * clase;
 }
 
 /** Fracción (0–1) de su presupuesto que el rival está dispuesto a usar en este héroe. */
@@ -58,36 +60,39 @@ export function limitePuja(estado: EstadoJuego, azar: Azar, g: Gremio, h: Heroe)
   return Math.floor(Math.min(disponible, percibido * prioridad(g, h) * factorPresupuesto(estado, g, h)));
 }
 
-/** Misión «estándar» de un rango, para la simulación abstracta de los rivales. */
-function misionEstandar(rango: Mision['rango'], id: string, g: Gremio): Mision {
-  const d = balance.misiones[rango];
-  const m = multiplicadores(categoria(g));
-  return { id, rango, titulo: '', dificultad: Math.round(d.dificultad * m.dificultad), duracion: d.duracion, recompensa: Math.round(d.recompensa * m.recompensa), equipo: d.equipo };
-}
-
 /**
- * Un rival elige sus misiones del día: de la más alta a la más baja, con sus mejores héroes libres,
- * si la probabilidad de éxito supera su mínimo. Devuelve las misiones con su equipo.
+ * Un rival elige sus misiones del día: recibe un tablón de su categoría (con tipos y clases favorecidas,
+ * igual que el jugador) y, de la más alta a la más baja, manda el equipo libre con más éxito si supera su
+ * mínimo. Devuelve las misiones con su equipo.
  */
-export function eligeMisiones(estado: EstadoJuego, gremioId: string, nuevoId: () => string): { mision: Mision; equipo: Heroe[] }[] {
+export function eligeMisiones(estado: EstadoJuego, azar: Azar, gremioId: string, nuevoId: () => string): { mision: Mision; equipo: Heroe[] }[] {
   let huecos = R.misionesSimultaneas - estado.enCurso.filter((c) => c.gremioId === gremioId).length;
+  if (huecos <= 0) return [];
   const libres = heroesDe(estado, gremioId)
     .filter((h) => h.estado === 'libre')
-    .sort((a, b) => b.poder - a.poder);
+    .sort((a, b) => b.poder - a.poder)
+    .slice(0, 8);
+  const tablon = generarTablon(azar, nuevoId, multiplicadores(categoria(gremio(estado, gremioId))));
   const elegidas: { mision: Mision; equipo: Heroe[] }[] = [];
-  for (const rango of [...RANGOS_MISION].reverse()) {
+  for (const mision of [...tablon].reverse()) {
     if (huecos <= 0) break;
-    const d = balance.misiones[rango];
-    const equipo = libres.slice(0, d.equipo);
-    if (equipo.length < d.equipo) continue;
-    const poder = equipo.reduce((t, h) => t + h.poder, 0);
-    const mision = misionEstandar(rango, '', gremio(estado, gremioId));
-    if (probabilidadExito(poder, mision.dificultad) < R.probExitoMinima) continue;
-    libres.splice(0, d.equipo);
+    const disponibles = libres.filter((h) => !elegidas.some((e) => e.equipo.includes(h)));
+    if (disponibles.length < mision.equipo) continue;
+    const equipo = combinaciones(disponibles, mision.equipo).sort((a, b) => probabilidadMision(mision, b) - probabilidadMision(mision, a))[0];
+    if (!equipo || probabilidadMision(mision, equipo) < R.probExitoMinima) continue;
     huecos -= 1;
-    elegidas.push({ mision: { ...mision, id: nuevoId() }, equipo });
+    elegidas.push({ mision, equipo });
   }
   return elegidas;
+}
+
+function combinaciones<T>(lista: readonly T[], k: number): T[][] {
+  if (k === 0) return [[]];
+  const resultado: T[][] = [];
+  lista.forEach((x, i) => {
+    for (const resto of combinaciones(lista.slice(i + 1), k - 1)) resultado.push([x, ...resto]);
+  });
+  return resultado;
 }
 
 /** Al terminar la semana, un rival puede invertir en instalaciones según su estrategia. */

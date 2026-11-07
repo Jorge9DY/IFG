@@ -56,6 +56,8 @@ describe('partida', () => {
     const estado = partida();
     const [h1, h2] = jugador(estado).plantilla;
     const medio = estado.tablon[1]!;
+    // Sin Explorador, que acortaría la misión.
+    for (const id of [h1!, h2!]) estado.heroes[id]!.clase = 'Guerrero';
     lanzarMision(estado, medio.id, [h1!, h2!]);
     const oro = jugador(estado).oro;
     const dia1 = finalizarDia(estado);

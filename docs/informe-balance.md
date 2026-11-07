@@ -28,6 +28,19 @@ Tras aplicar las decisiones del propietario (sueldos más altos, instalaciones m
 
 Versión anterior (sueldos e instalaciones baratos): el ambicioso ganaba en el 24% de las partidas y acababa con unos 22.000 de oro; el prudente acumulaba unos 89.000 sin usarlos.
 
+## Con clases, tipos de misión y retos (2026-11-07)
+
+| Métrica | Prudente | Ambiciosa |
+| --- | --: | --: |
+| Puesto medio al cerrar la temporada 2 | 5,0 | 4,2 |
+| Puesto medio al cerrar la temporada 3 | 4,7 | 2,9 |
+| Puesto medio al cerrar la temporada 4 | 4,6 | 2,1 |
+| Victoria en 4 temporadas o menos | 0% | 52% |
+
+- Las clases y los retos ayudan sobre todo al jugador que compone bien sus equipos. Sin ajustar, el bot ambicioso ganaba el 84%. Los rivales ahora también reciben misiones con tipo y eligen equipo según sus clases.
+- El Explorador era lo que más desequilibraba (acortar misiones dispara los ingresos): ahora solo acorta las de rango alto. Además, la dificultad base sube a 24/65/150.
+- Con todo, un jugador activo llega al n.º 1 hacia la temporada 3 o 4 (52% del bot ambicioso) y uno pasivo no sale de abajo. Pendiente de confirmar jugando.
+
 ## Tras el tablón que crece y la Ascensión (2026-11-07)
 
 | Métrica | Prudente | Ambiciosa |

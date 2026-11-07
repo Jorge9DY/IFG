@@ -145,6 +145,10 @@ Los sueldos son el gasto fijo semanal del gremio. El diseño ya los daba por hec
 
 Duraciones y recompensas: *ilustrativas*, sin equilibrar.
 
+### Tipos de misión \[Aceptado\]
+
+Cada misión tiene un tipo que favorece a una clase (misiones de un héroe: Caza → Guerrero, Encantamiento → Mago, Rastreo → Explorador, Socorro → Sanador) o a una combinación de clases (misiones de grupo: por ejemplo, Escolta → Guerrero + Sanador, Mazmorra → Guerrero + Mago + Sanador). Cada clase favorecida que lleve el equipo suma éxito, y la combinación completa suma un poco más (*ilustrativo:* +5% por clase y +5% con todas). Elegir equipo pasa a ser leer la misión; el equipo recomendado ya lo tiene en cuenta.
+
 ### Un tablón que crece con el gremio \[Aceptado\]
 
 El gremio tiene una **categoría** (D, C, B, A, S) que sube con el **prestigio** y **nunca baja**, para no frustrar al jugador. Cada categoría mantiene las tres misiones diarias (bajo, medio, alto), pero más difíciles y mejor pagadas. Subir de categoría se anuncia como un hito («La Asociación asciende a tu gremio a categoría B») y el tablón muestra cuánto prestigio falta para la siguiente. Los rivales juegan con el tablón de su propia categoría. Umbrales y multiplicadores: *ilustrativos*.
@@ -285,7 +289,22 @@ Un héroe que ha llegado a su límite puede intentar romperlo. El jugador paga p
 - La probabilidad y el coste se muestran antes de enviarlo, con un paso de confirmación que avisa de la muerte. Cuanto más alto el rango, más difícil (*ilustrativo:* 60% desde F, 35% desde A). Desde S no se puede ascender.
 - Se puede repetir tras cada ascenso, siempre más difícil.
 
-Especializaciones, habilidades y rarezas: \[Abierto\].
+### Clases \[Aceptado\]
+
+Cada héroe tiene una de cuatro clases desde que aparece y no cambia (cambiar de especialidad será un acontecimiento personal, fase 3). Cada clase tiene **un solo efecto pasivo**, sin habilidades que activar:
+
+| Clase | Efecto pasivo |
+| --- | --- |
+| Guerrero | Se lesiona menos. |
+| Mago | Más poder en misiones de rango alto, pero se lesiona más. |
+| Explorador | El equipo vuelve un día antes de las misiones de rango alto. |
+| Sanador | Sus compañeros de misión se lesionan menos. |
+
+Cada rival se especializa en una clase: la mitad de su plantilla es de ella y puja más fuerte por los novatos de esa clase. Cifras: *ilustrativas*.
+
+Habilidades y rarezas: \[Abierto\]. Descartado de momento: árboles de habilidades, habilidades que se activan a mano y subclases.
+
+**Para la fase 3** (idea del propietario, apuntada para no olvidarla): superar una Ascensión podría dar al héroe un **título** («Maga del Alba») con un pequeño extra de su clase.
 
 ### Rasgos de personalidad \[Aceptado\]
 
@@ -523,7 +542,15 @@ Opción A: noticias pequeñas frecuentes (más vida). Opción B: solo lo que pro
 
 Ejemplo: el maestro del Dragón Carmesí se burla de ti por ser el último; semanas después le arrebatas un novato extraordinario en la subasta.
 
-**\[Propuesta\] Retos de los maestros** (idea del propietario): un maestro rival te reta a enfrentar héroes, por ejemplo «no tienes un mago de rango C más fuerte que el mío». Eliges a uno de los tuyos sin ver el suyo y gana el más fuerte. Para que sea justo, el rival no saca a su mejor héroe sino a uno del rango de los tuyos. Depende de las clases de héroe, que se diseñan antes.
+### Retos de los maestros \[Aceptado\]
+
+Una vez por semana, el maestro de un gremio rival puede retarte: «¿Tienes un mago de rango C más fuerte que el mío?».
+
+- La clase y el rango salen de un héroe del rival con el mismo rango que alguno de los tuyos.
+- Eliges a uno de los tuyos de esa clase y rango **sin ver el suyo**. El rival no saca a su mejor héroe, sino a uno de ese mismo rango. Gana el de más poder; con empate, nadie paga.
+- **Apuesta en oro.** Si ganas, te llevas la apuesta y prestigio; si pierdes, pagas la apuesta. Rechazar no cuesta nada.
+- El reto vive arriba del Mercado de héroes (a veces hay que comprar al héroe para responder) y caduca el día 7.
+- Cada maestro tiene su frase. Sus nombres siguen \[Abierto\].
 
 **\[Abierto\]** Qué acciones hacen cada día, cómo se simula su progreso y cómo puntúan en el ranking.
 
@@ -623,6 +650,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-07 | Decisiones del propietario: cuatro clases (Guerrero, Mago, Explorador, Sanador) con un solo efecto pasivo; tipos de misión que favorecen a una clase o a una combinación; retos de los maestros con apuesta en oro (si ganas, oro y prestigio), pasan a \[Aceptado\]; el título por Ascensión queda apuntado para la fase 3. |
 | 2026-11-07 | Decisiones del propietario contra el estancamiento del medio juego: tablón que crece con la categoría del gremio (sube por prestigio, nunca baja); Ascensión para romper el límite de un héroe (si fracasa, muere: única muerte del juego, siempre por decisión del jugador); retos de los maestros como \[Propuesta\], pendientes de las clases de héroe. Mercado más barato. |
 | 2026-11-06 | Decisión del propietario: experiencia visible en barra, subidas de poder de golpe al llenarla, rangos F–S según el poder (ascender solo sube el sueldo), techo al llegar al potencial y regreso de la misión en el resumen del día. Sin experiencia extra. |
 | 2026-11-06 | Decisiones del propietario: se elimina el reclutamiento; fuera de la Prueba de los Novatos solo se ficha comprando a otros gremios en el mercado. Confirmado el orden de pago de sueldos (los más poderosos primero). |

@@ -22,14 +22,15 @@ import {
   type FilaRanking,
 } from './estado';
 import { generarHeroe, letraPotencialNovato } from './heroes';
-import { generarTablon, resolverMision, type InformeMision } from './misiones';
+import { duracionMision, generarTablon, resolverMision, type InformeMision } from './misiones';
+import { caducarReto, generarReto } from './retos';
 import { resolverAscension, type ResultadoAscension } from './ascension';
 import { actualizarCategoria, categoria, categoriaPorPrestigio, multiplicadores } from './categorias';
 import { prestigio } from './ranking';
 import { calcularRanking, premioTemporada } from './ranking';
 import { ajustarPlantilla, eligeMisiones, invertir } from './rivales';
 import { accionJugador, cerrarSubasta, crearSubasta } from './subasta';
-import type { Gremio, Letra, PerfilRival } from './tipos';
+import type { Clase, Gremio, Letra, PerfilRival } from './tipos';
 
 export interface OpcionesPartida {
   nombreGremio?: string;
@@ -50,7 +51,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
   const semilla = opciones.semilla ?? Math.floor(Math.random() * 2 ** 31);
   const J = balance.jugador;
   const estado: EstadoJuego = {
-    version: 6,
+    version: 7,
     semilla,
     azar: semilla,
     dia: 1,
@@ -61,6 +62,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
     tablon: [],
     enCurso: [],
     prueba: null,
+    reto: null,
     ranking: [],
     registro: [],
     contadorIds: 0,
@@ -98,12 +100,15 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
         personalidad: d.personalidad,
         estrategia: d.estrategia,
         perfil: d.perfil as PerfilRival,
+        clase: d.clase as Clase,
       });
       for (let i = 0; i < d.heroes; i++) {
         const h = generarHeroe(azar, nuevoId(estado, 'h'), {
           poder: d.poder as [number, number],
           potencial: d.potencial as Letra[],
           reputacion: d.reputacion as [number, number],
+          // La mitad de su plantilla es de la clase en la que se especializa.
+          clase: azar.probabilidad(balance.clases.probClaseRival) ? (d.clase as Clase) : undefined,
         });
         estado.heroes[h.id] = h;
         g.plantilla.push(h.id);
@@ -111,6 +116,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
     }
     for (const g of Object.values(estado.gremios)) g.categoria = categoriaPorPrestigio(prestigio(g));
     estado.tablon = generarTablon(azar, () => nuevoId(estado, 'm'), multiplicadores(categoria(j)));
+    generarReto(estado, azar);
   });
   estado.ranking = calcularRanking(estado);
   registrar(estado, 'temporada', `Empieza la temporada 1. ${jugador(estado).nombre} es el último del ranking.`);
@@ -144,7 +150,8 @@ export function lanzarMision(estado: EstadoJuego, misionId: string, equipo: read
   const mision = estado.tablon.find((m) => m.id === misionId)!;
   for (const id of equipo) obtenerHeroe(estado, id).estado = 'en mision';
   estado.tablon = estado.tablon.filter((m) => m.id !== misionId);
-  estado.enCurso.push({ mision, gremioId: estado.jugadorId, equipo: [...equipo], diaVuelta: estado.dia + mision.duracion - 1 });
+  const heroes = equipo.map((id) => obtenerHeroe(estado, id));
+  estado.enCurso.push({ mision, gremioId: estado.jugadorId, equipo: [...equipo], diaVuelta: estado.dia + duracionMision(mision, heroes) - 1 });
 }
 
 // ---------------------------------------------------------------------------
@@ -174,9 +181,9 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
   return conAzar(estado, (azar) => {
     // Los rivales también lanzan sus misiones del día.
     for (const rival of rivales(estado)) {
-      for (const { mision, equipo } of eligeMisiones(estado, rival.id, () => nuevoId(estado, 'm'))) {
+      for (const { mision, equipo } of eligeMisiones(estado, azar, rival.id, () => nuevoId(estado, 'm'))) {
         for (const h of equipo) h.estado = 'en mision';
-        estado.enCurso.push({ mision, gremioId: rival.id, equipo: equipo.map((h) => h.id), diaVuelta: dia + mision.duracion - 1 });
+        estado.enCurso.push({ mision, gremioId: rival.id, equipo: equipo.map((h) => h.id), diaVuelta: dia + duracionMision(mision, equipo) - 1 });
       }
     }
 
@@ -192,6 +199,7 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
     const ascensiones: ResultadoAscension[] = [];
     const informes = resolverRegresos(estado, azar, ascensiones);
     const categoriaNueva = actualizarCategorias(estado);
+    caducarReto(estado);
 
     // Día 7: sueldos y, después, Prueba de los Novatos.
     let sueldos: PagoSueldos | null = null;
@@ -205,7 +213,7 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
     } else {
       avanzarDia(estado, azar);
     }
-    const noticias = estado.registro.slice(desde).filter((e) => e.tipo === 'rival').map((e) => e.texto);
+    const noticias = estado.registro.slice(desde).filter((e) => e.tipo === 'rival' || e.tipo === 'reto').map((e) => e.texto);
     return { dia, informes: informes.filter((i) => i.gremioId === estado.jugadorId), sueldos, noticias, prueba: estado.fase === 'prueba', ascensiones, categoriaNueva };
   });
 }
@@ -252,6 +260,8 @@ function avanzarDia(estado: EstadoJuego, azar: Azar): void {
   estado.dia += 1;
   estado.fase = 'gestion';
   estado.tablon = generarTablon(azar, () => nuevoId(estado, 'm'), multiplicadores(categoria(jugador(estado))));
+  // Cada semana, un maestro rival puede lanzar un reto.
+  if ((estado.dia - 1) % balance.calendario.diasPorSemana === 0) generarReto(estado, azar);
   if (estado.registro.length > MAX_REGISTRO) estado.registro = estado.registro.slice(-MAX_REGISTRO);
 }
 

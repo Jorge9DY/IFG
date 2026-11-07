@@ -1,6 +1,7 @@
 // Estado completo de una partida y consultas sobre él. Es un objeto plano: se guarda con JSON.stringify.
 
 import balance from '../datos/balance.json';
+import type { Reto } from './retos';
 import type { Subasta } from './subasta';
 import type { Gremio, Heroe, Mision } from './tipos';
 
@@ -16,7 +17,7 @@ export interface MisionEnCurso {
 
 export interface Evento {
   dia: number;
-  tipo: 'mision' | 'fichaje' | 'venta' | 'sueldos' | 'novatos' | 'instalacion' | 'rival' | 'ranking' | 'temporada';
+  tipo: 'mision' | 'fichaje' | 'venta' | 'sueldos' | 'novatos' | 'instalacion' | 'rival' | 'ranking' | 'temporada' | 'reto';
   texto: string;
 }
 
@@ -44,7 +45,7 @@ export interface PruebaNovatos {
 export type Fase = 'gestion' | 'prueba' | 'victoria';
 
 export interface EstadoJuego {
-  version: 6;
+  version: 7;
   semilla: number;
   /** Estado del generador aleatorio, para continuar la misma secuencia. */
   azar: number;
@@ -58,6 +59,8 @@ export interface EstadoJuego {
   tablon: Mision[];
   enCurso: MisionEnCurso[];
   prueba: PruebaNovatos | null;
+  /** Reto de un maestro rival pendiente o recién resuelto (uno por semana como mucho). */
+  reto: Reto | null;
   /** Ranking oficial: se actualiza al terminar el día 7 de cada semana. */
   ranking: FilaRanking[];
   registro: Evento[];

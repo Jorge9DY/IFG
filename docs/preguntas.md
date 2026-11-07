@@ -65,6 +65,13 @@ Respuesta del propietario:
 - **Ascensión:** sí, pero si fracasa el héroe muere. Aplicado: cuesta la mitad de su valor (mínimo 1.500), dura 3 días, éxito del 60% (desde F) al 35% (desde A). Si la supera, sube a la letra siguiente y su techo también.
 - **Retos de los maestros:** sí, pero como duelos de héroes por clase y rango (ver la sección 14 de la biblia, \[Propuesta\]). Necesitan antes las clases (pregunta 15).
 
-## 15. Clases y habilidades de los héroes (en diseño con el propietario)
+## 15. Clases y habilidades de los héroes — RESUELTA
 
-Siguiente tema por decisión del propietario. Propuesta en la conversación; nada se implementa hasta que decida.
+Respuesta del propietario:
+1. Cuatro clases: Guerrero, Mago, Explorador y Sanador.
+2. Un solo efecto pasivo por clase.
+3. Tipos de misión que favorecen a una clase concreta y, en las de grupo, a combinaciones de clases.
+4. Retos: apuesta en oro; si ganas, oro y prestigio.
+5. El título por Ascensión, para la fase 3 (apuntado en la biblia, sección 9).
+
+Aplicado (cifras provisionales): Guerrero −50% de lesión; Mago +15% de poder en rango alto y +50% de lesión; Explorador −1 día en misiones de rango alto (al principio era en las de 2 días o más, pero desequilibraba los ingresos); Sanador −50% de lesión a sus compañeros. +5% de éxito por clase favorecida y +5% con la combinación completa. Retos: apuesta de 300 (F) a 2.500 (S) de oro y 8 de prestigio al ganar. Para compensar, la dificultad base de las misiones sube a 24/65/150.

@@ -2,7 +2,7 @@
 // Solo leen el estado y usan reglas del motor.
 
 import { heroesDe, type EstadoJuego } from '../motor/estado';
-import { poderEquipo, probabilidadExito } from '../motor/misiones';
+import { poderEquipo, probabilidadMision } from '../motor/misiones';
 import type { Heroe, Mision } from '../motor/tipos';
 
 /** Héroes del jugador que pueden salir de misión ahora. */
@@ -20,16 +20,16 @@ function combinaciones<T>(lista: readonly T[], k: number): T[][] {
 }
 
 /**
- * Equipo recomendado: de los equipos del tamaño exacto que llegan al 80% de éxito, el de menos poder
- * (para no gastar a los mejores). Si ninguno llega, el más fuerte. Vacío si no hay héroes suficientes.
+ * Equipo recomendado: de los equipos del tamaño exacto que llegan al 80% de éxito (contando las clases
+ * que favorece la misión), el de menos poder, para no gastar a los mejores. Si ninguno llega, el de más éxito. Vacío si no hay héroes suficientes.
  */
 export function equipoRecomendado(estado: EstadoJuego, mision: Mision, candidatos = heroesLibres(estado)): Heroe[] {
   if (candidatos.length < mision.equipo) return [];
   const opciones = combinaciones([...candidatos].sort((a, b) => b.poder - a.poder).slice(0, 12), mision.equipo);
-  const llegan = opciones.filter((e) => probabilidadExito(poderEquipo(e), mision.dificultad) >= 80);
+  const llegan = opciones.filter((e) => probabilidadMision(mision, e) >= 80);
   const orden = (a: Heroe[], b: Heroe[]): number => poderEquipo(a) - poderEquipo(b);
   if (llegan.length > 0) return llegan.sort(orden)[0] ?? [];
-  return opciones.sort(orden).at(-1) ?? [];
+  return opciones.sort((a, b) => probabilidadMision(mision, a) - probabilidadMision(mision, b) || orden(a, b)).at(-1) ?? [];
 }
 
 export type NivelDificultad = 'facil' | 'asequible' | 'arriesgada' | 'muy-dificil' | 'sin-equipo';
@@ -46,5 +46,5 @@ export function nivelDificultad(probabilidad: number | null): NivelDificultad {
 export function probabilidadRecomendada(estado: EstadoJuego, mision: Mision): number | null {
   const equipo = equipoRecomendado(estado, mision);
   if (equipo.length === 0) return null;
-  return probabilidadExito(poderEquipo(equipo), mision.dificultad);
+  return probabilidadMision(mision, equipo);
 }

@@ -2,6 +2,16 @@
 
 Entradas más recientes primero.
 
+## 2026-11-07 — Clases, tipos de misión y retos de los maestros
+
+- Decisiones del propietario (biblia, secciones 5, 9 y 14):
+  - **Clases** con un efecto pasivo cada una: Guerrero (se lesiona menos), Mago (más poder en rango alto, más lesiones), Explorador (vuelve antes de las misiones de rango alto), Sanador (protege a sus compañeros). Los rivales se especializan en una clase y pujan más por ella.
+  - **Tipos de misión** que favorecen a una clase (misiones de un héroe) o a una combinación (de grupo): +5% de éxito por clase y +5% con la combinación completa. El equipo recomendado los tiene en cuenta; la formación muestra qué clases cubre el equipo.
+  - **Retos de los maestros:** duelo de un héroe tuyo contra uno suyo de la misma clase y rango, sin ver el suyo. Apuesta en oro; si ganas, oro y prestigio. Vive arriba del Mercado; caduca el día 7.
+  - **Título por Ascensión:** apuntado para la fase 3.
+- Equilibrio: los rivales también juegan misiones con tipo; el Explorador solo acorta las de rango alto; dificultad base 24/65/150. Bot ambicioso: 52% de victorias en 4 temporadas.
+- Nuevo módulo `retos.ts`; 66 tests. Guardado versión 7. Probado en navegador sin errores.
+
 ## 2026-11-07 — Tablón que crece y Ascensión
 
 - Contra el estancamiento del medio juego (decisiones del propietario):
