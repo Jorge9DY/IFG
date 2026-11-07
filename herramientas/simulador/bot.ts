@@ -11,6 +11,7 @@ import { Azar } from '../../src/motor/azar';
 import { lanzarMision, pujarNovato, siguienteCandidato } from '../../src/motor/partida';
 import { motivoNoPujar, siguientePrecio } from '../../src/motor/subasta';
 import { equipoRecomendado } from '../../src/ui/ayudas';
+import { condicionesEntrenamiento, entrenar } from '../../src/motor/entrenamiento';
 import { condicionesAscension, iniciarAscension } from '../../src/motor/ascension';
 
 export interface Estrategia {
@@ -38,19 +39,20 @@ export interface MetricasBot {
   ascensiones: number;
   retos: number;
   retosGanados: number;
+  entrenamientos: number;
 }
 
 export function metricasVacias(): MetricasBot {
-  return { misiones: 0, exitos: 0, fichajesNovatos: 0, ventas: 0, mejoras: 0, compras: 0, ascensiones: 0, retos: 0, retosGanados: 0 };
+  return { misiones: 0, exitos: 0, fichajesNovatos: 0, ventas: 0, mejoras: 0, compras: 0, ascensiones: 0, retos: 0, retosGanados: 0, entrenamientos: 0 };
 }
 
 /** Decisiones del día: invertir y lanzar misiones (de la más alta a la más baja). */
 export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): void {
   const reserva = (): number => e.reservaSemanas * sueldosDe(estado, estado.jugadorId);
   const j = jugador(estado);
-  for (const tipo of ['sede', 'ojeadores'] as const) {
+  for (const tipo of ['entrenamiento', 'sede', 'ojeadores'] as const) {
     const info = infoInstalacion(estado, j.id, tipo);
-    const necesita = tipo === 'ojeadores' || plazasLibres(estado, j.id) <= 1;
+    const necesita = tipo === 'ojeadores' || (tipo === 'entrenamiento' && (j.nivelEntrenamiento ?? 0) < 2) || (tipo === 'sede' && plazasLibres(estado, j.id) <= 1);
     if (necesita && !info.bloqueo && info.coste !== null && j.oro - info.coste >= reserva() + 1500) {
       mejorar(estado, j.id, tipo);
       m.mejoras++;
@@ -84,9 +86,22 @@ export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): vo
       m.misiones++;
     }
   }
+  entrenarLibres(estado, e, m);
 }
 
 /** Prueba de los Novatos: puja hasta su tope por cada candidato si tiene plaza (o puede hacerla). */
+/** Después de lanzar misiones, manda a entrenar a los libres que no llegan al límite, si sobra oro. */
+export function entrenarLibres(estado: EstadoJuego, e: Estrategia, m: MetricasBot): void {
+  const j = jugador(estado);
+  for (const h of heroesDe(estado, j.id).sort((a, b) => b.potencial - b.poder - (a.potencial - a.poder))) {
+    const c = condicionesEntrenamiento(estado, h.id);
+    if (!c.bloqueo && j.oro - c.coste >= e.reservaSemanas * sueldosDe(estado, j.id)) {
+      entrenar(estado, h.id);
+      m.entrenamientos++;
+    }
+  }
+}
+
 export function jugarPrueba(estado: EstadoJuego, e: Estrategia, m: MetricasBot): void {
   while (siguienteCandidato(estado)) {
     const s = estado.prueba!.subasta!;

@@ -24,6 +24,7 @@ import {
 import { generarHeroe, letraPotencialNovato } from './heroes';
 import { duracionMision, generarTablon, resolverMision, type InformeMision } from './misiones';
 import { caducarReto, generarReto } from './retos';
+import { resolverEntrenamientos, type ResultadoEntrenamiento } from './entrenamiento';
 import { resolverAscension, type ResultadoAscension } from './ascension';
 import { actualizarCategoria, categoria, categoriaPorPrestigio, multiplicadores } from './categorias';
 import { prestigio } from './ranking';
@@ -51,7 +52,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
   const semilla = opciones.semilla ?? Math.floor(Math.random() * 2 ** 31);
   const J = balance.jugador;
   const estado: EstadoJuego = {
-    version: 7,
+    version: 8,
     semilla,
     azar: semilla,
     dia: 1,
@@ -63,6 +64,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
     enCurso: [],
     prueba: null,
     reto: null,
+    entrenamientos: [],
     ranking: [],
     registro: [],
     contadorIds: 0,
@@ -168,6 +170,8 @@ export interface ResumenDia {
   noticias: string[];
   /** true si empieza la Prueba de los Novatos. */
   prueba: boolean;
+  /** Héroes que terminan hoy su entrenamiento. */
+  entrenamientos: ResultadoEntrenamiento[];
   /** Ascensiones del jugador que han terminado hoy. */
   ascensiones: ResultadoAscension[];
   /** Nueva categoría del gremio del jugador, si ha subido. */
@@ -198,6 +202,7 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
     // Regreso de misiones: recompensas, lesiones y experiencia (y Ascensiones).
     const ascensiones: ResultadoAscension[] = [];
     const informes = resolverRegresos(estado, azar, ascensiones);
+    const entrenamientos = resolverEntrenamientos(estado);
     const categoriaNueva = actualizarCategorias(estado);
     caducarReto(estado);
 
@@ -214,7 +219,7 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
       avanzarDia(estado, azar);
     }
     const noticias = estado.registro.slice(desde).filter((e) => e.tipo === 'rival' || e.tipo === 'reto').map((e) => e.texto);
-    return { dia, informes: informes.filter((i) => i.gremioId === estado.jugadorId), sueldos, noticias, prueba: estado.fase === 'prueba', ascensiones, categoriaNueva };
+    return { dia, informes: informes.filter((i) => i.gremioId === estado.jugadorId), sueldos, noticias, prueba: estado.fase === 'prueba', ascensiones, entrenamientos, categoriaNueva };
   });
 }
 

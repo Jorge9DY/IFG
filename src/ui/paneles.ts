@@ -4,6 +4,8 @@
 
 import { condicionesCuracion, curar, sueldosDe } from '../motor/economia';
 import { condicionesAscension, iniciarAscension } from '../motor/ascension';
+import { condicionesEntrenamiento, entrenar, plazasEntrenamiento } from '../motor/entrenamiento';
+import type { Progreso } from '../motor/heroes';
 import { categoria, siguienteCategoria } from '../motor/categorias';
 import { prestigio } from '../motor/ranking';
 import { diasParaPrueba, esDia7, heroe as obtenerHeroe, heroesDe, jugador, misionDe, puesto, rivales, type EstadoJuego } from '../motor/estado';
@@ -64,6 +66,7 @@ const RANGO: Record<RangoMision, { nombre: string; riesgo: string }> = {
 const TEXTO_INSTALACION: Record<Instalacion, string> = {
   sede: 'Más plazas para héroes y más prestigio en el ranking.',
   ojeadores: 'Estrecha el rango de potencial que ves de los héroes y novatos. También da prestigio.',
+  entrenamiento: 'Entrena a tus héroes unos días a cambio de oro, sin riesgo de lesión. Cada nivel da una plaza más y más experiencia. También da prestigio.',
 };
 
 /** Paneles que no se cierran con ✕ ni con Escape. */
@@ -171,7 +174,7 @@ export class Interfaz {
       const bloqueo = estado.fase !== 'gestion' ? 'disabled' : '';
       const todos = heroesDe(estado, estado.jugadorId);
       const cuenta = (e: Heroe['estado']): number => todos.filter((h) => h.estado === e).length;
-      const resumen = [`${libres} ${libres === 1 ? 'libre' : 'libres'}`, cuenta('en mision') ? `${cuenta('en mision')} de misión` : '', cuenta('lesionado') ? `${cuenta('lesionado')} ${cuenta('lesionado') === 1 ? 'lesionado' : 'lesionados'}` : '']
+      const resumen = [`${libres} ${libres === 1 ? 'libre' : 'libres'}`, cuenta('en mision') ? `${cuenta('en mision')} de misión` : '', cuenta('lesionado') ? `${cuenta('lesionado')} ${cuenta('lesionado') === 1 ? 'lesionado' : 'lesionados'}` : '', cuenta('entrenando') ? `${cuenta('entrenando')} entrenando` : '']
         .filter(Boolean)
         .join(' · ');
       const sinCobrar = todos.some((h) => h.semanasSinCobrar > 0) ? '<em class="alerta-texto">Hay héroes sin cobrar</em>' : '';
@@ -333,7 +336,7 @@ export class Interfaz {
       .join('');
     const ocupados = heroesDe(estado, estado.jugadorId)
       .filter((h) => h.estado !== 'libre')
-      .map((h) => `${esc(h.nombre.split(' ')[0] ?? '')} (${h.estado === 'lesionado' ? `lesionado, ${h.diasLesion} d.` : 'de misión'})`)
+      .map((h) => `${esc(h.nombre.split(' ')[0] ?? '')} (${h.estado === 'lesionado' ? `lesionado, ${h.diasLesion} d.` : h.estado === 'entrenando' ? 'entrenando' : 'de misión'})`)
       .join(', ');
     const r = RANGO[mision.rango];
     const motivo = motivoNoLanzar(estado, mision.id, this.equipo);
@@ -429,10 +432,18 @@ export class Interfaz {
     const j = jugador(estado);
     switch (this.pestanaGremio) {
       case 'instalaciones': {
-        const filas = (['sede', 'ojeadores'] as Instalacion[])
+        const filas = (['sede', 'entrenamiento', 'ojeadores'] as Instalacion[])
           .map((tipo) => {
             const info = infoInstalacion(estado, j.id, tipo);
-            const extra = tipo === 'sede' ? `${plazas(j)} plazas` : `Potencial visto con ${balance.instalaciones.ojeadores.anchura[info.nivel] ?? 1} letra(s) de margen`;
+            const I = balance.instalaciones;
+            const extra =
+              tipo === 'sede'
+                ? `${plazas(j)} plazas`
+                : tipo === 'ojeadores'
+                  ? `Potencial visto con ${I.ojeadores.anchura[info.nivel] ?? 1} letra(s) de margen`
+                  : info.nivel === 0
+                    ? 'Sin construir'
+                    : `${I.entrenamiento.plazas[info.nivel] ?? 0} plaza(s) · ${I.entrenamiento.experienciaPorDia[info.nivel] ?? 0} exp por día`;
             return `<section class="sede-nivel">
               <div class="nivel-actual"><span class="tenue">${NOMBRE_INSTALACION[tipo]}</span><b>Nivel ${info.nivel}</b><span class="tenue">${esc(extra)}</span></div>
               <div class="mejora"><p>${TEXTO_INSTALACION[tipo]}</p>
@@ -462,6 +473,10 @@ export class Interfaz {
         const m = misionDe(estado, h.id);
         const vuelve = m ? m.diaVuelta - estado.dia : 0;
         detalle = m ? `«${esc(m.mision.titulo)}» · ${vuelve === 0 ? 'vuelve hoy al finalizar el día' : `vuelve en ${vuelve + 1} días`}` : '';
+      } else if (h.estado === 'entrenando') {
+        const e = estado.entrenamientos.find((x) => x.heroeId === h.id);
+        const vuelve = e ? e.diaVuelta - estado.dia : 0;
+        detalle = `En la zona de entrenamiento · ${vuelve === 0 ? 'termina hoy al finalizar el día' : `termina en ${vuelve + 1} días`}`;
       } else if (h.estado === 'lesionado') {
         const c = condicionesCuracion(estado, h.id);
         detalle = `${h.diasLesion} ${h.diasLesion === 1 ? 'día' : 'días'} de reposo`;
@@ -477,6 +492,9 @@ export class Interfaz {
                 <div class="botones"><button data-accion="cancelar-ascension">Cancelar</button><button class="peligro" data-accion="ascension" data-id="${h.id}" ${a.bloqueo ? `disabled title="${esc(a.bloqueo)}"` : ''}>Enviar por ${num(a.coste)}</button></div>
               </div>`
             : `<button class="boton-ascension" data-accion="preparar-ascension" data-id="${h.id}" title="Arriesgarlo todo para romper su límite">Ascensión · ${a.probabilidad}%</button>`;
+        } else if (plazasEntrenamiento(estado) > 0) {
+          const e = condicionesEntrenamiento(estado, h.id);
+          accion = `<button data-accion="entrenar" data-id="${h.id}" ${e.bloqueo ? `disabled title="${esc(e.bloqueo)}"` : ''} title="+${e.experiencia} exp sin riesgo de lesión">Entrenar ${e.dias} días · ${num(e.coste)}</button>`;
         }
       }
       const aviso = h.semanasSinCobrar > 0
@@ -489,7 +507,7 @@ export class Interfaz {
         <div class="accion-fila">${accion}</div>
       </div>`;
     };
-    const grupos: [Heroe['estado'], string][] = [['lesionado', 'Lesionados'], ['en mision', 'De misión'], ['libre', 'Libres']];
+    const grupos: [Heroe['estado'], string][] = [['lesionado', 'Lesionados'], ['en mision', 'De misión'], ['entrenando', 'Entrenando'], ['libre', 'Libres']];
     const bloques = grupos
       .map(([e, titulo]) => {
         const lista = heroes.filter((h) => h.estado === e);
@@ -576,34 +594,10 @@ export class Interfaz {
   private panelDia(estado: EstadoJuego): string {
     const r = this.resumenDia;
     if (!r) return '';
-    const total = balance.heroes.experienciaPorBarra;
     const misiones = r.informes
       .map((i) => {
         const heroes = i.partes
-          .map((parte) => {
-            const g = parte.progreso;
-            const nombre = (estado.heroes[parte.heroeId]?.nombre ?? '').split(' ')[0] ?? '';
-            // La barra se llena desde donde estaba; si se completa, llega al final y celebra la subida.
-            const desde = Math.round((100 * g.experienciaAntes) / total);
-            const hasta = g.barras > 0 ? 100 : Math.round((100 * g.experienciaDespues) / total);
-            const hitos = [
-              g.barras > 0 ? `<span class="hito subida">¡Sube de poder! ${g.poderAntes} → ${g.poderDespues}</span>` : '',
-              g.rangoDespues !== g.rangoAntes
-                ? `<span class="hito ascenso">¡Asciende a rango ${g.rangoDespues}! Su sueldo pasa de ${num(g.sueldoAntes)} a ${num(g.sueldoDespues)}</span>`
-                : '',
-              g.llegaAlLimite ? `<span class="hito limite">Ha llegado a su límite: potencial ${g.rangoDespues}</span>` : '',
-              parte.diasLesion > 0 ? `<span class="hito lesion">Lesionado ${parte.diasLesion} ${parte.diasLesion === 1 ? 'día' : 'días'}</span>` : '',
-            ].join('');
-            const barra = g.experienciaGanada > 0
-              ? `<span class="barra-xp grande ${g.barras > 0 ? 'llena' : ''}"><i style="--desde:${desde}%;--hasta:${hasta}%"></i></span>
-                 <small class="tenue">+${g.experienciaGanada} exp · ${g.llegaAlLimite ? 'al límite' : `${g.experienciaDespues}/${total}${g.barras > 0 ? ' hacia la siguiente subida' : ''}`}</small>`
-              : '<small class="tenue">Ya está al límite: no gana experiencia</small>';
-            return `<div class="regreso">
-              <div class="quien"><strong>${esc(nombre)}</strong>${this.rangoChip(g.rangoDespues)}</div>
-              <div class="progreso">${barra}</div>
-              <div class="hitos">${hitos}</div>
-            </div>`;
-          })
+          .map((parte) => this.tarjetaRegreso((estado.heroes[parte.heroeId]?.nombre ?? '').split(' ')[0] ?? '', parte.progreso, parte.diasLesion))
           .join('');
         return `<div class="resultado r-${i.exito ? 'exito' : 'fracaso'}"><b>${i.exito ? '¡Misión cumplida!' : 'La misión ha fracasado'}</b><span>«${esc(i.mision.titulo)}» · +${num(i.oro)} oro</span>
           <div class="regresos">${heroes}</div></div>`;
@@ -628,9 +622,37 @@ export class Interfaz {
       )
       .join('');
     const ascenso = r.categoriaNueva ? `<div class="resultado ascenso-categoria"><b>¡Categoría ${r.categoriaNueva}!</b><span>La Asociación asciende a tu gremio: desde mañana el tablón ofrece misiones más difíciles y mejor pagadas.</span></div>` : '';
-    return `${ascenso}${ascensiones}${misiones || (ascensiones ? '' : '<p>Hoy no ha vuelto ninguna misión.</p>')}${sueldos}${noticias}
+    const entrenos = r.entrenamientos.length
+      ? `<div class="resultado entreno"><b>Vuelven de entrenar</b><span>Sin lesiones.</span><div class="regresos">${r.entrenamientos.map((e) => this.tarjetaRegreso(e.nombre.split(' ')[0] ?? '', e.progreso, 0)).join('')}</div></div>`
+      : '';
+    return `${ascenso}${ascensiones}${misiones}${entrenos}${misiones || ascensiones || entrenos ? '' : '<p>Hoy no ha vuelto ninguna misión.</p>'}${sueldos}${noticias}
       ${r.prueba ? '' : `<p class="tenue">Empieza el ${esc(textoCalendario(estado).split(' · ')[1] ?? '')}.</p>`}
       <div class="botones">${boton}</div>`;
+  }
+
+  /** Tarjeta de un héroe que vuelve (de misión o de entrenar): barra de experiencia, subida, ascenso, límite y lesión. */
+  private tarjetaRegreso(nombre: string, g: Progreso, diasLesion: number): string {
+    const total = balance.heroes.experienciaPorBarra;
+    // La barra se llena desde donde estaba; si se completa, llega al final y celebra la subida.
+    const desde = Math.round((100 * g.experienciaAntes) / total);
+    const hasta = g.barras > 0 ? 100 : Math.round((100 * g.experienciaDespues) / total);
+    const hitos = [
+      g.barras > 0 ? `<span class="hito subida">¡Sube de poder! ${g.poderAntes} → ${g.poderDespues}</span>` : '',
+      g.rangoDespues !== g.rangoAntes
+        ? `<span class="hito ascenso">¡Asciende a rango ${g.rangoDespues}! Su sueldo pasa de ${num(g.sueldoAntes)} a ${num(g.sueldoDespues)}</span>`
+        : '',
+      g.llegaAlLimite ? `<span class="hito limite">Ha llegado a su límite: potencial ${g.rangoDespues}</span>` : '',
+      diasLesion > 0 ? `<span class="hito lesion">Lesionado ${diasLesion} ${diasLesion === 1 ? 'día' : 'días'}</span>` : '',
+    ].join('');
+    const barra = g.experienciaGanada > 0
+      ? `<span class="barra-xp grande ${g.barras > 0 ? 'llena' : ''}"><i style="--desde:${desde}%;--hasta:${hasta}%"></i></span>
+         <small class="tenue">+${g.experienciaGanada} exp · ${g.llegaAlLimite ? 'al límite' : `${g.experienciaDespues}/${total}${g.barras > 0 ? ' hacia la siguiente subida' : ''}`}</small>`
+      : '<small class="tenue">Ya está al límite: no gana experiencia</small>';
+    return `<div class="regreso">
+      <div class="quien"><strong>${esc(nombre)}</strong>${this.rangoChip(g.rangoDespues)}</div>
+      <div class="progreso">${barra}</div>
+      <div class="hitos">${hitos}</div>
+    </div>`;
   }
 
   private panelSemana(estado: EstadoJuego): string {
@@ -768,6 +790,13 @@ export class Interfaz {
         this.mensaje = 'Has rechazado el reto.';
         this.guardar();
         return this.repintar();
+      case 'entrenar': {
+        const h = obtenerHeroe(estado, id);
+        entrenar(estado, id);
+        this.mensaje = `${h.nombre} se va a entrenar ${balance.entrenamiento.dias} días.`;
+        this.guardar();
+        return this.repintar();
+      }
       case 'preparar-ascension':
         this.confirmarAscension = id;
         return this.repintar();

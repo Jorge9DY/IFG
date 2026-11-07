@@ -129,6 +129,8 @@ Los sueldos son el gasto fijo semanal del gremio. El diseño ya los daba por hec
 
 **\[Aceptado\]** Instalación de ojeadores: estrecha el rango de potencial que se ve de los novatos (ver Prueba de los Novatos).
 
+**\[Aceptado\] Zona de entrenamiento** (idea del propietario): manda a un héroe unos días a entrenar. Gana experiencia a cambio de oro y no se lesiona. Sirve para subir a héroes demasiado flojos para las misiones y es otra decisión de gestión además de las misiones. No supera el límite del héroe (para eso está la Ascensión). Cada nivel da una plaza más y más experiencia por día. Cifras: *ilustrativas*.
+
 **\[Aceptado\]** Las instalaciones son caras: junto con los sueldos, son el gran destino del oro y evitan que se acumule sin uso.
 
 **\[Abierto\]** Lista de instalaciones, niveles, costes y efectos concretos.
@@ -650,6 +652,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-07 | Idea del propietario: zona de entrenamiento como instalación (entrenar unos días a cambio de oro, sin lesiones, sin superar el límite). |
 | 2026-11-07 | Decisiones del propietario: cuatro clases (Guerrero, Mago, Explorador, Sanador) con un solo efecto pasivo; tipos de misión que favorecen a una clase o a una combinación; retos de los maestros con apuesta en oro (si ganas, oro y prestigio), pasan a \[Aceptado\]; el título por Ascensión queda apuntado para la fase 3. |
 | 2026-11-07 | Decisiones del propietario contra el estancamiento del medio juego: tablón que crece con la categoría del gremio (sube por prestigio, nunca baja); Ascensión para romper el límite de un héroe (si fracasa, muere: única muerte del juego, siempre por decisión del jugador); retos de los maestros como \[Propuesta\], pendientes de las clases de héroe. Mercado más barato. |
 | 2026-11-06 | Decisión del propietario: experiencia visible en barra, subidas de poder de golpe al llenarla, rangos F–S según el poder (ascender solo sube el sueldo), techo al llegar al potencial y regreso de la misión en el resumen del día. Sin experiencia extra. |

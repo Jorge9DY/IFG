@@ -10,3 +10,4 @@ Argumentos: número de temporadas y semilla inicial. El informe se imprime y se 
 
 - `bot.ts`: estrategias del jugador automático (prudente y arriesgada).
 - `simular.ts`: bucle de simulación e informe.
+- `analisis.ts`: evolución semana a semana (puesto, fuerza, prestigio, oro, sueldos, héroes al límite, categoría). Uso: `npx tsx herramientas/simulador/analisis.ts a` (ambiciosa) o `p` (prudente).

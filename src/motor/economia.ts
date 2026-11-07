@@ -69,6 +69,7 @@ function marcharse(estado: EstadoJuego, h: Heroe, origen: Gremio): string | null
   // Si estaba de misión, el resto del equipo sigue sin él.
   for (const c of estado.enCurso) c.equipo = c.equipo.filter((id) => id !== h.id);
   estado.enCurso = estado.enCurso.filter((c) => c.equipo.length > 0);
+  estado.entrenamientos = estado.entrenamientos.filter((e) => e.heroeId !== h.id);
   h.estado = 'libre';
   h.diasLesion = 0;
   h.semanasSinCobrar = 0;

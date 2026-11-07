@@ -18,7 +18,7 @@ export function fuerza(estado: EstadoJuego, gremioId: string): number {
 /** Prestigio: instalaciones + misiones de rango alto completadas + novatos destacados fichados + retos ganados. */
 export function prestigio(g: Gremio): number {
   return (
-    R.prestigioPorNivelInstalacion * (g.nivelSede + g.nivelOjeadores) +
+    R.prestigioPorNivelInstalacion * (g.nivelSede + g.nivelOjeadores + (g.nivelEntrenamiento ?? 0)) +
     R.prestigioPorMisionAlta * g.misionesAltas +
     R.prestigioPorNovatoDestacado * g.novatosDestacados +
     R.prestigioPorReto * (g.retosGanados ?? 0)

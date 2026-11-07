@@ -53,6 +53,8 @@ No se pasa a la siguiente fase sin superar su puerta (biblia, sección 17). El r
 - [x] Ascensión: romper el límite de un héroe arriesgando su vida
 - [x] Clases de héroe (Guerrero, Mago, Explorador, Sanador) con un efecto pasivo y tipos de misión que favorecen clases o combinaciones
 - [x] Retos de los maestros: duelos por clase y rango con apuesta en oro
+- [x] Zona de entrenamiento: entrenar héroes a cambio de oro, sin lesiones
+- [ ] Contra el estancamiento: decidir la Prueba de los Novatos que crece y categorías más seguidas (pregunta 16)
 - [ ] Puerta 1: prueba con jugadores de la economía sin narrativa
 
 ## Fase 2 — Competencia

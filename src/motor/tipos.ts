@@ -3,7 +3,7 @@
 export const LETRAS = ['F', 'D', 'C', 'B', 'A', 'S'] as const;
 export type Letra = (typeof LETRAS)[number];
 
-export type EstadoHeroe = 'libre' | 'en mision' | 'lesionado';
+export type EstadoHeroe = 'libre' | 'en mision' | 'lesionado' | 'entrenando';
 
 /** Decisión del propietario: cuatro clases, con un solo efecto pasivo cada una. */
 export const CLASES = ['Guerrero', 'Mago', 'Explorador', 'Sanador'] as const;
@@ -68,6 +68,8 @@ export interface Gremio {
   plantilla: string[];
   nivelSede: number;
   nivelOjeadores: number;
+  /** Zona de entrenamiento (0 = no hay). */
+  nivelEntrenamiento?: number;
   /** Misiones de rango alto completadas (prestigio). */
   misionesAltas: number;
   /** Novatos destacados fichados en la Prueba (prestigio). */

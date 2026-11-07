@@ -75,3 +75,15 @@ Respuesta del propietario:
 5. El título por Ascensión, para la fase 3 (apuntado en la biblia, sección 9).
 
 Aplicado (cifras provisionales): Guerrero −50% de lesión; Mago +15% de poder en rango alto y +50% de lesión; Explorador −1 día en misiones de rango alto (al principio era en las de 2 días o más, pero desequilibraba los ingresos); Sanador −50% de lesión a sus compañeros. +5% de éxito por clase favorecida y +5% con la combinación completa. Retos: apuesta de 300 (F) a 2.500 (S) de oro y 8 de prestigio al ganar. Para compensar, la dificultad base de las misiones sube a 24/65/150.
+
+## 16. El estancamiento hacia la temporada 2, día 5 (en diseño con el propietario)
+
+Análisis con el simulador (150 partidas, semana a semana; herramienta `herramientas/simulador/analisis.ts`):
+- **Los héroes tocan techo:** hacia la semana 5–6 el 30–40% de la plantilla ha llegado a su límite; en la semana 9 el 60%, y el 75% al final. La fuerza crece +30 por semana al principio y +10–15 después.
+- **La Prueba de los Novatos no crece:** los novatos tienen el mismo poder (10–35) y el mismo potencial toda la partida. En la temporada 2 ya son mucho más flojos que tu equipo, así que el gran evento semanal deja de importar.
+- **Los hitos están muy separados:** la categoría C llega hacia la semana 7 y la B hacia la 11. Entre medias, solo se ve bajar poco a poco la distancia con el primero (unos 25 puntos por semana).
+- **Los sueldos se comen el crecimiento:** a partir de la semana 6 son el 70–75% de lo que dan las misiones.
+- **Las instalaciones daban poco:** la sede da plazas, pero solo cuentan los 5 mejores héroes, y cada héroe más es otro sueldo. Los ojeadores solo dan información.
+
+Aplicado: zona de entrenamiento (idea del propietario). Propuestas pendientes de decidir: Prueba de los Novatos que crece con la categoría y categorías más seguidas.
+

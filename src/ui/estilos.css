@@ -494,3 +494,9 @@ td.tenue { color: var(--tenue); }
 .resultado.reto-aviso { border-color: #e9c46a; }
 .resultado.reto-aviso b { color: #e9c46a; }
 .poder span.rango-chip, .quien span.rango-chip { color: #111; font-size: 11px; letter-spacing: 0.08em; }
+
+/* ---------- Zona de entrenamiento ---------- */
+.fila-heroe.e-entrenando { border-left-color: #e9c46a; }
+.estado-chip.e-entrenando { border-color: #e9c46a; color: #e9c46a; }
+.resultado.entreno { border-color: #e9c46a; }
+.fila-heroe.e-entrenando { color: var(--texto); border-top-color: var(--linea-suave); border-right-color: var(--linea-suave); border-bottom-color: var(--linea-suave); }

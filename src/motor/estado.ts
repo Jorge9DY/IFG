@@ -45,7 +45,7 @@ export interface PruebaNovatos {
 export type Fase = 'gestion' | 'prueba' | 'victoria';
 
 export interface EstadoJuego {
-  version: 7;
+  version: 8;
   semilla: number;
   /** Estado del generador aleatorio, para continuar la misma secuencia. */
   azar: number;
@@ -59,6 +59,8 @@ export interface EstadoJuego {
   tablon: Mision[];
   enCurso: MisionEnCurso[];
   prueba: PruebaNovatos | null;
+  /** Héroes en la zona de entrenamiento y el día en que terminan. */
+  entrenamientos: { heroeId: string; diaVuelta: number }[];
   /** Reto de un maestro rival pendiente o recién resuelto (uno por semana como mucho). */
   reto: Reto | null;
   /** Ranking oficial: se actualiza al terminar el día 7 de cada semana. */

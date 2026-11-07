@@ -67,7 +67,8 @@
   "instalaciones": {
     "_nota": "Sección 4: la sede da plazas y prestigio; los ojeadores estrechan el rango de potencial. Niveles y costes provisionales; más caros por decisión del propietario para que el oro siga apretando.",
     "sede": { "plazas": [5, 7, 9, 11, 13, 15, 18], "coste": [3000, 8000, 15000, 25000, 40000, 60000] },
-    "ojeadores": { "anchura": [4, 3, 2, 1], "coste": [3000, 9000, 20000] }
+    "ojeadores": { "anchura": [4, 3, 2, 1], "coste": [3000, 9000, 20000] },
+    "entrenamiento": { "_nota": "Idea del propietario: zona de entrenamiento. Cada nivel da una plaza más y más experiencia por día.", "coste": [4000, 10000, 20000], "plazas": [0, 1, 2, 3], "experienciaPorDia": [0, 7, 10, 14] }
   },
   "clases": {
     "_nota": "Decisión del propietario: cuatro clases con un solo efecto pasivo cada una. Cifras provisionales.",
@@ -86,6 +87,12 @@
   "retos": {
     "_nota": "Decisión del propietario: un maestro rival te reta a un duelo de héroes de una clase y un rango. Apuesta en oro; si ganas, oro y prestigio. Cifras provisionales.",
     "apuestaPorRango": [300, 500, 800, 1200, 1800, 2500]
+  },
+  "entrenamiento": {
+    "_nota": "Entrenar: el héroe pasa unos días en la zona de entrenamiento, gana experiencia a cambio de oro y no se lesiona. No supera su límite (para eso está la Ascensión). Coste provisional por día.",
+    "dias": 3,
+    "porDia": 150,
+    "porPoderPorDia": 5
   },
   "categorias": {
     "_nota": "Decisión del propietario: el tablón crece con el gremio. La categoría sube por prestigio y nunca baja. Umbrales y multiplicadores provisionales.",

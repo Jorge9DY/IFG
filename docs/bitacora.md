@@ -2,6 +2,12 @@
 
 Entradas más recientes primero.
 
+## 2026-11-07 — Análisis del estancamiento y zona de entrenamiento
+
+- Análisis semana a semana con el simulador (nuevo `analisis.ts`). Las causas del estancamiento hacia la temporada 2 están en la pregunta 16: héroes que tocan techo, una Prueba de los Novatos que no crece, hitos muy separados, sueldos que se comen el crecimiento e instalaciones que daban poco.
+- Idea del propietario aplicada: **zona de entrenamiento**, una instalación nueva (3 niveles: 4.000/10.000/20.000). Un héroe libre que no está al límite entrena 3 días a cambio de oro (150 + 5 × poder por día), gana 21/30/42 de experiencia según el nivel y no se lesiona. Botón en el inventario; vuelve en el resumen del día como el regreso de una misión. Da prestigio como el resto de instalaciones.
+- 70 tests; guardado versión 8; probado en navegador sin errores. Equilibrio sin cambios (bot ambicioso: 54%).
+
 ## 2026-11-07 — Clases, tipos de misión y retos de los maestros
 
 - Decisiones del propietario (biblia, secciones 5, 9 y 14):
