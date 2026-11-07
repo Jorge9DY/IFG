@@ -11,6 +11,8 @@ export interface MisionEnCurso {
   equipo: string[];
   /** Día (global) en cuyo cierre vuelve el equipo. */
   diaVuelta: number;
+  /** Carta del tablón de la que sale (una carta se puede lanzar varias veces el mismo día). */
+  cartaId?: string;
   /** Misión de Ascensión (un héroe solo; si fracasa, muere). */
   ascension?: boolean;
 }

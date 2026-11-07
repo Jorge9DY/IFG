@@ -615,3 +615,20 @@ td.tenue { color: var(--tenue); }
 .veredicto.legendario em { color: #fff1c2; }
 @keyframes legendario { 50% { box-shadow: 0 0 80px rgba(233, 196, 106, 0.95); } }
 @media (prefers-reduced-motion: reduce) { .veredicto.legendario { animation: none; opacity: 1; } }
+
+/* ---------- Misiones repetibles ---------- */
+.tarjeta-mision { position: relative; }
+.tarjeta-mision .lanzadas { position: absolute; top: 6px; right: 8px; font-family: var(--titulo); font-weight: 700; font-size: 13px; color: var(--cian); }
+.aviso-prueba { font-size: 11.5px; color: #e8b04f; }
+div.aviso-prueba { font-size: 12.5px; margin-top: 2px; }
+
+/* ---------- Retratos ---------- */
+.avatar { position: relative; flex: none; display: inline-block; width: 46px; height: 46px; }
+.avatar .retrato { display: block; width: 100%; height: 100%; border: 1px solid var(--linea-suave); }
+.avatar .rango { position: absolute; right: -6px; bottom: -6px; width: 22px; height: 19px; font-size: 12px; }
+.avatar.mini { width: 26px; height: 26px; margin-right: 6px; vertical-align: middle; }
+.avatar.grande { width: 64px; height: 64px; }
+.avatar.grande .rango { width: 28px; height: 24px; font-size: 14px; }
+.avatar.caido .retrato { filter: grayscale(1) brightness(0.6); }
+.ficha-heroe .avatar { width: 36px; height: 36px; }
+.ascension-viaje .cabeza .avatar.mini { margin-right: 2px; }

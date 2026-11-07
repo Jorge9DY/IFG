@@ -34,7 +34,8 @@ No se pasa a la siguiente fase sin superar su puerta (biblia, sección 17). El r
 
 - [x] Calendario por días con «Finalizar día»; semanas de 7 días y temporadas de 28
 - [x] Tablón diario con tres misiones (bajo, medio, alto), duraciones 1/2/3 días y equipos de 1/2/3 héroes
-- [x] Varias misiones el mismo día si hay héroes libres
+- [x] Cada misión se puede repetir mientras haya equipos libres, con aviso si el oro llega después de la Prueba
+- [x] Retratos provisionales generados para cada héroe
 - [x] Fracaso: menos recompensa y lesiones que obligan a descansar (sin muertes)
 - [x] Héroes con poder, potencial, experiencia, reputación y lealtad; la experiencia sube el poder hasta el potencial
 - [x] Sueldos semanales el día 7 que crecen con poder y reputación

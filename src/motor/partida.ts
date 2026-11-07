@@ -8,6 +8,7 @@ import { Azar } from './azar';
 import { pagarSueldos, type PagoSueldos } from './economia';
 import {
   diaDeTemporada,
+  diasParaPrueba,
   esDia7,
   esFinDeTemporada,
   gremio,
@@ -31,7 +32,7 @@ import { prestigio } from './ranking';
 import { calcularRanking, premioTemporada } from './ranking';
 import { ajustarPlantilla, eligeMisiones, invertir } from './rivales';
 import { accionJugador, cerrarSubasta, crearSubasta } from './subasta';
-import type { Clase, Gremio, Letra, PerfilRival } from './tipos';
+import type { Clase, Gremio, Letra, Mision, PerfilRival } from './tipos';
 
 export interface OpcionesPartida {
   nombreGremio?: string;
@@ -145,15 +146,36 @@ export function motivoNoLanzar(estado: EstadoJuego, misionId: string, equipo: re
   return null;
 }
 
-/** Lanza una misión del tablón. Los enviados no están disponibles hasta que vuelven. */
+/**
+ * Lanza una misión del tablón. Cada misión se puede lanzar tantas veces como equipos libres tengas
+ * (decisión del propietario): ¿tres misiones bajas o una alta? Los enviados no están disponibles
+ * hasta que vuelven.
+ */
 export function lanzarMision(estado: EstadoJuego, misionId: string, equipo: readonly string[]): void {
   const motivo = motivoNoLanzar(estado, misionId, equipo);
   if (motivo) throw new Error(motivo);
-  const mision = estado.tablon.find((m) => m.id === misionId)!;
+  const carta = estado.tablon.find((m) => m.id === misionId)!;
+  const mision = { ...carta, id: nuevoId(estado, 'm') };
   for (const id of equipo) obtenerHeroe(estado, id).estado = 'en mision';
-  estado.tablon = estado.tablon.filter((m) => m.id !== misionId);
-  const heroes = equipo.map((id) => obtenerHeroe(estado, id));
-  estado.enCurso.push({ mision, gremioId: estado.jugadorId, equipo: [...equipo], diaVuelta: estado.dia + duracionMision(mision, heroes) - 1 });
+  estado.enCurso.push({ mision, gremioId: estado.jugadorId, equipo: [...equipo], diaVuelta: diaDeVuelta(estado, carta, equipo), cartaId: carta.id });
+}
+
+/** Día (al finalizarlo) en que volvería esta misión con este equipo. */
+export function diaDeVuelta(estado: EstadoJuego, mision: Mision, equipo: readonly string[]): number {
+  return estado.dia + duracionMision(mision, equipo.map((id) => obtenerHeroe(estado, id))) - 1;
+}
+
+/**
+ * true si una misión que vuelve ese día traerá su oro después de la próxima Prueba de los Novatos
+ * (el día 7 primero vuelven las misiones, luego se pagan sueldos y después llega la Prueba).
+ */
+export function vuelveTrasPrueba(estado: EstadoJuego, diaVuelta: number): boolean {
+  return diaVuelta > estado.dia + diasParaPrueba(estado.dia);
+}
+
+/** Veces que se ha lanzado hoy una misión del tablón. */
+export function lanzadasHoy(estado: EstadoJuego, carta: Mision): number {
+  return estado.enCurso.filter((c) => c.cartaId === carta.id).length;
 }
 
 // ---------------------------------------------------------------------------

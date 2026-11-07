@@ -1,7 +1,7 @@
 // Jugador automático con una estrategia sencilla, para medir el balance del juego.
 
 import { sueldosDe } from '../../src/motor/economia';
-import { heroe, heroesDe, jugador, rivales, type EstadoJuego } from '../../src/motor/estado';
+import { diasParaPrueba, heroe, heroesDe, jugador, rivales, type EstadoJuego } from '../../src/motor/estado';
 import { nivelOjeo, potencialEstimado, valorEstimado } from '../../src/motor/heroes';
 import type { Heroe } from '../../src/motor/tipos';
 import { infoInstalacion, mejorar, plazasLibres } from '../../src/motor/instalaciones';
@@ -9,7 +9,7 @@ import { comprar, condicionesCompra, ofertaVenta, vender } from '../../src/motor
 import { probabilidadMision } from '../../src/motor/misiones';
 import { aceptarReto, heroesParaReto, motivoNoAceptar } from '../../src/motor/retos';
 import { Azar } from '../../src/motor/azar';
-import { lanzarMision, pujarNovato, siguienteCandidato } from '../../src/motor/partida';
+import { diaDeVuelta, lanzarMision, pujarNovato, siguienteCandidato, vuelveTrasPrueba } from '../../src/motor/partida';
 import { motivoNoPujar, siguientePrecio } from '../../src/motor/subasta';
 import { equipoRecomendado } from '../../src/ui/ayudas';
 import { condicionesEntrenamiento, entrenar } from '../../src/motor/entrenamiento';
@@ -84,11 +84,15 @@ export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): vo
     if (r.desenlace === 'victoria') m.retosGanados++;
   }
   if (e.rota) comprarRefuerzo(estado, reserva(), m);
+  // Cada misión se puede repetir: de la que más paga a la que menos, mientras haya equipo que llegue.
+  // La víspera de la Prueba evita las que traerían el oro después de pujar.
   for (const mision of [...estado.tablon].sort((a, b) => b.recompensa - a.recompensa)) {
-    const equipo = equipoRecomendado(estado, mision);
-    if (equipo.length === 0) continue;
-    if (probabilidadMision(mision, equipo) >= e.probMinima) {
-      lanzarMision(estado, mision.id, equipo.map((h) => h.id));
+    for (;;) {
+      const equipo = equipoRecomendado(estado, mision);
+      if (equipo.length === 0 || probabilidadMision(mision, equipo) < e.probMinima) break;
+      const ids = equipo.map((h) => h.id);
+      if (vuelveTrasPrueba(estado, diaDeVuelta(estado, mision, ids)) && diasParaPrueba(estado.dia) <= 1) break;
+      lanzarMision(estado, mision.id, ids);
       m.misiones++;
     }
   }

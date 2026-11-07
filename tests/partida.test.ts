@@ -3,7 +3,7 @@ import balance from '../src/datos/balance.json';
 import { sueldosDe } from '../src/motor/economia';
 import { heroesDe, jugador, puesto } from '../src/motor/estado';
 import { motivoNoPujar } from '../src/motor/subasta';
-import { crearPartida, finalizarDia, lanzarMision, motivoNoLanzar, pujarNovato, siguienteCandidato, terminarPrueba } from '../src/motor/partida';
+import { crearPartida, diaDeVuelta, finalizarDia, lanzadasHoy, lanzarMision, motivoNoLanzar, vuelveTrasPrueba, pujarNovato, siguienteCandidato, terminarPrueba } from '../src/motor/partida';
 import { partida } from './fabrica';
 
 /** Finaliza días (y Pruebas, retirándose de todo) hasta llegar al día indicado. */
@@ -33,14 +33,32 @@ describe('partida', () => {
     expect(JSON.parse(JSON.stringify(a))).toEqual(a);
   });
 
-  it('se pueden lanzar varias misiones el mismo día si hay héroes libres', () => {
+  it('cada misión se puede lanzar tantas veces como equipos libres tengas', () => {
     const estado = partida();
     const [h1, h2, h3] = jugador(estado).plantilla;
-    const [bajo, medio] = estado.tablon;
-    lanzarMision(estado, bajo!.id, [h1!]);
-    lanzarMision(estado, medio!.id, [h2!, h3!]);
-    expect(estado.tablon).toHaveLength(1);
+    const bajo = estado.tablon.find((m) => m.rango === 'bajo')!;
+    lanzarMision(estado, bajo.id, [h1!]);
+    lanzarMision(estado, bajo.id, [h2!]);
+    lanzarMision(estado, bajo.id, [h3!]);
+    expect(estado.tablon).toHaveLength(3);
+    expect(lanzadasHoy(estado, bajo)).toBe(3);
+    expect(new Set(estado.enCurso.map((c) => c.mision.id)).size).toBe(3);
     expect(heroesDe(estado, 'jugador').every((h) => h.estado === 'en mision')).toBe(true);
+    expect(motivoNoLanzar(estado, bajo.id, [h1!])).toMatch(/no está disponible/);
+  });
+
+  it('avisa si el oro de la misión llegaría después de la Prueba de los Novatos', () => {
+    const estado = partida();
+    avanzarHasta(estado, 6);
+    // Hoy es el día 6: la Prueba llega al finalizar el día 7.
+    expect(vuelveTrasPrueba(estado, 7)).toBe(false);
+    expect(vuelveTrasPrueba(estado, 8)).toBe(true);
+    const [a, b, c] = jugador(estado).plantilla;
+    for (const id of [a!, b!, c!]) estado.heroes[id]!.clase = 'Guerrero';
+    const alto = estado.tablon.find((m) => m.rango === 'alto')!;
+    expect(vuelveTrasPrueba(estado, diaDeVuelta(estado, alto, [a!, b!, c!]))).toBe(true);
+    const bajo = estado.tablon.find((m) => m.rango === 'bajo')!;
+    expect(vuelveTrasPrueba(estado, diaDeVuelta(estado, bajo, [a!]))).toBe(false);
   });
 
   it('exige el tamaño de equipo de cada misión y héroes libres', () => {

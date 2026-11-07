@@ -2,6 +2,12 @@
 
 Entradas más recientes primero.
 
+## 2026-11-07 — Misiones repetibles y retratos de los héroes
+
+- Petición del propietario: cada misión del tablón se puede lanzar tantas veces como equipos libres tengas, para decidir entre varias bajas o una alta. La carta muestra cuántas veces se ha lanzado hoy («×2 hoy») y avisa si el oro llegaría después de la Prueba de los Novatos; la formación indica qué día vuelve el equipo. Los rivales también reparten a todos sus héroes (ya no tienen tope de 2 misiones).
+- Retratos provisionales (`src/ui/retrato.ts`, unas 50 líneas): una cara en SVG generada a partir del id del héroe, con piel, pelo, ojos y boca variados y un accesorio y color según su clase (casco, sombrero de mago, capucha, cinta de sanador). Aparecen en cartas, inventario, formación, regreso de misiones, barra de Ascensión y gran reveal.
+- Equilibrio: el bot ambicioso gana el 72% en 4 temporadas (antes el 68%). 81 tests; probado en navegador sin errores.
+
 ## 2026-11-07 — Techo tras la Ascensión
 
 - Petición del propietario: era raro que, al ascender a C, el techo fuera también C. Ahora el techo queda por encima del nuevo rango: +1 (75%), +2 «despertar extraordinario» (20%) o +3 «despertar legendario» (5%), con S como máximo. El techo nuevo se conoce con exactitud (campo `techoConocido`).

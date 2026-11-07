@@ -72,22 +72,21 @@ export function limitePuja(estado: EstadoJuego, azar: Azar, g: Gremio, h: Heroe)
  * mínimo. Devuelve las misiones con su equipo.
  */
 export function eligeMisiones(estado: EstadoJuego, azar: Azar, gremioId: string, nuevoId: () => string): { mision: Mision; equipo: Heroe[] }[] {
-  let huecos = R.misionesSimultaneas - estado.enCurso.filter((c) => c.gremioId === gremioId).length;
-  if (huecos <= 0) return [];
   const libres = heroesDe(estado, gremioId)
     .filter((h) => h.estado === 'libre')
     .sort((a, b) => b.poder - a.poder)
-    .slice(0, 8);
+    .slice(0, 10);
   const tablon = generarTablon(azar, nuevoId, multiplicadores(categoria(gremio(estado, gremioId))));
   const elegidas: { mision: Mision; equipo: Heroe[] }[] = [];
-  for (const mision of [...tablon].reverse()) {
-    if (huecos <= 0) break;
-    const disponibles = libres.filter((h) => !elegidas.some((e) => e.equipo.includes(h)));
-    if (disponibles.length < mision.equipo) continue;
-    const equipo = combinaciones(disponibles, mision.equipo).sort((a, b) => probabilidadMision(mision, b) - probabilidadMision(mision, a))[0];
-    if (!equipo || probabilidadMision(mision, equipo) < R.probExitoMinima) continue;
-    huecos -= 1;
-    elegidas.push({ mision, equipo });
+  // Igual que el jugador: cada misión se puede repetir mientras queden equipos libres. De la más alta a la más baja.
+  for (const carta of [...tablon].reverse()) {
+    for (;;) {
+      const disponibles = libres.filter((h) => !elegidas.some((e) => e.equipo.includes(h)));
+      if (disponibles.length < carta.equipo) break;
+      const equipo = combinaciones(disponibles, carta.equipo).sort((a, b) => probabilidadMision(carta, b) - probabilidadMision(carta, a))[0];
+      if (!equipo || probabilidadMision(carta, equipo) < R.probExitoMinima) break;
+      elegidas.push({ mision: { ...carta, id: nuevoId() }, equipo });
+    }
   }
   return elegidas;
 }

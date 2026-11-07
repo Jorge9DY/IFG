@@ -8,7 +8,7 @@ import { condicionesEntrenamiento, entrenar, plazasEntrenamiento } from '../moto
 import type { Progreso } from '../motor/heroes';
 import { categoria, siguienteCategoria } from '../motor/categorias';
 import { prestigio } from '../motor/ranking';
-import { diasParaPrueba, esDia7, heroe as obtenerHeroe, heroesDe, jugador, misionDe, puesto, rivales, type EstadoJuego } from '../motor/estado';
+import { diaDeTemporada, diasParaPrueba, esDia7, heroe as obtenerHeroe, heroesDe, jugador, misionDe, puesto, rivales, type EstadoJuego } from '../motor/estado';
 import { alLimite, indiceLetra, letraDe, nivelOjeo, potencialEstimado, rango, rangoPotencial, sueldo } from '../motor/heroes';
 import { LETRAS } from '../motor/tipos';
 import { NOMBRE_INSTALACION, infoInstalacion, mejorar, plazas, type Instalacion } from '../motor/instalaciones';
@@ -18,6 +18,9 @@ import { fraseReto, heroesParaReto, motivoNoAceptar, aceptarReto, rechazarReto }
 import {
   conAzar,
   crearPartida,
+  diaDeVuelta,
+  lanzadasHoy,
+  vuelveTrasPrueba,
   finalizarDia,
   lanzarMision,
   motivoNoLanzar,
@@ -37,6 +40,7 @@ import type { ResultadoAscension } from '../motor/ascension';
 import { equipoRecomendado, heroesLibres, nivelDificultad, probabilidadRecomendada } from './ayudas';
 import { borrar, cargar, guardar } from './guardado';
 import { esc, num, pct } from './html';
+import { retrato } from './retrato';
 
 export type Panel = 'nueva' | 'misiones' | 'mercado' | 'gremio' | 'prueba' | 'dia' | 'semana' | 'victoria';
 type PestanaGremio = 'heroes' | 'instalaciones' | 'ranking';
@@ -267,6 +271,11 @@ export class Interfaz {
   // Piezas
   // ---------------------------------------------------------------------------
 
+  /** Retrato del héroe con su rango actual en una esquina. */
+  private avatar(h: Heroe): string {
+    return `<span class="avatar">${retrato(h)}${this.hexRango(h)}</span>`;
+  }
+
   /** Hexágono con el rango actual del héroe (según su poder). */
   private hexRango(h: Heroe): string {
     const r = rango(h);
@@ -323,7 +332,7 @@ export class Interfaz {
         : `<span class="estado-chip e-${h.estado.replace(' ', '-')}">${esc(h.estado === 'lesionado' ? `lesionado · ${h.diasLesion} d.` : h.estado)}</span>`;
     return `<article class="carta ${extraClase}">
       <header>
-        ${this.hexRango(h)}
+        ${this.avatar(h)}
         <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} Reputación ${h.reputacion} · Lealtad ${h.lealtad}</span></div>
         ${estadoTexto}
       </header>
@@ -364,13 +373,17 @@ export class Interfaz {
       .map((m) => {
         const prob = probabilidadRecomendada(estado, m);
         const r = RANGO[m.rango];
-        return `<button class="tarjeta-mision t-${m.rango}" data-accion="elegir-mision" data-id="${m.id}">
+        const veces = lanzadasHoy(estado, m);
+        const tarde = vuelveTrasPrueba(estado, estado.dia + m.duracion - 1);
+        return `<button class="tarjeta-mision t-${m.rango}" data-accion="elegir-mision" data-id="${m.id}" ${prob === null ? 'disabled' : ''}>
+          ${veces ? `<span class="lanzadas">×${veces} hoy</span>` : ''}
           <span class="nivel">${r.nombre}</span>
           <span class="titulo-mision">${esc(m.titulo)}</span>
           <span class="tipo-mision">${esc(m.tipo)} · ideal: ${m.clases.map((c) => `${ICONO_CLASE[c] ?? ''} ${c}`).join(' + ')}</span>
           <span class="oro-mision">+${num(m.recompensa)}<small>oro</small></span>
           <span class="tenue">${m.duracion} ${m.duracion === 1 ? 'día' : 'días'} · ${m.equipo} ${m.equipo === 1 ? 'héroe' : 'héroes'} · ${r.riesgo}</span>
           <span class="dificultad d-${nivelDificultad(prob)}">${prob === null ? 'Sin héroes libres' : `${pct(prob)} de éxito`}</span>
+          ${tarde ? '<span class="aviso-prueba">El oro llega después de la Prueba</span>' : ''}
         </button>`;
       })
       .join('');
@@ -382,7 +395,8 @@ export class Interfaz {
         return `<li>«${esc(c.mision.titulo)}» · ${esc(nombres)} · ${vuelve === 0 ? 'vuelve hoy al finalizar el día' : `vuelve en ${vuelve + 1} días`}</li>`;
       })
       .join('');
-    return `${meta}${tarjetas ? `<p>Puedes lanzar las tres misiones si tienes héroes libres. Los enviados no vuelven hasta que termina la misión.</p><div class="tres">${tarjetas}</div>` : '<p>Ya has lanzado todas las misiones de hoy. Mañana habrá un tablón nuevo.</p>'}
+    const libres = heroesLibres(estado).length;
+    return `${meta}<p>Puedes repetir cada misión tantas veces como equipos libres tengas (${libres} ${libres === 1 ? 'héroe libre' : 'héroes libres'}). ¿Varias bajas o una alta? Los enviados no vuelven hasta que termina la misión.</p><div class="tres">${tarjetas}</div>
       ${fuera ? `<h3>De misión</h3><ul class="lista">${fuera}</ul>` : ''}`;
   }
 
@@ -398,7 +412,7 @@ export class Interfaz {
       .map((h) => {
         const va = this.equipo.includes(h.id);
         return `<button class="ficha-heroe ${va ? 'va' : ''}" data-accion="alternar" data-id="${h.id}" aria-pressed="${va}">
-          ${this.hexRango(h)}
+          ${this.avatar(h)}
           <span class="quien"><strong>${esc(h.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${ICONO_CLASE[h.clase] ?? ''} ${h.clase} · poder ${num(h.poder)}</span></span>
           <span class="marca">${va ? '✓' : '+'}</span>
         </button>`;
@@ -412,7 +426,8 @@ export class Interfaz {
     const motivo = motivoNoLanzar(estado, mision.id, this.equipo);
     return `<div class="cabecera-mision">
         <div><span class="nivel t-${mision.rango}">${r.nombre}</span> <strong>${esc(mision.titulo)}</strong>
-          <div class="tenue">+${num(mision.recompensa)} oro · ${duracion} ${duracion === 1 ? 'día' : 'días'}${duracion < mision.duracion ? ' (el Explorador ahorra uno)' : ''} · elige <strong>${mision.equipo}</strong> ${mision.equipo === 1 ? 'héroe' : 'héroes'}. Ya te proponemos un equipo.</div></div>
+          <div class="tenue">+${num(mision.recompensa)} oro · ${duracion} ${duracion === 1 ? 'día' : 'días'}${duracion < mision.duracion ? ' (el Explorador ahorra uno)' : ''} · elige <strong>${mision.equipo}</strong> ${mision.equipo === 1 ? 'héroe' : 'héroes'}. Ya te proponemos un equipo.</div>
+          ${this.avisoVuelta(estado, mision, duracion)}</div>
         <div class="medidor d-${nivelDificultad(prob)}"><b>${prob === null ? '—' : pct(prob)}</b><span>de éxito</span></div>
       </div>
       ${clases}
@@ -452,6 +467,14 @@ export class Interfaz {
       <p class="tenue">Plazo: ${faltan === 0 ? 'hoy' : `${faltan + 1} días`}. Rechazarlo no cuesta nada.</p>
       <div class="botones">${botones || `<span class="tenue">No tienes ningún ${nombreClase} de rango ${r.rango}. Puedes comprar uno aquí abajo.</span>`}<button data-accion="reto-rechazar">Rechazar</button></div>
     </section>`;
+  }
+
+  /** Cuándo vuelve el equipo y si su oro llegará antes o después de la próxima Prueba de los Novatos. */
+  private avisoVuelta(estado: EstadoJuego, mision: Mision, duracion: number): string {
+    const vuelta = this.equipo.length === mision.equipo ? diaDeVuelta(estado, mision, this.equipo) : estado.dia + duracion - 1;
+    const cuando = vuelta === estado.dia ? 'hoy al finalizar el día' : `al finalizar el día ${diaDeTemporada(vuelta)}`;
+    if (vuelveTrasPrueba(estado, vuelta)) return `<div class="aviso-prueba">Vuelve ${cuando}: su oro llegará <strong>después</strong> de la Prueba de los Novatos.</div>`;
+    return `<div class="tenue">Vuelve ${cuando}${diasParaPrueba(estado.dia) <= 2 ? ', antes de la Prueba de los Novatos' : ''}.</div>`;
   }
 
   private panelMercado(estado: EstadoJuego): string {
@@ -571,7 +594,7 @@ export class Interfaz {
         ? `<span class="alerta-texto">Sin cobrar ${h.semanasSinCobrar} ${h.semanasSinCobrar === 1 ? 'semana' : 'semanas'}: se irá si no cobra el próximo día 7</span>`
         : '';
       return `<div class="fila-heroe e-${h.estado.replace(' ', '-')}">
-        ${this.hexRango(h)}
+        ${this.avatar(h)}
         <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} Poder ${h.poder} · sueldo ${num(sueldo(h))} · lealtad ${h.lealtad}</span>${this.techo(estado, h)}${this.barraXp(h)}${aviso}</div>
         <div class="situacion"><span class="estado-chip e-${h.estado.replace(' ', '-')}">${h.estado === 'en mision' ? 'de misión' : h.estado}</span><span class="tenue">${detalle}</span></div>
         <div class="accion-fila">${accion}</div>
@@ -684,7 +707,7 @@ export class Interfaz {
     const misiones = r.informes
       .map((i) => {
         const heroes = i.partes
-          .map((parte) => this.tarjetaRegreso((estado.heroes[parte.heroeId]?.nombre ?? '').split(' ')[0] ?? '', parte.progreso, parte.diasLesion))
+          .map((parte) => this.tarjetaRegreso(estado.heroes[parte.heroeId], parte.progreso, parte.diasLesion))
           .join('');
         return `<div class="resultado r-${i.exito ? 'exito' : 'fracaso'}"><b>${i.exito ? '¡Misión cumplida!' : 'La misión ha fracasado'}</b><span>«${esc(i.mision.titulo)}» · +${num(i.oro)} oro</span>
           <div class="regresos">${heroes}</div></div>`;
@@ -710,7 +733,7 @@ export class Interfaz {
       .join('');
     const ascenso = r.categoriaNueva ? `<div class="resultado ascenso-categoria"><b>¡Categoría ${r.categoriaNueva}!</b><span>La Asociación asciende a tu gremio: desde mañana el tablón ofrece misiones más difíciles y mejor pagadas.</span></div>` : '';
     const entrenos = r.entrenamientos.length
-      ? `<div class="resultado entreno"><b>Vuelven de entrenar</b><span>Sin lesiones.</span><div class="regresos">${r.entrenamientos.map((e) => this.tarjetaRegreso(e.nombre.split(' ')[0] ?? '', e.progreso, 0)).join('')}</div></div>`
+      ? `<div class="resultado entreno"><b>Vuelven de entrenar</b><span>Sin lesiones.</span><div class="regresos">${r.entrenamientos.map((e) => this.tarjetaRegreso(estado.heroes[e.heroeId], e.progreso, 0)).join('')}</div></div>`
       : '';
     return `${ascenso}${ascensiones}${misiones}${entrenos}${misiones || ascensiones || entrenos ? '' : '<p>Hoy no ha vuelto ninguna misión.</p>'}${sueldos}${noticias}
       ${r.prueba ? '' : `<p class="tenue">Empieza el ${esc(textoCalendario(estado).split(' · ')[1] ?? '')}.</p>`}
@@ -718,7 +741,8 @@ export class Interfaz {
   }
 
   /** Tarjeta de un héroe que vuelve (de misión o de entrenar): barra de experiencia, subida, ascenso, límite y lesión. */
-  private tarjetaRegreso(nombre: string, g: Progreso, diasLesion: number): string {
+  private tarjetaRegreso(h: Heroe | undefined, g: Progreso, diasLesion: number): string {
+    const nombre = (h?.nombre ?? '').split(' ')[0] ?? '';
     const total = balance.heroes.experienciaPorBarra;
     // La barra se llena desde donde estaba; si se completa, llega al final y celebra la subida.
     const desde = Math.round((100 * g.experienciaAntes) / total);
@@ -736,7 +760,7 @@ export class Interfaz {
          <small class="tenue">+${g.experienciaGanada} exp · ${g.llegaAlLimite ? 'al límite' : `${g.experienciaDespues}/${total}${g.barras > 0 ? ' hacia la siguiente subida' : ''}`}</small>`
       : '<small class="tenue">Ya está al límite: no gana experiencia</small>';
     return `<div class="regreso">
-      <div class="quien"><strong>${esc(nombre)}</strong>${this.rangoChip(g.rangoDespues)}</div>
+      <div class="quien">${h ? `<span class="avatar mini">${retrato(h)}</span>` : ''}<strong>${esc(nombre)}</strong>${this.rangoChip(g.rangoDespues)}</div>
       <div class="progreso">${barra}</div>
       <div class="hitos">${hitos}</div>
     </div>`;
@@ -834,7 +858,8 @@ export class Interfaz {
         this.misionId = null;
         this.equipo = [];
         this.guardar();
-        this.mensaje = `Misión lanzada: «${mision?.titulo ?? ''}».`;
+        const quedan = heroesLibres(estado).length;
+        this.mensaje = `Misión lanzada: «${mision?.titulo ?? ''}». ${quedan ? `Te quedan ${quedan} ${quedan === 1 ? 'héroe libre' : 'héroes libres'}.` : 'Ya no te quedan héroes libres.'}`;
         return this.repintar();
       }
       case 'pestana-mercado':
@@ -970,7 +995,7 @@ export class Interfaz {
         const marcas = Array.from({ length: duracion }, (_, i) => `<i class="${i < dia ? 'hecho' : ''} ${i === dia - 1 ? 'hoy' : ''}"></i>`).join('');
         const falta = c.diaVuelta - estado.dia;
         return `<div class="ascension-viaje">
-          <div class="cabeza"><span class="etq">Ascensión</span><strong>${esc(nombre)}</strong><span class="tenue">${falta === 0 ? 'el resultado llega al finalizar el día' : `faltan ${falta + 1} días`}</span></div>
+          <div class="cabeza">${estado.heroes[id] ? `<span class="avatar mini">${retrato(estado.heroes[id]!)}</span>` : ''}<span class="etq">Ascensión</span><strong>${esc(nombre)}</strong><span class="tenue">${falta === 0 ? 'el resultado llega al finalizar el día' : `faltan ${falta + 1} días`}</span></div>
           <div class="marcas">${marcas}</div>
           <ul class="diario">${lineas}</ul>
         </div>`;
@@ -996,8 +1021,8 @@ export class Interfaz {
         const extra = r.exito && r.despertar >= 3 ? linea(t.legendario, 'legendaria') : r.exito && r.despertar === 2 ? linea(t.extraordinario, 'extraordinaria') : '';
         const desenlace = (r.exito ? t.exito : t.fracaso).map((x) => linea(x, r.exito ? 'luz' : 'sombra')).join('') + extra;
         const veredicto = r.exito
-          ? `<div class="veredicto exito ${DESPERTAR[r.despertar]?.clase ?? ''}" style="--d:${retraso.toFixed(1)}s"><span class="rango r${r.rangoDespues}">${r.rangoDespues}</span><div>${DESPERTAR[r.despertar]?.titulo ? `<em>${DESPERTAR[r.despertar]!.titulo}</em>` : ''}<b>¡${esc(r.nombre)} asciende a rango ${r.rangoDespues}!</b><span>Poder ${r.poderAntes} → ${r.poderDespues} · ${r.despertar === 0 ? 'ha alcanzado la cima' : `nuevo techo <strong class="r${r.techoNuevo}">${r.techoNuevo}</strong>`}</span></div></div>`
-          : `<div class="veredicto fracaso" style="--d:${retraso.toFixed(1)}s"><div><b>${esc(r.nombre)} ha caído en su Ascensión</b><span>El gremio guarda luto.</span></div></div>`;
+          ? `<div class="veredicto exito ${DESPERTAR[r.despertar]?.clase ?? ''}" style="--d:${retraso.toFixed(1)}s"><span class="avatar grande">${retrato({ id: r.heroeId, clase: r.clase })}<span class="rango r${r.rangoDespues}">${r.rangoDespues}</span></span><div>${DESPERTAR[r.despertar]?.titulo ? `<em>${DESPERTAR[r.despertar]!.titulo}</em>` : ''}<b>¡${esc(r.nombre)} asciende a rango ${r.rangoDespues}!</b><span>Poder ${r.poderAntes} → ${r.poderDespues} · ${r.despertar === 0 ? 'ha alcanzado la cima' : `nuevo techo <strong class="r${r.techoNuevo}">${r.techoNuevo}</strong>`}</span></div></div>`
+          : `<div class="veredicto fracaso" style="--d:${retraso.toFixed(1)}s"><span class="avatar grande caido">${retrato({ id: r.heroeId, clase: r.clase })}</span><div><b>${esc(r.nombre)} ha caído en su Ascensión</b><span>El gremio guarda luto.</span></div></div>`;
         retraso += paso;
         return `<div class="bloque-reveal">${preambulo}${desenlace}${veredicto}</div>`;
       })

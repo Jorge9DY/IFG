@@ -137,7 +137,9 @@ Los sueldos son el gasto fijo semanal del gremio. El diseño ya los daba por hec
 
 ## 5. Misiones
 
-**\[Aceptado\]** El tablón muestra siempre tres misiones (rango bajo, medio y alto) y se renueva cada día. Se pueden lanzar las tres si hay héroes libres, y los enviados no están disponibles hasta que vuelven.
+**\[Aceptado\]** El tablón muestra siempre tres misiones (rango bajo, medio y alto) y se renueva cada día. **Cada misión se puede lanzar tantas veces como equipos libres tengas** (decisión del propietario), y los enviados no están disponibles hasta que vuelven.
+
+Motivo: el dilema pasa a ser cómo repartir a los héroes. ¿Tres misiones bajas que vuelven mañana o una alta que tarda tres días? La víspera de la Prueba de los Novatos conviene lanzar misiones cortas para tener todo el oro posible al pujar; el tablón y la formación avisan cuando el oro de una misión llegaría después de la Prueba.
 
 | Rango | Duración | Recompensa | Riesgo | Equipo |
 | --- | --: | --: | --- | --: |
@@ -278,6 +280,8 @@ Motivo: con la IA, el tiempo real es difícil de programar y de equilibrar, y co
 ## 9. Héroes
 
 **\[Aceptado\]** Cada héroe es un personaje reconocible con cuatro bloques: estadísticas, personalidad, relaciones e historia.
+
+**\[Aceptado\] Retrato:** cada héroe tiene una cara. En el prototipo es un retrato provisional generado a partir del héroe (siempre el mismo para el mismo héroe), con un accesorio y un color según su clase; se sustituirá por arte definitivo.
 
 ### Estadísticas \[Aceptado\]
 
@@ -672,6 +676,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-07 | Decisiones del propietario: cada misión del tablón se puede repetir mientras haya equipos libres (con aviso si el oro llega después de la Prueba); retratos provisionales generados para cada héroe. |
 | 2026-11-07 | Decisión del propietario: tras una Ascensión el techo queda al menos un rango por encima del nuevo rango (+1, +2 extraordinario, +3 legendario) y se conoce. |
 | 2026-11-07 | Decisiones del propietario: el inventario muestra primero a los héroes libres; la Ascensión se sigue con una barra diaria en la pantalla principal y termina con un gran reveal en el centro. |
 | 2026-11-07 | Decisiones del propietario: la Prueba de los Novatos mejora con la categoría; rediseño del ojeo (rango actual, poder y techo por separado; techo con letras posibles e interrogación; cada rival valora con sus propios ojeadores; precios públicos que no delatan joyas); la Prueba se presenta como sobres de un gacha. |

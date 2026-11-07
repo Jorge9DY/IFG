@@ -138,7 +138,6 @@
   },
   "rivales": {
     "probExitoMinima": 60,
-    "misionesSimultaneas": 2,
     "plantillaObjetivo": 8,
     "reservaSueldos": 1,
     "probMejora": 30,

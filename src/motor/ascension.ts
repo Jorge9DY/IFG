@@ -6,7 +6,7 @@ import balance from '../datos/balance.json';
 import type { Azar } from './azar';
 import { heroe as obtenerHeroe, jugador, nuevoId, registrar, type EstadoJuego, type MisionEnCurso } from './estado';
 import { alLimite, indiceLetra, letraDe, valor } from './heroes';
-import { LETRAS, type Letra } from './tipos';
+import { LETRAS, type Clase, type Letra } from './tipos';
 
 const A = balance.ascension;
 const U = balance.letras.umbral;
@@ -67,6 +67,7 @@ function tirarDespertar(azar: Azar): number {
 export interface ResultadoAscension {
   heroeId: string;
   nombre: string;
+  clase: Clase;
   exito: boolean;
   rangoAntes: Letra;
   rangoDespues: Letra;
@@ -104,10 +105,10 @@ export function resolverAscension(estado: EstadoJuego, azar: Azar, c: MisionEnCu
     const rangoDespues = letraDe(h.poder);
     const tipo = despertar >= 3 ? ' (despertar legendario)' : despertar === 2 ? ' (despertar extraordinario)' : '';
     registrar(estado, 'mision', `¡${h.nombre} supera su Ascensión y asciende a rango ${rangoDespues}! Su nuevo techo es ${letraDe(h.potencial)}${tipo}.`);
-    return { heroeId: h.id, nombre: h.nombre, exito: true, rangoAntes, rangoDespues, poderAntes, poderDespues: h.poder, techoNuevo: letraDe(h.potencial), despertar: indiceLetra(letraDe(h.potencial)) - indiceLetra(rangoDespues) };
+    return { heroeId: h.id, nombre: h.nombre, clase: h.clase, exito: true, rangoAntes, rangoDespues, poderAntes, poderDespues: h.poder, techoNuevo: letraDe(h.potencial), despertar: indiceLetra(letraDe(h.potencial)) - indiceLetra(rangoDespues) };
   }
   if (g) g.plantilla = g.plantilla.filter((x) => x !== h.id);
   delete estado.heroes[h.id];
   registrar(estado, 'mision', `${h.nombre} no vuelve de su Ascensión. El gremio guarda luto.`);
-  return { heroeId: h.id, nombre: h.nombre, exito: false, rangoAntes, rangoDespues: rangoAntes, poderAntes, poderDespues: poderAntes, techoNuevo: null, despertar: 0 };
+  return { heroeId: h.id, nombre: h.nombre, clase: h.clase, exito: false, rangoAntes, rangoDespues: rangoAntes, poderAntes, poderDespues: poderAntes, techoNuevo: null, despertar: 0 };
 }
