@@ -57,3 +57,9 @@ Con sueldos e instalaciones más caros, el oro aprieta toda la partida, pero sub
 ## 13. Experiencia, subidas de poder y feedback al volver de misión — RESUELTA
 
 Respuesta: el propietario acepta la propuesta completa. Barra de experiencia visible; al llenarse (21 puntos) el poder sube +3 de golpe; rangos F–S según el poder, y ascender solo sube el sueldo; techo al llegar al potencial; regreso de la misión en el resumen del día; sin experiencia extra. Recogido en la sección 9 de la biblia.
+
+## 14. El estancamiento a partir de la segunda temporada (en diseño con el propietario)
+
+Síntoma: los héroes llegan a su límite, los sueldos y las mejoras son caros y lo único que queda es vender a los que tocan techo y comprar otros. Causas: el tablón no crece (las mismas tres misiones y recompensas toda la partida), un héroe al límite ya no ofrece decisiones y no hay metas a medio plazo aparte del ranking.
+
+Propuesta en estudio (ver la conversación con el propietario): 1) un tablón que crece con el gremio (misiones de rango superior al subir de categoría), 2) la Ascensión para romper el límite de un héroe una vez, con coste y riesgo, 3) retos de temporada de los maestros rivales. Nada se implementa hasta que el propietario decida.
