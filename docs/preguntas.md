@@ -26,7 +26,9 @@ Respuesta: no hay reclutamiento. Fuera de la Prueba de los Novatos, solo se fich
 
 ## 6. Precios del mercado (sección 7)
 
-Provisional: valor = 80 × poder + 50 × margen de crecimiento + 60 × reputación. Comprar cuesta el 130% del valor y vender da el 90%, al instante, al rival más interesado que tenga plaza y oro. La Última Esperanza no vende a sus héroes. Ningún héroe se niega todavía (eso llega con la lealtad, fase 3).
+Provisional: valor = 80 × poder + 50 × margen de crecimiento + 20 × reputación. Comprar cuesta el 90% del valor y vender da el 85%, al instante, al rival más interesado que tenga plaza y oro (vender por debajo de lo que cuesta comprar evita revender con beneficio). La Última Esperanza no vende a sus héroes. Ningún héroe se niega todavía (eso llega con la lealtad, fase 3).
+
+El propietario pidió bajar los precios de compra (casi nunca se compraba): un héroe de poder 60–75 pasa de unos 12.000–15.000 a unos 5.500–7.000.
 
 ## 7. Instalaciones (sección 4)
 

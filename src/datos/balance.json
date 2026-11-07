@@ -48,13 +48,13 @@
     "porPoderPorDia": 8
   },
   "valor": {
-    "_nota": "Precio de referencia de un héroe (provisional): poder, margen de crecimiento y reputación.",
+    "_nota": "Precio de referencia de un héroe (provisional): poder, margen de crecimiento y reputación. Comprar cuesta el 90% y vender da el 85%: por debajo de la compra para que revender no dé beneficio.",
     "porPoder": 80,
     "porMargen": 50,
-    "porReputacion": 60,
+    "porReputacion": 20,
     "minimo": 300,
-    "factorCompra": 1.3,
-    "factorVenta": 0.9
+    "factorCompra": 0.9,
+    "factorVenta": 0.85
   },
   "novatos": {
     "porPrueba": 5,

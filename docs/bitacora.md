@@ -2,6 +2,12 @@
 
 Entradas más recientes primero.
 
+## 2026-11-07 — Mercado más barato
+
+- Petición del propietario: comprar en el mercado era tan caro que casi nunca se hacía. La reputación pesa menos en el valor (60 → 20 por punto), comprar cuesta el 90% del valor (antes el 130%) y vender da el 85% (antes el 90%), justo por debajo para que revender no dé beneficio.
+- Un héroe de poder 60–75 pasa de 12.000–15.000 a 5.500–7.000. El bot ambicioso compra el doble (5,8 compras en 4 temporadas). Gana el 6% de las partidas.
+- Pendiente de diseñar con el propietario: el estancamiento a partir de la segunda temporada (pregunta 14).
+
 ## 2026-11-06 — Experiencia, subidas de poder y rangos
 
 - Diseñado con el propietario y aceptado (biblia, sección 9): barra de experiencia visible; al llenarse (21 puntos) el poder sube +3 de golpe, al mismo ritmo que antes (+1 cada 7), así que el balance no cambia; rangos F–S según el poder, y ascender solo sube el sueldo; techo al llegar al potencial, que revela el potencial real.
