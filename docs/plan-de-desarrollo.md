@@ -50,7 +50,7 @@ No se pasa a la siguiente fase sin superar su puerta (biblia, sección 17). El r
 - [x] Sueldos e instalaciones más caros para mantener la tensión económica
 - [x] Experiencia visible, subidas de poder de golpe, rangos F–S, techo y regreso de la misión en el resumen del día
 - [x] Tablón que crece con la categoría del gremio (D–S por prestigio, nunca baja)
-- [x] Ascensión: romper el límite de un héroe arriesgando su vida
+- [x] Ascensión: romper el límite de un héroe arriesgando su vida, con barra diaria en la pantalla principal y gran reveal del resultado
 - [x] Clases de héroe (Guerrero, Mago, Explorador, Sanador) con un efecto pasivo y tipos de misión que favorecen clases o combinaciones
 - [x] Retos de los maestros: duelos por clase y rango con apuesta en oro
 - [x] Zona de entrenamiento: entrenar héroes a cambio de oro, sin lesiones

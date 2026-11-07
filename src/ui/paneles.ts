@@ -32,6 +32,8 @@ import { calcularRanking } from '../motor/ranking';
 import { interesados, motivoNoPujar, siguientePrecio } from '../motor/subasta';
 import type { Heroe, Mision, RangoMision } from '../motor/tipos';
 import balance from '../datos/balance.json';
+import textosAscension from '../narrativa/ascension.json';
+import type { ResultadoAscension } from '../motor/ascension';
 import { equipoRecomendado, heroesLibres, nivelDificultad, probabilidadRecomendada } from './ayudas';
 import { borrar, cargar, guardar } from './guardado';
 import { esc, num, pct } from './html';
@@ -103,11 +105,33 @@ export class Interfaz {
   private resumenDia: ResumenDia | null = null;
   private resumenSemana: ResumenSemana | null = null;
 
+  /** Barra de la Ascensión en la pantalla principal y gran reveal del resultado (se crean aquí). */
+  private readonly hudAscension: HTMLElement;
+  private readonly revelacion: HTMLElement;
+
   constructor(private readonly el: ElementosInterfaz) {
+    const pantalla = el.panel.parentElement ?? document.body;
+    this.hudAscension = document.createElement('section');
+    this.hudAscension.className = 'hud ascension-hud';
+    this.hudAscension.setAttribute('aria-live', 'polite');
+    this.hudAscension.hidden = true;
+    this.revelacion = document.createElement('div');
+    this.revelacion.className = 'revelacion';
+    this.revelacion.setAttribute('role', 'dialog');
+    this.revelacion.setAttribute('aria-modal', 'true');
+    this.revelacion.hidden = true;
+    pantalla.append(this.hudAscension, this.revelacion);
+    this.revelacion.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('[data-accion=cerrar-reveal]')) this.revelacion.hidden = true;
+    });
     for (const zona of [el.panel, el.menu, el.accion, el.objetivo, el.equipo, el.cabecera]) {
       zona.addEventListener('click', (e) => this.alHacerClic(e));
     }
     window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !this.revelacion.hidden) {
+        this.revelacion.hidden = true;
+        return;
+      }
       if (e.key === 'Escape' && this.abierto && !FIJOS.includes(this.abierto)) this.cerrar();
     });
     if (!this.estado) this.abrir('nueva');
@@ -168,6 +192,7 @@ export class Interfaz {
       this.el.cabecera.innerHTML = '<div class="oro"><span>Gremio</span><b>de héroes</b></div>';
     }
 
+    this.pintarAscensiones(estado);
     if (enJuego && estado) {
       if (estado.fase === 'prueba') {
         this.el.objetivo.innerHTML = `<button class="boton-dia novatos" data-abrir="prueba">Prueba de los Novatos<small>Los gremios pujan por los novatos</small></button>`;
@@ -279,7 +304,8 @@ export class Interfaz {
 
   /** Barra de experiencia hacia la siguiente subida de poder (o «Al límite» si ya no crece). */
   private barraXp(h: Heroe): string {
-    if (alLimite(h)) return '<span class="al-limite" title="Ha llegado a su potencial: ya no gana poder">Al límite</span>';
+    // Al límite no hay barra: el techo ya dice «alcanzado».
+    if (alLimite(h)) return '';
     const total = balance.heroes.experienciaPorBarra;
     return `<span class="xp" title="Experiencia: al llenar la barra, +${balance.heroes.poderPorBarra} de poder"><span class="barra-xp"><i style="--hasta:${Math.round((100 * h.experiencia) / total)}%"></i></span><small>${h.experiencia}/${total} exp</small></span>`;
   }
@@ -545,7 +571,8 @@ export class Interfaz {
         <div class="accion-fila">${accion}</div>
       </div>`;
     };
-    const grupos: [Heroe['estado'], string][] = [['lesionado', 'Lesionados'], ['en mision', 'De misión'], ['entrenando', 'Entrenando'], ['libre', 'Libres']];
+    // Primero los libres: son los que puedes usar ahora mismo.
+    const grupos: [Heroe['estado'], string][] = [['libre', 'Libres'], ['lesionado', 'Lesionados'], ['entrenando', 'Entrenando'], ['en mision', 'De misión']];
     const bloques = grupos
       .map(([e, titulo]) => {
         const lista = heroes.filter((h) => h.estado === e);
@@ -911,6 +938,70 @@ export class Interfaz {
     this.resumenDia = finalizarDia(estado);
     this.guardar();
     this.abrir('dia');
+    if (this.resumenDia.ascensiones.length > 0) this.mostrarReveal(this.resumenDia.ascensiones);
+  }
+
+  /** Barra de cada Ascensión en curso, con una línea por día de lo que está sufriendo el héroe. */
+  private pintarAscensiones(estado: EstadoJuego | null): void {
+    const viajes = estado && estado.fase !== 'victoria' ? estado.enCurso.filter((c) => c.ascension && c.gremioId === estado.jugadorId) : [];
+    this.hudAscension.hidden = viajes.length === 0;
+    if (!estado || viajes.length === 0) {
+      this.hudAscension.innerHTML = '';
+      return;
+    }
+    const duracion = balance.ascension.duracion;
+    this.hudAscension.innerHTML = viajes
+      .map((c) => {
+        const id = c.equipo[0] ?? '';
+        const nombre = (estado.heroes[id]?.nombre ?? '').split(' ')[0] ?? '';
+        const inicio = c.diaVuelta - duracion + 1;
+        const dia = Math.min(duracion, Math.max(1, estado.dia - inicio + 1));
+        const semilla = [...id].reduce((t, ch) => t + ch.charCodeAt(0), 0);
+        const lineas = textosAscension.dias
+          .slice(0, dia)
+          .map((opciones, i) => `<li class="${i === dia - 1 ? 'hoy' : ''}"><b>Día ${i + 1}</b> ${esc((opciones[semilla % opciones.length] ?? '').replace('{nombre}', nombre))}</li>`)
+          .join('');
+        const marcas = Array.from({ length: duracion }, (_, i) => `<i class="${i < dia ? 'hecho' : ''} ${i === dia - 1 ? 'hoy' : ''}"></i>`).join('');
+        const falta = c.diaVuelta - estado.dia;
+        return `<div class="ascension-viaje">
+          <div class="cabeza"><span class="etq">Ascensión</span><strong>${esc(nombre)}</strong><span class="tenue">${falta === 0 ? 'el resultado llega al finalizar el día' : `faltan ${falta + 1} días`}</span></div>
+          <div class="marcas">${marcas}</div>
+          <ul class="diario">${lineas}</ul>
+        </div>`;
+      })
+      .join('');
+  }
+
+  /** El gran reveal: unas líneas de tensión y, después, el resultado. Se cierra con la ✕. */
+  private mostrarReveal(resultados: ResultadoAscension[]): void {
+    const t = textosAscension;
+    const dias = balance.ascension.duracion;
+    let retraso = 0;
+    const paso = 1.1;
+    const bloques = resultados
+      .map((r) => {
+        const nombre = r.nombre.split(' ')[0] ?? r.nombre;
+        const linea = (texto: string, clase = ''): string => {
+          const html = `<p class="linea ${clase}" style="--d:${retraso.toFixed(1)}s">${esc(texto.replace(/\{nombre\}/g, nombre).replace('{dias}', String(dias)))}</p>`;
+          retraso += paso;
+          return html;
+        };
+        const preambulo = t.preambulo.map((x) => linea(x)).join('');
+        const desenlace = (r.exito ? t.exito : t.fracaso).map((x) => linea(x, r.exito ? 'luz' : 'sombra')).join('');
+        const veredicto = r.exito
+          ? `<div class="veredicto exito" style="--d:${retraso.toFixed(1)}s"><span class="rango r${r.rangoDespues}">${r.rangoDespues}</span><div><b>¡${esc(r.nombre)} asciende a rango ${r.rangoDespues}!</b><span>Poder ${r.poderAntes} → ${r.poderDespues} · nuevo techo ${r.techoNuevo ?? r.rangoDespues}</span></div></div>`
+          : `<div class="veredicto fracaso" style="--d:${retraso.toFixed(1)}s"><div><b>${esc(r.nombre)} ha caído en su Ascensión</b><span>El gremio guarda luto.</span></div></div>`;
+        retraso += paso;
+        return `<div class="bloque-reveal">${preambulo}${desenlace}${veredicto}</div>`;
+      })
+      .join('');
+    this.revelacion.innerHTML = `<div class="caja-reveal ${resultados.every((r) => r.exito) ? 'exito' : resultados.every((r) => !r.exito) ? 'fracaso' : ''}">
+      <button class="cerrar-reveal" data-accion="cerrar-reveal" aria-label="Cerrar">✕</button>
+      <h2>La Ascensión</h2>
+      ${bloques}
+    </div>`;
+    this.revelacion.hidden = false;
+    this.revelacion.querySelector<HTMLButtonElement>('.cerrar-reveal')?.focus();
   }
 
   private guardar(): void {

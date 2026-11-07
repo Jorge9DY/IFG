@@ -308,6 +308,8 @@ Un héroe que ha llegado a su límite puede intentar romperlo. El jugador paga p
 - **Si fracasa: muere.** Es la única forma de morir del juego y por eso pesa: ¿lo vendes o lo arriesgas todo para convertirlo en leyenda?
 - La probabilidad y el coste se muestran antes de enviarlo, con un paso de confirmación que avisa de la muerte. Cuanto más alto el rango, más difícil (*ilustrativo:* 60% desde F, 35% desde A). Desde S no se puede ascender.
 - Se puede repetir tras cada ascenso, siempre más difícil.
+- **Se vive en la pantalla principal** (decisión del propietario): mientras dura, una barra bajo «Finalizar día» avanza cada día con una línea de lo que está sufriendo el héroe. Es la única excepción a los cinco elementos de la sección 3, y solo aparece durante una Ascensión.
+- **Gran reveal:** el día que termina, una ventana en el centro de la pantalla cuenta unas líneas de tensión antes de desvelar si ha vuelto y ha ascendido o si ha caído. Se cierra con una ✕.
 
 ### Clases \[Aceptado\]
 
@@ -670,6 +672,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-07 | Decisiones del propietario: el inventario muestra primero a los héroes libres; la Ascensión se sigue con una barra diaria en la pantalla principal y termina con un gran reveal en el centro. |
 | 2026-11-07 | Decisiones del propietario: la Prueba de los Novatos mejora con la categoría; rediseño del ojeo (rango actual, poder y techo por separado; techo con letras posibles e interrogación; cada rival valora con sus propios ojeadores; precios públicos que no delatan joyas); la Prueba se presenta como sobres de un gacha. |
 | 2026-11-07 | Idea del propietario: zona de entrenamiento como instalación (entrenar unos días a cambio de oro, sin lesiones, sin superar el límite). |
 | 2026-11-07 | Decisiones del propietario: cuatro clases (Guerrero, Mago, Explorador, Sanador) con un solo efecto pasivo; tipos de misión que favorecen a una clase o a una combinación; retos de los maestros con apuesta en oro (si ganas, oro y prestigio), pasan a \[Aceptado\]; el título por Ascensión queda apuntado para la fase 3. |

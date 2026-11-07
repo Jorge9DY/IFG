@@ -1,0 +1,33 @@
+{
+  "_nota": "Textos de la Ascensión: una línea por día de la prueba (se elige una por héroe) y el gran reveal del resultado. {nombre} se sustituye por el nombre del héroe.",
+  "dias": [
+    [
+      "{nombre} cruza la puerta de la Torre del Umbral. Dicen que nadie sale igual.",
+      "{nombre} desciende a la Sima de las Mil Voces con una antorcha y su arma.",
+      "{nombre} se adentra solo en el Bosque sin Retorno. Los pájaros han dejado de cantar."
+    ],
+    [
+      "Las pruebas no dan tregua: {nombre} lleva un día entero sin dormir y sangra de un brazo.",
+      "Algo persigue a {nombre} en la oscuridad. Ha tenido que retroceder dos veces.",
+      "{nombre} se enfrenta a un reflejo de sí mismo que conoce todos sus miedos."
+    ],
+    [
+      "Última noche. Desde lo alto de la torre se oyen gritos y luego, silencio.",
+      "La tierra tiembla cerca de la sima. Nadie sabe si es buena señal.",
+      "Una luz extraña brilla sobre el bosque. El gremio entero espera despierto."
+    ]
+  ],
+  "preambulo": [
+    "Han pasado {dias} días.",
+    "Al amanecer, una silueta aparece en el camino de la sede…",
+    "Camina despacio. Todo el gremio contiene la respiración."
+  ],
+  "exito": [
+    "¡Es {nombre}! Herido, agotado… y distinto.",
+    "Algo ha despertado en su interior."
+  ],
+  "fracaso": [
+    "No es {nombre}. Es un mensajero de la Asociación.",
+    "Trae su arma y una carta. {nombre} no volverá."
+  ]
+}

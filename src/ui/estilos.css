@@ -548,3 +548,56 @@ td.tenue { color: var(--tenue); }
 @media (prefers-reduced-motion: reduce) {
   .sobre, .sobre.brillo-oro, .sobre-abierto.girando, .sobre-abierto.girando.brillo-oro .carta { animation: none; }
 }
+
+/* ---------- Ascensión en la pantalla principal ---------- */
+.ascension-hud {
+  top: 20px; left: 50%; transform: translateX(-50%); width: min(440px, 38vw);
+  display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+}
+.ascension-viaje { padding: 8px 12px; background: var(--caja); border: 1px solid #e9c46a; box-shadow: 0 0 14px rgba(233, 196, 106, 0.2); }
+.ascension-viaje .cabeza { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.ascension-viaje .cabeza .etq { color: #e9c46a; }
+.ascension-viaje .cabeza strong { font-family: var(--titulo); font-size: 17px; letter-spacing: 0.04em; }
+.ascension-viaje .cabeza .tenue { font-size: 12px; margin-left: auto; }
+.ascension-viaje .marcas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 6px 0; }
+.ascension-viaje .marcas i { height: 6px; background: #34373a; }
+.ascension-viaje .marcas i.hecho { background: #e9c46a; }
+.ascension-viaje .marcas i.hoy { animation: latido-marca 1.6s ease-in-out infinite; }
+.diario { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; color: var(--tenue); }
+.diario li b { color: #e9c46a; font-weight: 600; margin-right: 4px; }
+.diario li.hoy { color: var(--texto); }
+@keyframes latido-marca { 50% { opacity: 0.45; } }
+@media (max-width: 900px) { .ascension-hud { top: 74px; width: calc(100vw - 24px); } }
+
+/* ---------- Gran reveal de la Ascensión ---------- */
+.revelacion { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(5, 6, 7, 0.82); animation: oscurecer 0.6s ease-out both; }
+.caja-reveal {
+  position: relative; width: min(560px, 100%); padding: 28px 28px 24px; text-align: center;
+  background: var(--caja-solida); border: 1px solid var(--linea); box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+}
+.caja-reveal h2 { margin: 0 0 14px; font-family: var(--titulo); font-size: 15px; letter-spacing: 0.3em; text-transform: uppercase; color: #e9c46a; }
+.cerrar-reveal { position: absolute; top: 8px; right: 8px; background: transparent; color: var(--texto); border: 1px solid var(--linea); padding: 2px 9px; font-size: 14px; }
+.cerrar-reveal:hover { border-color: var(--cian); }
+.bloque-reveal + .bloque-reveal { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--linea-suave); }
+.caja-reveal .linea { margin: 6px 0; font-size: 16px; opacity: 0; animation: aparecer-linea 0.9s ease-out var(--d) forwards; }
+.caja-reveal .linea.luz { color: #e9c46a; }
+.caja-reveal .linea.sombra { color: #c9a0a0; }
+.veredicto { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 16px; padding: 14px; opacity: 0; animation: veredicto 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) var(--d) forwards; }
+.veredicto b { display: block; font-family: var(--titulo); font-size: 22px; letter-spacing: 0.04em; }
+.veredicto span { font-size: 13px; color: var(--tenue); }
+.veredicto .rango { width: 48px; height: 42px; font-size: 22px; }
+.veredicto.exito { border: 1px solid #e9c46a; background: rgba(233, 196, 106, 0.1); box-shadow: 0 0 30px rgba(233, 196, 106, 0.35); }
+.veredicto.exito b { color: #e9c46a; }
+.veredicto.fracaso { border: 1px solid var(--alerta); background: rgba(232, 87, 79, 0.08); }
+.veredicto.fracaso b { color: var(--alerta); }
+@keyframes oscurecer { from { background: rgba(5, 6, 7, 0); } }
+@keyframes aparecer-linea { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes veredicto { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .revelacion, .caja-reveal .linea, .veredicto, .ascension-viaje .marcas i.hoy { animation: none; opacity: 1; }
+}
+/* Ajustes: el reveal tapa del todo lo de detrás (sin destripar el resultado) y la barra va bajo «Finalizar día». */
+.revelacion { background: rgba(5, 6, 7, 0.96); backdrop-filter: blur(8px); }
+.veredicto .rango { color: #111; }
+.ascension-hud { left: auto; right: 24px; top: 112px; transform: none; width: min(380px, 30vw); }
+@media (max-width: 900px) { .ascension-hud { left: 12px; right: 12px; top: 74px; width: auto; } }

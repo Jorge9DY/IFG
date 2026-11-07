@@ -2,6 +2,14 @@
 
 Entradas más recientes primero.
 
+## 2026-11-07 — Ascensión en la pantalla principal y gran reveal
+
+- Peticiones del propietario:
+  - El inventario muestra primero a los héroes libres (luego lesionados, entrenando y de misión).
+  - Mientras dura una Ascensión, una barra bajo «Finalizar día» avanza cada día con una línea de lo que está sufriendo el héroe (textos en `src/narrativa/ascension.json`).
+  - El día que termina, un gran reveal en el centro de la pantalla: líneas de tensión una a una y después el veredicto (asciende o cae). Se cierra con la ✕ o con Escape, tapa lo de detrás para no destripar el resultado y respeta «reducir movimiento».
+- Solo interfaz y textos (el motor no cambia). 77 tests; probado en navegador sin errores.
+
 ## 2026-11-07 — Ojeo, fichajes ocultos y Prueba tipo gacha
 
 - Fallo de diseño corregido: los rivales conocían el potencial real de todos los héroes, y el precio de salida de la subasta lo delataba. Ahora cada gremio valora con lo que ven sus ojeadores (`potencialEstimado`, `valorEstimado`) y los precios salen del valor público (`valorPublico`), así que puede haber joyas ocultas que se escapan a los gremios con pocos ojeadores.
