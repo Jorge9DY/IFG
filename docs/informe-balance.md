@@ -28,6 +28,21 @@ Tras aplicar las decisiones del propietario (sueldos más altos, instalaciones m
 
 Versión anterior (sueldos e instalaciones baratos): el ambicioso ganaba en el 24% de las partidas y acababa con unos 22.000 de oro; el prudente acumulaba unos 89.000 sin usarlos.
 
+## Tres ramas de desarrollo (2026-11-07, rama `claude/tres-ramas-desarrollo`)
+
+300 partidas por estrategia, hasta 4 temporadas. Nueva estrategia «Comerciante»: construye establecimientos pronto y deja a sus héroes trabajando.
+
+| Métrica | Prudente | Comerciante | Ambiciosa |
+| --- | --: | --: | --: |
+| Puesto medio en la temporada 4 | 4,5 | 4,8 | 1,7 |
+| Victoria en 4 temporadas o menos | 0% | 0% | 79% |
+| Rama dominante al final | militar (96%) | económica 44%, militar 34%, investigación 18% | militar (100%) |
+| Oro de misiones / de establecimientos | 268.000 / 3.500 | 134.000 / 26.000 | 289.000 / 600 |
+
+- La especialización militar era demasiado fuerte al principio (el bot ambicioso llegaba al 90% de victorias): se bajaron sus puntos y bonificaciones.
+- Un héroe en un establecimiento rinde como en una misión baja (unos 500 de oro al día), sin riesgo pero sin experiencia ni prestigio. La primera versión daba casi el doble y dejaba sin sentido las misiones.
+- La vía económica es viable pero no gana partidas por sí sola: el ranking depende de la fuerza y el prestigio, y el oro solo ayuda si se gasta en héroes. Pendiente de probarlo jugando.
+
 ## Techo tras la Ascensión (2026-11-07)
 
 Tras ascender, el techo queda 1–3 rangos por encima. El bot ambicioso gana el 68% de las partidas en 4 temporadas (antes el 58%) e intenta unas 4 Ascensiones por partida. El prudente no cambia (0%). Pendiente de confirmar jugando si la Ascensión compensa demasiado.

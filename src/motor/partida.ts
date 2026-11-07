@@ -26,6 +26,10 @@ import { generarHeroe, letraPotencialNovato } from './heroes';
 import { duracionMision, generarTablon, resolverMision, type InformeMision } from './misiones';
 import { caducarReto, generarReto } from './retos';
 import { resolverEntrenamientos, type ResultadoEntrenamiento } from './entrenamiento';
+import { decaerPuntos, desarrolloInicial, actualizarDominante, modificadoresMision, puntosMilitares, sumarPuntos } from './desarrollo';
+import { pagarMantenimiento, producir, type Produccion } from './establecimientos';
+import { avanzarInvestigaciones, type ResultadoInvestigacion } from './investigacion';
+import { celebrarTorneo, type CombateTorneo } from './torneo';
 import { resolverAscension, type ResultadoAscension } from './ascension';
 import { actualizarCategoria, categoria, categoriaPorPrestigio, multiplicadores } from './categorias';
 import { prestigio } from './ranking';
@@ -53,7 +57,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
   const semilla = opciones.semilla ?? Math.floor(Math.random() * 2 ** 31);
   const J = balance.jugador;
   const estado: EstadoJuego = {
-    version: 8,
+    version: 9,
     semilla,
     azar: semilla,
     dia: 1,
@@ -66,6 +70,10 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
     prueba: null,
     reto: null,
     entrenamientos: [],
+    desarrollo: desarrolloInicial(),
+    establecimientos: [],
+    investigacion: { enCurso: [], completadas: [] },
+    objetos: { elixires: 0 },
     ranking: [],
     registro: [],
     contadorIds: 0,
@@ -198,6 +206,12 @@ export interface ResumenDia {
   ascensiones: ResultadoAscension[];
   /** Nueva categoría del gremio del jugador, si ha subido. */
   categoriaNueva: Letra | null;
+  /** Oro producido hoy por cada establecimiento. */
+  produccion: Produccion[];
+  /** Investigaciones completadas hoy. */
+  investigaciones: ResultadoInvestigacion[];
+  /** Mantenimiento de los establecimientos (solo el día 7). */
+  mantenimiento: number | null;
 }
 
 export function finalizarDia(estado: EstadoJuego): ResumenDia {
@@ -225,13 +239,18 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
     const ascensiones: ResultadoAscension[] = [];
     const informes = resolverRegresos(estado, azar, ascensiones);
     const entrenamientos = resolverEntrenamientos(estado);
+    // Rama económica e investigación: los establecimientos producen y los proyectos avanzan.
+    const produccion = producir(estado);
+    const investigaciones = avanzarInvestigaciones(estado);
     const categoriaNueva = actualizarCategorias(estado);
     caducarReto(estado);
 
     // Día 7: sueldos y, después, Prueba de los Novatos.
     let sueldos: PagoSueldos | null = null;
+    let mantenimiento: number | null = null;
     if (esDia7(dia)) {
       sueldos = pagarSueldos(estado, estado.jugadorId);
+      if (estado.establecimientos.length) mantenimiento = pagarMantenimiento(estado);
       for (const rival of rivales(estado)) {
         pagarSueldos(estado, rival.id);
         invertir(estado, azar, rival.id);
@@ -241,7 +260,7 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
       avanzarDia(estado, azar);
     }
     const noticias = estado.registro.slice(desde).filter((e) => e.tipo === 'rival' || e.tipo === 'reto').map((e) => e.texto);
-    return { dia, informes: informes.filter((i) => i.gremioId === estado.jugadorId), sueldos, noticias, prueba: estado.fase === 'prueba', ascensiones, entrenamientos, categoriaNueva };
+    return { dia, informes: informes.filter((i) => i.gremioId === estado.jugadorId), sueldos, noticias, prueba: estado.fase === 'prueba', ascensiones, entrenamientos, categoriaNueva, produccion, investigaciones, mantenimiento };
   });
 }
 
@@ -268,10 +287,12 @@ function resolverRegresos(estado: EstadoJuego, azar: Azar, ascensiones: Resultad
     const g = estado.gremios[c.gremioId];
     // Un héroe en misión no se puede vender ni comprar: el equipo vuelve completo.
     const equipo = c.equipo.map((id) => obtenerHeroe(estado, id));
-    const informe = resolverMision(azar, c.mision, equipo, c.gremioId);
+    const informe = resolverMision(azar, c.mision, equipo, c.gremioId, modificadoresMision(estado, c.gremioId));
     informes.push(informe);
     if (!g) continue;
     g.oro += informe.oro;
+    // Rama militar: el oro ganado con misiones con éxito es desarrollo militar.
+    if (g.esJugador && informe.exito) sumarPuntos(estado, 'militar', puntosMilitares(informe.oro));
     if (informe.exito && c.mision.rango === 'alto') {
       g.misionesAltas += 1;
       if (!g.esJugador) registrar(estado, 'rival', `${g.nombre} completa una misión de rango alto.`);
@@ -349,6 +370,8 @@ export interface ResumenSemana {
   /** Cierre de temporada (cada 4 semanas). */
   temporada: { numero: number; puesto: number; premio: number } | null;
   victoria: boolean;
+  /** Torneo de fin de temporada (solo al cerrar la temporada). */
+  torneo: CombateTorneo[] | null;
   /** Nueva categoría del gremio del jugador, si ha subido (por ejemplo, al fichar un novato destacado). */
   categoriaNueva: Letra | null;
 }
@@ -371,6 +394,11 @@ export function terminarPrueba(estado: EstadoJuego): ResumenSemana {
     for (const r of prueba.resultados) if (!r.ganador) delete estado.heroes[r.heroeId];
     estado.prueba = null;
 
+    // Cada semana el desarrollo antiguo pierde peso: la especialización sigue a lo que haces ahora.
+    decaerPuntos(estado);
+    actualizarDominante(estado);
+    // Al cerrar la temporada, antes del ranking final, se celebra el torneo.
+    const torneo = esFinDeTemporada(estado.dia) ? celebrarTorneo(estado, azar) : null;
     const categoriaNueva = actualizarCategorias(estado);
     const puestoAnterior = puesto(estado, estado.jugadorId);
     estado.ranking = calcularRanking(estado);
@@ -394,7 +422,7 @@ export function terminarPrueba(estado: EstadoJuego): ResumenSemana {
     } else {
       avanzarDia(estado, azar);
     }
-    return { ranking: estado.ranking, puestoAnterior, temporada, victoria, categoriaNueva };
+    return { ranking: estado.ranking, puestoAnterior, temporada, victoria, torneo, categoriaNueva };
   });
 }
 

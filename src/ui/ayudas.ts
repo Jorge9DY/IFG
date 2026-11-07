@@ -2,6 +2,7 @@
 // Solo leen el estado y usan reglas del motor.
 
 import { heroesDe, type EstadoJuego } from '../motor/estado';
+import { modificadoresMision } from '../motor/desarrollo';
 import { poderEquipo, probabilidadMision } from '../motor/misiones';
 import type { Heroe, Mision } from '../motor/tipos';
 
@@ -26,10 +27,11 @@ function combinaciones<T>(lista: readonly T[], k: number): T[][] {
 export function equipoRecomendado(estado: EstadoJuego, mision: Mision, candidatos = heroesLibres(estado)): Heroe[] {
   if (candidatos.length < mision.equipo) return [];
   const opciones = combinaciones([...candidatos].sort((a, b) => b.poder - a.poder).slice(0, 12), mision.equipo);
-  const llegan = opciones.filter((e) => probabilidadMision(mision, e) >= 80);
+  const bonus = modificadoresMision(estado, estado.jugadorId).exito;
+  const llegan = opciones.filter((e) => probabilidadMision(mision, e, bonus) >= 80);
   const orden = (a: Heroe[], b: Heroe[]): number => poderEquipo(a) - poderEquipo(b);
   if (llegan.length > 0) return llegan.sort(orden)[0] ?? [];
-  return opciones.sort((a, b) => probabilidadMision(mision, a) - probabilidadMision(mision, b) || orden(a, b)).at(-1) ?? [];
+  return opciones.sort((a, b) => probabilidadMision(mision, a, bonus) - probabilidadMision(mision, b, bonus) || orden(a, b)).at(-1) ?? [];
 }
 
 export type NivelDificultad = 'facil' | 'asequible' | 'arriesgada' | 'muy-dificil' | 'sin-equipo';
@@ -46,5 +48,5 @@ export function nivelDificultad(probabilidad: number | null): NivelDificultad {
 export function probabilidadRecomendada(estado: EstadoJuego, mision: Mision): number | null {
   const equipo = equipoRecomendado(estado, mision);
   if (equipo.length === 0) return null;
-  return probabilidadMision(mision, equipo);
+  return probabilidadMision(mision, equipo, modificadoresMision(estado, estado.jugadorId).exito);
 }

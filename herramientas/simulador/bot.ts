@@ -12,6 +12,8 @@ import { Azar } from '../../src/motor/azar';
 import { diaDeVuelta, lanzarMision, pujarNovato, siguienteCandidato, vuelveTrasPrueba } from '../../src/motor/partida';
 import { motivoNoPujar, siguientePrecio } from '../../src/motor/subasta';
 import { equipoRecomendado } from '../../src/ui/ayudas';
+import { CATALOGO, aporte, asignarTrabajador, construido, construirOMejorar, costeSiguienteNivel, motivoNoAsignar, retirarTrabajador } from '../../src/motor/establecimientos';
+import { costeProyecto, disponibles, iniciarInvestigacion, motivoNoIniciar } from '../../src/motor/investigacion';
 import { condicionesEntrenamiento, entrenar } from '../../src/motor/entrenamiento';
 import { condicionesAscension, iniciarAscension } from '../../src/motor/ascension';
 
@@ -25,10 +27,16 @@ export interface Estrategia {
   reservaSemanas: number;
   /** Vende al más flojo cuando la plantilla está llena y llega un novato mejor. */
   rota: boolean;
+  /** Usa establecimientos e investigación con los héroes que le sobran. */
+  ramas?: boolean;
+  /** Prioriza la rama económica: construye pronto y deja a sus héroes trabajando antes de las misiones. */
+  comerciante?: boolean;
 }
 
-export const PRUDENTE: Estrategia = { nombre: 'Prudente', probMinima: 70, pujaMaxima: 1.0, reservaSemanas: 2, rota: false };
-export const AMBICIOSA: Estrategia = { nombre: 'Ambiciosa', probMinima: 55, pujaMaxima: 2.0, reservaSemanas: 1, rota: true };
+export const PRUDENTE: Estrategia = { nombre: 'Prudente', probMinima: 70, pujaMaxima: 1.0, reservaSemanas: 2, rota: false, ramas: true };
+/** Prioriza los establecimientos: sirve para comprobar que la vía económica es viable. */
+export const COMERCIANTE: Estrategia = { nombre: 'Comerciante', probMinima: 65, pujaMaxima: 1.2, reservaSemanas: 1, rota: false, ramas: true, comerciante: true };
+export const AMBICIOSA: Estrategia = { nombre: 'Ambiciosa', probMinima: 55, pujaMaxima: 2.0, reservaSemanas: 1, rota: true, ramas: true };
 
 export interface MetricasBot {
   misiones: number;
@@ -41,10 +49,12 @@ export interface MetricasBot {
   retos: number;
   retosGanados: number;
   entrenamientos: number;
+  investigaciones: number;
+  establecimientos: number;
 }
 
 export function metricasVacias(): MetricasBot {
-  return { misiones: 0, exitos: 0, fichajesNovatos: 0, ventas: 0, mejoras: 0, compras: 0, ascensiones: 0, retos: 0, retosGanados: 0, entrenamientos: 0 };
+  return { misiones: 0, exitos: 0, fichajesNovatos: 0, ventas: 0, mejoras: 0, compras: 0, ascensiones: 0, retos: 0, retosGanados: 0, entrenamientos: 0, investigaciones: 0, establecimientos: 0 };
 }
 
 /** El bot solo ve lo que ven sus ojeadores, como una persona. */
@@ -56,6 +66,9 @@ function techoVisto(estado: EstadoJuego, h: Heroe): number {
 export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): void {
   const reserva = (): number => e.reservaSemanas * sueldosDe(estado, estado.jugadorId);
   const j = jugador(estado);
+  // Cada mañana recupera a los trabajadores: primero decide misiones y luego vuelve a repartir.
+  if (!e.comerciante) for (const est of estado.establecimientos) for (const id of [...est.trabajadores]) retirarTrabajador(estado, id);
+  else investigarYTrabajar(estado, reserva(), m, true);
   for (const tipo of ['entrenamiento', 'sede', 'ojeadores'] as const) {
     const info = infoInstalacion(estado, j.id, tipo);
     const necesita = tipo === 'ojeadores' || (tipo === 'entrenamiento' && (j.nivelEntrenamiento ?? 0) < 2) || (tipo === 'sede' && plazasLibres(estado, j.id) <= 1);
@@ -97,6 +110,7 @@ export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): vo
     }
   }
   entrenarLibres(estado, e, m);
+  if (e.ramas) investigarYTrabajar(estado, reserva(), m, !!e.comerciante);
 }
 
 /** Prueba de los Novatos: puja hasta su tope por cada candidato si tiene plaza (o puede hacerla). */
@@ -108,6 +122,36 @@ export function entrenarLibres(estado: EstadoJuego, e: Estrategia, m: MetricasBo
     if (!c.bloqueo && j.oro - c.coste >= e.reservaSemanas * sueldosDe(estado, j.id)) {
       entrenar(estado, h.id);
       m.entrenamientos++;
+    }
+  }
+}
+
+/** Con los héroes que sobran: una investigación (si hay oro) y, después, trabajo en establecimientos. */
+function investigarYTrabajar(estado: EstadoJuego, reserva: number, m: MetricasBot, comerciante = false): void {
+  const j = jugador(estado);
+  const libres = (): ReturnType<typeof heroesDe> => heroesDe(estado, j.id).filter((h) => h.estado === 'libre');
+  if (estado.investigacion.enCurso.length === 0) {
+    const p = disponibles(estado).sort((a, b) => a.coste - b.coste)[0];
+    const quienes = libres().sort((a, b) => (b.clase === 'Mago' ? 1 : 0) - (a.clase === 'Mago' ? 1 : 0) || b.poder - a.poder).slice(0, 2);
+    if (p && quienes.length && j.oro - costeProyecto(estado, p.id) >= reserva && !motivoNoIniciar(estado, p.id, quienes.map((h) => h.id))) {
+      iniciarInvestigacion(estado, p.id, quienes.map((h) => h.id));
+      m.investigaciones++;
+    }
+  }
+  // Construye el establecimiento que mejor encaja con su plantilla si le sobra el oro.
+  if (estado.establecimientos.length < (comerciante ? 3 : 2) || comerciante) {
+    // El comerciante también mejora lo que ya tiene.
+    const tipo = CATALOGO.map((t) => t.id).find((id) => !construido(estado, id)) ?? (comerciante ? estado.establecimientos.find((x) => costeSiguienteNivel(estado, x.tipo) !== null)?.tipo : undefined);
+    const coste = tipo ? costeSiguienteNivel(estado, tipo) : null;
+    if (tipo && coste !== null && j.oro - coste >= reserva + (comerciante ? 1000 : 3000)) {
+      construirOMejorar(estado, tipo);
+      m.establecimientos++;
+    }
+  }
+  for (const est of estado.establecimientos) {
+    for (const h of libres().sort((a, b) => aporte(est, b) - aporte(est, a))) {
+      if (motivoNoAsignar(estado, est.tipo, h.id)) break;
+      asignarTrabajador(estado, est.tipo, h.id);
     }
   }
 }

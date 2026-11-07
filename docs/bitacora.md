@@ -2,6 +2,16 @@
 
 Entradas más recientes primero.
 
+## 2026-11-07 — Tres ramas de desarrollo (rama `claude/tres-ramas-desarrollo`)
+
+- Documento nuevo del propietario: concepto ampliado, pilares, bucle y tres ramas de desarrollo. Por petición suya, en una rama aparte hasta su visto bueno.
+- Motor nuevo: `desarrollo.ts` (puntos por rama, especialización emergente con decaimiento semanal y margen para cambiar de rama, niveles y bonificaciones), `establecimientos.ts` (construir, mejorar, asignar y retirar, producción diaria con rendimiento decreciente, mantenimiento), `investigacion.ts` (exploración con secretos del mundo y magias con efectos, investigadores con rendimiento decreciente, elixir del techo) y `torneo.ts` (fin de temporada por categorías). Catálogo y cifras en `src/datos/desarrollo.json`; secretos en `src/narrativa/secretos.json`.
+- Rivales con rama preferida, desarrollada de forma abstracta.
+- Interfaz: resumen de especialización en Gestionar gremio, pestañas Establecimientos e Investigación, héroes trabajando o investigando en el inventario, producción y secretos en el resumen del día, torneo en el ranking de fin de temporada.
+- Equilibrio: estrategia «Comerciante» en el simulador y diagnóstico `ramas.ts`. Ajustados puntos y bonificaciones militares y la producción de los establecimientos.
+- 96 tests; guardado versión 9; probado en navegador sin errores.
+- Queda: las decisiones de la pregunta 17 y el visto bueno para llevarlo a `main`.
+
 ## 2026-11-07 — Misiones repetibles y retratos de los héroes
 
 - Petición del propietario: cada misión del tablón se puede lanzar tantas veces como equipos libres tengas, para decidir entre varias bajas o una alta. La carta muestra cuántas veces se ha lanzado hoy («×2 hoy») y avisa si el oro llegaría después de la Prueba de los Novatos; la formación indica qué día vuelve el equipo. Los rivales también reparten a todos sus héroes (ya no tienen tope de 2 misiones).

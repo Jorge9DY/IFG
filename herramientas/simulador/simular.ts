@@ -8,7 +8,7 @@ import balance from '../../src/datos/balance.json';
 import { jugador, type EstadoJuego } from '../../src/motor/estado';
 import { crearPartida, finalizarDia, terminarPrueba } from '../../src/motor/partida';
 import { fuerza } from '../../src/motor/ranking';
-import { AMBICIOSA, PRUDENTE, jugarDia, jugarPrueba, metricasVacias, type Estrategia, type MetricasBot } from './bot';
+import { AMBICIOSA, COMERCIANTE, PRUDENTE, jugarDia, jugarPrueba, metricasVacias, type Estrategia, type MetricasBot } from './bot';
 
 const TEMPORADAS = 4;
 
@@ -81,6 +81,8 @@ export function informe(resultados: ResultadoPartida[], e: Estrategia): string {
     ['Compras en el mercado', m((x) => x.compras)],
     ['Ascensiones intentadas', m((x) => x.ascensiones)],
     ['Entrenamientos', m((x) => x.entrenamientos)],
+    ['Investigaciones empezadas', m((x) => x.investigaciones)],
+    ['Establecimientos construidos', m((x) => x.establecimientos)],
     ['Retos aceptados / ganados', `${m((x) => x.retos)} / ${m((x) => x.retosGanados)}`],
     ['Mejoras de instalaciones', m((x) => x.mejoras)],
     ['Oro final', Math.round(media(resultados.map((r) => r.oroFinal))).toString()],
@@ -93,7 +95,7 @@ export function informe(resultados: ResultadoPartida[], e: Estrategia): string {
 function principal(): void {
   const partidas = Number(process.argv[2] ?? 300);
   const semilla = Number(process.argv[3] ?? 1);
-  const textos = [PRUDENTE, AMBICIOSA].map((e) => {
+  const textos = [PRUDENTE, COMERCIANTE, AMBICIOSA].map((e) => {
     const resultados = Array.from({ length: partidas }, (_, i) => simularPartida(semilla + i, e));
     return informe(resultados, e);
   });

@@ -16,7 +16,7 @@ export function cargar(): EstadoJuego | null {
     const texto = localStorage.getItem(CLAVE);
     if (!texto) return null;
     const estado = JSON.parse(texto) as EstadoJuego;
-    return estado.version === 8 ? estado : null;
+    return estado.version === 9 ? estado : null;
   } catch {
     return null;
   }

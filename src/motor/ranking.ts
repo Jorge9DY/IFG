@@ -1,6 +1,7 @@
 // Ranking y puntos de gremio (biblia, sección 6): Puntos = Fuerza + Prestigio.
 
 import balance from '../datos/balance.json';
+import D from '../datos/desarrollo.json';
 import { heroesDe, type EstadoJuego, type FilaRanking } from './estado';
 import type { Gremio } from './tipos';
 
@@ -21,7 +22,10 @@ export function prestigio(g: Gremio): number {
     R.prestigioPorNivelInstalacion * (g.nivelSede + g.nivelOjeadores + (g.nivelEntrenamiento ?? 0)) +
     R.prestigioPorMisionAlta * g.misionesAltas +
     R.prestigioPorNovatoDestacado * g.novatosDestacados +
-    R.prestigioPorReto * (g.retosGanados ?? 0)
+    R.prestigioPorReto * (g.retosGanados ?? 0) +
+    D.torneo.prestigioPorCategoria * (g.torneosGanados ?? 0) +
+    D.prestigio.porNivelEstablecimiento * (g.nivelesEstablecimientos ?? 0) +
+    D.prestigio.porInvestigacion * (g.investigaciones ?? 0)
   );
 }
 

@@ -94,10 +94,10 @@ export function poderEnMision(mision: Mision, equipo: readonly Heroe[]): number 
 }
 
 /** Probabilidad de éxito de este equipo en esta misión: poder, efecto del Mago y clases favorecidas. */
-export function probabilidadMision(mision: Mision, equipo: readonly Heroe[]): number {
+export function probabilidadMision(mision: Mision, equipo: readonly Heroe[], bonusExito = 0): number {
   if (equipo.length === 0) return 0;
   const porPoder = M.exito.base + M.exito.pendiente * (poderEnMision(mision, equipo) / mision.dificultad - 1);
-  return limitar(porPoder + bonusClases(mision, equipo));
+  return limitar(porPoder + bonusClases(mision, equipo) + bonusExito);
 }
 
 /** Días que dura la misión con este equipo: un Explorador acorta en un día las más largas (rango alto). */
@@ -141,13 +141,15 @@ export function resolverMision(
   mision: Mision,
   equipo: readonly Heroe[],
   gremioId: string,
+  /** Especialización e investigaciones del gremio: oro, lesiones, éxito y experiencia. */
+  mods: { oro: number; lesion: number; exito: number; experiencia: number } = { oro: 1, lesion: 1, exito: 0, experiencia: 1 },
 ): InformeMision {
   const d = M[mision.rango];
-  const probabilidad = probabilidadMision(mision, equipo);
+  const probabilidad = probabilidadMision(mision, equipo, mods.exito);
   const exito = azar.d100() <= probabilidad;
-  const xp = exito ? d.experiencia : Math.round(d.experiencia * M.fraccionExperienciaFracaso);
+  const xp = Math.round((exito ? d.experiencia : d.experiencia * M.fraccionExperienciaFracaso) * mods.experiencia);
   const partes = equipo.map((h) => {
-    const lesion = azar.probabilidad(probLesion(h, equipo, exito ? d.lesionExito : d.lesionFracaso));
+    const lesion = azar.probabilidad(probLesion(h, equipo, exito ? d.lesionExito : d.lesionFracaso) * mods.lesion);
     const diasLesion = lesion ? azar.entero(d.diasLesion[0] ?? 1, d.diasLesion[1] ?? 1) : 0;
     const progreso = ganarExperiencia(h, xp);
     if (exito) h.reputacion = Math.min(100, h.reputacion + d.reputacion);
@@ -160,7 +162,7 @@ export function resolverMision(
     gremioId,
     probabilidad,
     exito,
-    oro: exito ? mision.recompensa : Math.round(mision.recompensa * M.fraccionRecompensaFracaso),
+    oro: Math.round((exito ? mision.recompensa : mision.recompensa * M.fraccionRecompensaFracaso) * mods.oro),
     partes,
   };
 }

@@ -16,7 +16,7 @@
       "nivelOjeadores": 0,
       "misionesAltas": 4,
       "novatosDestacados": 1,
-      "perfil": { "prioridad": "poder", "agresividad": 1.2, "mejora": 0.3, "vende": true }
+      "perfil": { "prioridad": "poder", "agresividad": 1.2, "mejora": 0.3, "vende": true, "rama": "militar" }
     },
     {
       "id": "corona",
@@ -33,7 +33,7 @@
       "nivelOjeadores": 1,
       "misionesAltas": 3,
       "novatosDestacados": 3,
-      "perfil": { "prioridad": "destacado", "agresividad": 1.1, "mejora": 1.0, "vende": true }
+      "perfil": { "prioridad": "destacado", "agresividad": 1.1, "mejora": 1.0, "vende": true, "rama": "economico" }
     },
     {
       "id": "sombras",
@@ -50,7 +50,7 @@
       "nivelOjeadores": 2,
       "misionesAltas": 2,
       "novatosDestacados": 2,
-      "perfil": { "prioridad": "potencial", "agresividad": 1.0, "mejora": 0.5, "vende": true }
+      "perfil": { "prioridad": "potencial", "agresividad": 1.0, "mejora": 0.5, "vende": true, "rama": "investigacion" }
     },
     {
       "id": "esperanza",
@@ -67,7 +67,7 @@
       "nivelOjeadores": 1,
       "misionesAltas": 6,
       "novatosDestacados": 0,
-      "perfil": { "prioridad": "barato", "agresividad": 0.7, "mejora": 0.4, "vende": false }
+      "perfil": { "prioridad": "barato", "agresividad": 0.7, "mejora": 0.4, "vende": false, "rama": "militar" }
     }
   ],
   "tiposMision": {

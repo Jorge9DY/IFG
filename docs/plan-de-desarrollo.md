@@ -74,6 +74,16 @@ No se pasa a la siguiente fase sin superar su puerta (biblia, sección 17). El r
 - [ ] Reacciones de los maestros con nombre y personalidad (ya tienen una frase al retar)
 - [ ] Puerta 2
 
+## Tres ramas de desarrollo (documento del 2026-11-07, rama `claude/tres-ramas-desarrollo`)
+
+- [x] Puntos por rama, especialización emergente con niveles y bonificaciones
+- [x] Establecimientos productivos: construir, mejorar, asignar y retirar héroes, producción diaria y mantenimiento semanal
+- [x] Investigación: proyectos de exploración (secretos del mundo) y mágicos (mejoras), con investigadores y rendimiento decreciente
+- [x] Torneo de fin de temporada por categorías (propuesta)
+- [x] Rivales que desarrollan su rama preferida (versión abstracta)
+- [ ] Decisiones abiertas de la pregunta 17 (fórmulas, catálogos, habilidad especial, torneo, victoria)
+- [ ] Visto bueno del propietario para llevarlo a `main`
+
 ## Fases 3 y 4 — Héroes con voluntad y narrativa
 
 Se detallarán al superar la puerta 2 (biblia, secciones 9–13 y 18).

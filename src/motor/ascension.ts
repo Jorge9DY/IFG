@@ -5,6 +5,7 @@
 import balance from '../datos/balance.json';
 import type { Azar } from './azar';
 import { heroe as obtenerHeroe, jugador, nuevoId, registrar, type EstadoJuego, type MisionEnCurso } from './estado';
+import { efectoInvestigaciones } from './desarrollo';
 import { alLimite, indiceLetra, letraDe, valor } from './heroes';
 import { LETRAS, type Clase, type Letra } from './tipos';
 
@@ -25,7 +26,8 @@ export function condicionesAscension(estado: EstadoJuego, heroeId: string): Cond
   const actual = letraDe(h.poder);
   const rangoNuevo = (LETRAS[indiceLetra(actual) + 1] as Letra | undefined) ?? null;
   const coste = Math.max(A.costeMinimo, Math.round((valor(h) * A.factorCoste) / 50) * 50);
-  const probabilidad = (A.probExito as Record<string, number>)[actual] ?? 0;
+  // La investigación «Ritual de la Ascensión» mejora la probabilidad.
+  const probabilidad = Math.min(95, ((A.probExito as Record<string, number>)[actual] ?? 0) + efectoInvestigaciones(estado, 'ascension'));
   const base = { coste, probabilidad, rangoNuevo };
   if (!jugador(estado).plantilla.includes(heroeId)) return { ...base, bloqueo: 'No es de tu gremio' };
   if (!rangoNuevo) return { ...base, bloqueo: 'Ya tiene el rango máximo' };
@@ -90,7 +92,7 @@ export function resolverAscension(estado: EstadoJuego, azar: Azar, c: MisionEnCu
   const g = estado.gremios[c.gremioId];
   const rangoAntes = letraDe(h.poder);
   const poderAntes = h.poder;
-  const prob = (A.probExito as Record<string, number>)[rangoAntes] ?? 0;
+  const prob = Math.min(95, ((A.probExito as Record<string, number>)[rangoAntes] ?? 0) + (c.gremioId === estado.jugadorId ? efectoInvestigaciones(estado, 'ascension') : 0));
   if (azar.d100() <= prob) {
     const i = indiceLetra(rangoAntes) + 1;
     const despertar = tirarDespertar(azar);

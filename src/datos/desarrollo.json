@@ -1,0 +1,106 @@
+{
+  "_nota": "Tres ramas de desarrollo (biblia, sección 4 nueva): militar, económica e investigación. Todo es provisional: catálogo, umbrales, bonificaciones y fórmulas se equilibrarán jugando.",
+  "puntos": {
+    "_nota": "Puntos de desarrollo por inversión real, no por acciones triviales. Militar: por oro ganado con misiones con éxito. Económica: por oro invertido en establecimientos y por el oro que producen. Investigación: por oro invertido en proyectos y por proyectos completados.",
+    "militarPorOro": 0.0006,
+    "economicoPorOro": 0.002,
+    "economicoPorOroProducido": 0.0012,
+    "investigacionPorOro": 0.002,
+    "investigacionPorProyecto": 4,
+    "decaimientoSemanal": 0.85,
+    "margenCambio": 1.15
+  },
+  "niveles": {
+    "_nota": "Umbrales de puntos de la rama dominante para cada nivel de especialización. Solo la rama dominante da bonificaciones.",
+    "umbral": [15, 40, 90],
+    "militar": [
+      { "nombre": "Veteranos", "texto": "+8% de oro en las misiones", "oroMisiones": 0.08 },
+      { "nombre": "Disciplina de hierro", "texto": "−25% de probabilidad de lesión en misiones", "lesionMisiones": 0.25 },
+      { "nombre": "Leyenda en armas", "texto": "+4% de éxito en todas las misiones", "exitoMisiones": 4 }
+    ],
+    "economico": [
+      { "nombre": "Buenos administradores", "texto": "+15% de producción en los establecimientos", "produccion": 0.15 },
+      { "nombre": "Contratos ventajosos", "texto": "−40% de mantenimiento y −15% en mejoras de establecimientos", "mantenimiento": 0.4, "mejoras": 0.15 },
+      { "nombre": "Red comercial", "texto": "+30% más de producción en los establecimientos", "produccion": 0.3 }
+    ],
+    "investigacion": [
+      { "nombre": "Método riguroso", "texto": "+20% de progreso en las investigaciones", "progreso": 0.2 },
+      { "nombre": "Becas de la Academia", "texto": "−30% de coste en las investigaciones", "costeProyectos": 0.3 },
+      { "nombre": "Cátedra arcana", "texto": "+30% más de progreso y una investigación más a la vez", "progreso": 0.3, "proyectosExtra": 1 }
+    ]
+  },
+  "establecimientos": {
+    "_nota": "Producción diaria por héroe = (base del nivel + poder × porPoder) × afinidad de clase; cada héroe extra rinde un poco menos (rendimiento decreciente). Mantenimiento semanal por nivel.",
+    "rendimientoExtra": 0.8,
+    "lista": [
+      {
+        "id": "taller",
+        "nombre": "Taller de forja",
+        "texto": "Héroes de gran fuerza física forjan armas y herramientas para la ciudad.",
+        "clases": { "Guerrero": 1.5, "Explorador": 1.0, "Sanador": 0.7, "Mago": 0.7 },
+        "coste": [5000, 9000, 16000],
+        "plazas": [1, 2, 3],
+        "base": [100, 160, 220],
+        "porPoder": 5,
+        "mantenimiento": [300, 600, 1000]
+      },
+      {
+        "id": "invernadero",
+        "nombre": "Invernadero",
+        "texto": "Héroes con magia de agua y vida riegan y cuidan cultivos raros y hierbas medicinales.",
+        "clases": { "Sanador": 1.5, "Mago": 1.3, "Explorador": 0.8, "Guerrero": 0.6 },
+        "coste": [5000, 9000, 16000],
+        "plazas": [1, 2, 3],
+        "base": [100, 160, 220],
+        "porPoder": 5,
+        "mantenimiento": [300, 600, 1000]
+      },
+      {
+        "id": "cartografos",
+        "nombre": "Casa de cartógrafos",
+        "texto": "Héroes viajeros dibujan mapas y guían caravanas a cambio de una comisión.",
+        "clases": { "Explorador": 1.5, "Guerrero": 0.9, "Mago": 0.9, "Sanador": 0.8 },
+        "coste": [5000, 9000, 16000],
+        "plazas": [1, 2, 3],
+        "base": [100, 160, 220],
+        "porPoder": 5,
+        "mantenimiento": [300, 600, 1000]
+      }
+    ]
+  },
+  "investigacion": {
+    "_nota": "Progreso diario = suma de contribuciones con rendimiento decreciente (cada investigador extra aporta un 65% del anterior). Contribución = poder / 10 × afinidad de clase.",
+    "rendimientoExtra": 0.65,
+    "maxInvestigadores": 3,
+    "afinidad": { "Mago": 1.5, "Sanador": 1.2, "Explorador": 1.0, "Guerrero": 0.7 },
+    "proyectosSimultaneos": 1,
+    "proyectos": [
+      { "id": "ruinas-sede", "tipo": "exploracion", "nombre": "Las ruinas bajo la sede", "texto": "Bajo los sótanos del gremio hay muros más antiguos que la ciudad.", "coste": 1500, "puntos": 30, "requiere": [] },
+      { "id": "torre-umbral", "tipo": "exploracion", "nombre": "La Torre del Umbral", "texto": "¿Qué ocurre de verdad en las Ascensiones? Los registros de la Asociación callan.", "coste": 3000, "puntos": 55, "requiere": ["ruinas-sede"] },
+      { "id": "origen-asociacion", "tipo": "exploracion", "nombre": "El origen de la Asociación", "texto": "Alguien fundó el sistema de rangos. Nadie recuerda quién ni por qué.", "coste": 4000, "puntos": 70, "requiere": ["ruinas-sede"] },
+      { "id": "despertar", "tipo": "exploracion", "nombre": "El primer Despertar", "texto": "Los novatos despiertan sus poderes a la misma edad. No puede ser casualidad.", "coste": 6000, "puntos": 90, "requiere": ["origen-asociacion"] },
+      { "id": "ritual-ascension", "tipo": "magia", "nombre": "Ritual de la Ascensión", "texto": "Preparar a los héroes antes de la Torre: +10% de probabilidad de superar la Ascensión.", "coste": 6000, "puntos": 80, "requiere": ["torre-umbral"], "efecto": { "ascension": 10 } },
+      { "id": "runas-crecimiento", "tipo": "magia", "nombre": "Runas de crecimiento", "texto": "Grabar runas en el equipo: +20% de experiencia en misiones y entrenamientos.", "coste": 5000, "puntos": 65, "requiere": [], "efecto": { "experiencia": 0.2 } },
+      { "id": "balsamo", "tipo": "magia", "nombre": "Bálsamo de sauce", "texto": "Un ungüento para los heridos: −40% de probabilidad de lesión en misiones.", "coste": 4000, "puntos": 50, "requiere": [], "efecto": { "lesion": 0.4 } },
+      { "id": "elixir-techo", "tipo": "magia", "nombre": "Elixir del techo", "texto": "Destila un elixir que sube una letra el techo de un héroe. Se puede repetir.", "coste": 8000, "puntos": 100, "requiere": ["despertar"], "efecto": { "elixir": 1 }, "repetible": true },
+      { "id": "alquimia", "tipo": "magia", "nombre": "Alquimia áurea", "texto": "Transmutar metales vulgares. Si sale bien, vale una fortuna: 14.000 de oro.", "coste": 5000, "puntos": 120, "requiere": ["ruinas-sede"], "efecto": { "oro": 14000 }, "repetible": true }
+    ]
+  },
+  "torneo": {
+    "_nota": "Propuesta: al cerrar la temporada, cada gremio presenta a su mejor héroe de cada clase y al mejor de todos (categoría absoluta). Gana el de más poder. Premios provisionales por categoría ganada.",
+    "categorias": ["Guerrero", "Mago", "Explorador", "Sanador", "Absoluta"],
+    "oroPorCategoria": 2500,
+    "prestigioPorCategoria": 12
+  },
+  "rivales": {
+    "_nota": "Versión abstracta para los rivales: cada uno desarrolla su rama preferida cada semana si le sobra el oro. Económica: un nivel de establecimiento más (hasta 6), que da ingresos semanales. Investigación: una investigación completada cada semana. Militar: +10% de oro en sus misiones a partir de la segunda temporada.",
+    "costeNivelEconomico": [5000, 9000, 16000, 16000, 16000, 16000],
+    "ingresoSemanalPorNivel": 1400,
+    "costeInvestigacion": 4000,
+    "maxInvestigaciones": 12
+  },
+  "prestigio": {
+    "porNivelEstablecimiento": 10,
+    "porInvestigacion": 6
+  }
+}

@@ -57,7 +57,7 @@ export interface Oferta {
 /** Mejor oferta inmediata de los rivales por un héroe del jugador, o null si nadie lo quiere ahora. */
 export function ofertaVenta(estado: EstadoJuego, heroeId: string): Oferta | null {
   const h = obtenerHeroe(estado, heroeId);
-  if (!jugador(estado).plantilla.includes(heroeId) || h.estado === 'en mision' || h.estado === 'entrenando') return null;
+  if (!jugador(estado).plantilla.includes(heroeId) || ['en mision', 'entrenando', 'trabajando', 'investigando'].includes(h.estado)) return null;
   const precio = redondear(valorPublico(h) * V.factorVenta);
   const g = comprador(estado, h, precio);
   return g ? { compradorId: g.id, precio } : null;

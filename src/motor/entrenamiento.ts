@@ -6,6 +6,7 @@ import balance from '../datos/balance.json';
 import { heroe as obtenerHeroe, jugador, registrar, type EstadoJuego } from './estado';
 import { alLimite, ganarExperiencia, type Progreso } from './heroes';
 import { nivelInstalacion } from './instalaciones';
+import { efectoInvestigaciones } from './desarrollo';
 
 const E = balance.entrenamiento;
 const I = balance.instalaciones.entrenamiento;
@@ -71,7 +72,7 @@ export function resolverEntrenamientos(estado: EstadoJuego): ResultadoEntrenamie
     const h = estado.heroes[e.heroeId];
     if (!h) continue;
     h.estado = 'libre';
-    const progreso = ganarExperiencia(h, E.dias * experienciaPorDia(estado));
+    const progreso = ganarExperiencia(h, Math.round(E.dias * experienciaPorDia(estado) * (1 + efectoInvestigaciones(estado, 'experiencia'))));
     resultados.push({ heroeId: h.id, nombre: h.nombre, progreso });
   }
   return resultados;

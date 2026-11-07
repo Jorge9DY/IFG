@@ -87,3 +87,16 @@ Análisis con el simulador (150 partidas, semana a semana; herramienta `herramie
 
 Aplicado: zona de entrenamiento (idea del propietario) y Prueba de los Novatos que crece con la categoría, con el ojeo rediseñado y la revelación tipo gacha (biblia, sección 8). Pendiente de decidir: categorías más seguidas y que la sede dé algo más que plazas.
 
+## 17. Tres ramas de desarrollo: lo que el documento deja abierto
+
+Implementado en la rama `claude/tres-ramas-desarrollo` con versiones provisionales (cifras en `src/datos/desarrollo.json`). Pendiente de decidir:
+
+1. **Fórmula de la especialización:** ahora, los puntos pierden un 15% cada semana y para cambiar de rama dominante otra tiene que superarla en un 15%. ¿Te parece bien así?
+2. **Niveles y bonificaciones** de cada rama (tabla en la biblia, sección 4 bis).
+3. **Catálogo de establecimientos:** Taller de forja, Invernadero y Casa de cartógrafos. ¿Cuáles quieres y qué atributos debe valorar cada uno?
+4. **Habilidad especial de los héroes** (pilar 4): aún no existe. ¿Es el siguiente tema a diseñar? Afecta a establecimientos, investigación y ascensiones.
+5. **Investigaciones mágicas:** ¿qué magias, power-ups y habilidades nuevas quieres? Por ahora hay cinco.
+6. **Torneo de fin de temporada:** ahora el juego elige al campeón de cada clase y al mejor de todos, y gana el de más poder. ¿Quieres elegir tú a los campeones, combates por equipos u otro formato?
+7. **Condición de victoria, duración de la campaña y persistencia entre temporadas:** el documento las deja abiertas; el prototipo mantiene «gana quien cierre una temporada en el n.º 1» y todo persiste.
+8. **Rivales:** desarrollan su rama de forma abstracta. ¿Quieres que construyan e investiguen como el jugador?
+

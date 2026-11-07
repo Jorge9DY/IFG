@@ -70,6 +70,8 @@ function marcharse(estado: EstadoJuego, h: Heroe, origen: Gremio): string | null
   for (const c of estado.enCurso) c.equipo = c.equipo.filter((id) => id !== h.id);
   estado.enCurso = estado.enCurso.filter((c) => c.equipo.length > 0);
   estado.entrenamientos = estado.entrenamientos.filter((e) => e.heroeId !== h.id);
+  for (const e of estado.establecimientos) e.trabajadores = e.trabajadores.filter((id) => id !== h.id);
+  for (const c of estado.investigacion.enCurso) c.investigadores = c.investigadores.filter((id) => id !== h.id);
   h.estado = 'libre';
   h.diasLesion = 0;
   h.semanasSinCobrar = 0;

@@ -3,7 +3,11 @@
 export const LETRAS = ['F', 'D', 'C', 'B', 'A', 'S'] as const;
 export type Letra = (typeof LETRAS)[number];
 
-export type EstadoHeroe = 'libre' | 'en mision' | 'lesionado' | 'entrenando';
+export type EstadoHeroe = 'libre' | 'en mision' | 'lesionado' | 'entrenando' | 'trabajando' | 'investigando';
+
+/** Las tres ramas de desarrollo del gremio. */
+export const RAMAS = ['militar', 'economico', 'investigacion'] as const;
+export type Rama = (typeof RAMAS)[number];
 
 /** Decisión del propietario: cuatro clases, con un solo efecto pasivo cada una. */
 export const CLASES = ['Guerrero', 'Mago', 'Explorador', 'Sanador'] as const;
@@ -60,6 +64,8 @@ export interface PerfilRival {
   mejora: number;
   /** Si acepta vender a sus héroes en el mercado. */
   vende: boolean;
+  /** Rama de desarrollo que prefiere (militar, económica o investigación). */
+  rama?: Rama;
 }
 
 export interface Gremio {
@@ -78,6 +84,11 @@ export interface Gremio {
   novatosDestacados: number;
   /** Retos de maestros ganados (prestigio). */
   retosGanados?: number;
+  /** Categorías del torneo de fin de temporada ganadas (prestigio). */
+  torneosGanados?: number;
+  /** Niveles de establecimientos construidos e investigaciones completadas (prestigio). */
+  nivelesEstablecimientos?: number;
+  investigaciones?: number;
   /** Clase en la que se especializa un rival: puja más por ella. */
   clase?: Clase;
   /** Categoría del gremio (D–S): sube con el prestigio, nunca baja, y marca el nivel del tablón. */

@@ -28,6 +28,18 @@ No es solo administrar una empresa: es levantar una organización legendaria con
 
 **Género y tono \[Aceptado\]:** juego de gestión con mucho drama, personajes y acontecimientos narrativos, por encima de un simulador puramente estratégico.
 
+### Concepto ampliado \[Aceptado\] (documento del propietario, 2026-11-07)
+
+El jugador dirige un gremio de héroes en un mundo de fantasía: recluta y desarrolla héroes, administra los recursos, construye instalaciones, envía expediciones, investiga los secretos del mundo y compite contra otros gremios. El juego se organiza en temporadas; al final de cada una se celebra un **torneo entre gremios** por categorías.
+
+El objetivo general es construir el gremio más prestigioso y exitoso equilibrando **tres vías de desarrollo**:
+
+- **Militar:** recursos y prestigio mediante misiones.
+- **Económica:** establecimientos productivos que generan ingresos.
+- **Investigación:** descubrir secretos del mundo y nuevas capacidades mágicas para los héroes.
+
+El jugador no elige especialización en un menú: la identidad del gremio surge de sus inversiones. Los tres sistemas están abiertos a todos, pero concentrarse en una rama da bonificaciones más potentes en ella (ver sección 4 bis).
+
 ### Arco de progresión
 
 1. Gremio miserable, sin prestigio y con poco dinero.
@@ -47,6 +59,21 @@ No es solo administrar una empresa: es levantar una organización legendaria con
 | Profundo por dentro, simple por fuera | La complejidad genera historias, no trabajo administrativo. |
 
 > **Regla de oro:** el sistema puede ser profundo por dentro, pero la experiencia del jugador debe ser sencilla, intuitiva y emocionalmente significativa.
+
+### Pilares de diseño ampliados \[Aceptado\] (2026-11-07)
+
+Se suman a los anteriores, que siguen vigentes:
+
+1. **Gestión con decisiones y costes de oportunidad.** Los recursos y los héroes son limitados: asignar un héroe a una actividad es renunciar a usarlo en otras.
+2. **Tres vías económicas complementarias.** Misiones, establecimientos e investigación generan valor de formas distintas.
+3. **Identidad emergente del gremio.** El estilo sale de las decisiones, no de una elección inicial obligatoria.
+4. **Héroes con valor estratégico individual.** Poder, potencial, clase y habilidad especial (esta última \[Abierto\]) determinan su utilidad en cada actividad.
+5. **Progresión a largo plazo.** Héroes y gremio mejoran durante la temporada y entre temporadas (reglas de persistencia \[Abierto\]; en el prototipo todo persiste).
+6. **Competición entre gremios.** Los rivales desarrollan sus organizaciones y participan en el torneo de fin de temporada.
+
+### Objetivo del jugador
+
+Terminar las temporadas con un gremio cada vez más desarrollado y prestigioso, aspirando a las primeras posiciones del ranking; el torneo de fin de temporada ofrece una competición directa por categorías. **\[Abierto\]** La condición definitiva de victoria, la duración total de la campaña y la persistencia entre temporadas (el prototipo mantiene la provisional: gana quien cierra una temporada en el n.º 1).
 
 ## 2. Bucle de juego y calendario
 
@@ -69,6 +96,18 @@ No es solo administrar una empresa: es levantar una organización legendaria con
 | Semana | 7 días | Día 7: pago de sueldos y después Prueba de los Novatos. Se actualiza el ranking. |
 | Temporada | 4 semanas (28 días) | Cierre oficial del ranking y premio en oro según la posición. |
 | Partida | Varias temporadas | Termina al cerrar una temporada en el n.º 1 **\[Aceptado\]**. |
+
+### Bucle principal ampliado \[Aceptado\] (2026-11-07)
+
+1. Consultar el estado del gremio: oro, gastos, héroes disponibles, lesiones, instalaciones, investigaciones y posición.
+2. Decidir dónde invertir los recursos.
+3. Asignar héroes a misiones, establecimientos o investigaciones (cada héroe solo puede estar en una actividad).
+4. Resolver las actividades y recibir resultados: ingresos, experiencia, descubrimientos o penalizaciones.
+5. Pagar los salarios y mantener la economía.
+6. Mejorar héroes e instalaciones y desarrollar la especialización dominante.
+7. Prepararse para el torneo y competir al final de la temporada.
+
+Tres tensiones constantes: **supervivencia económica** (cubrir salarios, costes e inversiones), **desarrollo** (mejorar héroes, instalaciones y tecnologías) y **competición** (superar a los rivales). Ninguna de las tres ramas debe eliminar la relevancia de las otras.
 
 Motivo: sin temporadas no hay presión de tiempo ni un final claro. Pagar sueldos justo antes de la subasta genera cada semana el dilema «¿pago a todos o pujo fuerte?».
 
@@ -134,6 +173,61 @@ Los sueldos son el gasto fijo semanal del gremio. El diseño ya los daba por hec
 **\[Aceptado\]** Las instalaciones son caras: junto con los sueldos, son el gran destino del oro y evitan que se acumule sin uso.
 
 **\[Abierto\]** Lista de instalaciones, niveles, costes y efectos concretos.
+
+## 4 bis. Tres ramas de desarrollo \[Aceptado\] (documento del propietario, 2026-11-07)
+
+### Especialización emergente
+
+No se elige en un menú: sale de dónde invierte el gremio. Todas las actividades están abiertas a todos; la especialización solo da **ventajas exclusivas y progresivas** en la rama en la que el gremio se ha concentrado.
+
+- **Puntos de desarrollo por rama** (militar, económica, investigación), solo por inversión real, no por acciones triviales. En el prototipo: el oro ganado con misiones con éxito (militar), el oro invertido y producido en establecimientos (económica), y el oro invertido en investigaciones más cada proyecto completado (investigación).
+- **Rama dominante:** la de más puntos, a partir del primer umbral. Solo ella da bonificaciones.
+- **Niveles:** tres por rama, con umbrales de puntos. Cifras y nombres *ilustrativos*:
+
+| Nivel | Militar | Económica | Investigación |
+| --- | --- | --- | --- |
+| 1 | +8% de oro en misiones | +15% de producción | +20% de progreso |
+| 2 | −25% de lesiones en misiones | −40% de mantenimiento y −15% en mejoras | −30% de coste de los proyectos |
+| 3 | +4% de éxito en misiones | +30% más de producción | +30% más de progreso y un proyecto más a la vez |
+
+- **Evolución \[Propuesta para el prototipo\]:** cada semana los puntos pierden un 15% de peso, así que cuenta el desarrollo actual. Para cambiar de rama dominante, otra tiene que superarla en un 15%: una inversión aislada no basta. La fórmula definitiva se decidirá jugando.
+
+### Rama militar
+
+Misiones y expediciones, como hasta ahora. Sus ventajas no eliminan el riesgo: siguen las lesiones, los sueldos y la disponibilidad de héroes.
+
+### Rama económica: establecimientos
+
+1. Se construye (o desbloquea) un establecimiento.
+2. Se invierte oro para mejorarlo.
+3. Se le asignan uno o varios héroes, que quedan ocupados hasta que el jugador los retire.
+4. La productividad depende del poder y la clase de los héroes, del nivel del establecimiento y de la especialización económica.
+5. Produce oro cada día. Paga mantenimiento cada semana.
+
+Catálogo del prototipo (*ilustrativo*): **Taller de forja** (Guerreros), **Invernadero** (Sanadores y Magos, por su magia de agua y vida) y **Casa de cartógrafos** (Exploradores). Tres niveles cada uno, con más puestos y más producción. Cada trabajador extra rinde algo menos y los trabajadores no ganan experiencia, para que la producción pasiva no deje sin sentido las misiones: un héroe trabajando rinde más o menos como en una misión baja, sin riesgo pero sin crecer.
+
+**\[Abierto\]** Catálogo definitivo, requisitos y fórmulas; uso de la habilidad especial.
+
+### Rama de investigación
+
+1. Se elige una investigación disponible y se paga.
+2. Se asignan hasta 3 investigadores, que quedan ocupados durante el proyecto.
+3. La duración depende del proyecto y de los investigadores: los Magos son los más afines y cada investigador extra aporta menos (rendimiento decreciente), así que se acelera sin volverse instantáneo.
+4. Al completarse se aplica la recompensa.
+
+- **Exploración:** descubre secretos del mundo (lore) y abre nuevas investigaciones. No da oro.
+- **Magia:** mejora a los héroes y al gremio. En el prototipo: Ritual de la Ascensión (+10% de éxito en la Ascensión), Runas de crecimiento (+20% de experiencia), Bálsamo de sauce (−40% de lesiones), Elixir del techo (sube una letra el techo de un héroe; repetible) y Alquimia áurea (mucho oro; repetible).
+- No todas son rentables: las que no dan oro valen por lo que descubren o desbloquean. El jugador siempre ve qué persigue cada proyecto.
+
+**\[Abierto\]** Nuevas habilidades asignables a héroes, ascensiones adicionales y el resto del catálogo.
+
+### Rivales
+
+Cada rival prefiere una rama (Dragón Carmesí y Última Esperanza, militar; Corona Dorada, económica; Sombras Negras, investigación) y la desarrolla de forma abstracta cada semana si le sobra el oro.
+
+### Torneo de fin de temporada \[Propuesta\]
+
+Al cerrar la temporada, antes del ranking final, cada gremio presenta a su mejor héroe de cada clase y al mejor de todos (categoría absoluta). Gana el de más poder. Cada categoría ganada da oro y prestigio. Premia una plantilla capaz de competir en todas las categorías. **\[Abierto\]** Formato definitivo (¿elige el jugador a sus campeones?, ¿combates?, ¿por equipos?).
 
 ## 5. Misiones
 
@@ -676,6 +770,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-07 | Documento del propietario: concepto ampliado, pilares, bucle y **tres ramas de desarrollo** (militar, económica e investigación) con especialización emergente, establecimientos e investigaciones; torneo de fin de temporada. La condición de victoria vuelve a \[Abierto\] (el prototipo mantiene la provisional). Implementado en la rama `claude/tres-ramas-desarrollo`, pendiente del visto bueno del propietario. |
 | 2026-11-07 | Decisiones del propietario: cada misión del tablón se puede repetir mientras haya equipos libres (con aviso si el oro llega después de la Prueba); retratos provisionales generados para cada héroe. |
 | 2026-11-07 | Decisión del propietario: tras una Ascensión el techo queda al menos un rango por encima del nuevo rango (+1, +2 extraordinario, +3 legendario) y se conoce. |
 | 2026-11-07 | Decisiones del propietario: el inventario muestra primero a los héroes libres; la Ascensión se sigue con una barra diaria en la pantalla principal y termina con un gran reveal en el centro. |

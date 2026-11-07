@@ -6,6 +6,7 @@ import type { Azar } from './azar';
 import { sueldosDe } from './economia';
 import { gremio, heroesDe, registrar, type EstadoJuego } from './estado';
 import { letraDe, nivelOjeo, potencialEstimado, valorEstimado } from './heroes';
+import datosDesarrollo from '../datos/desarrollo.json';
 import { categoria, multiplicadores } from './categorias';
 import { infoInstalacion, mejorar, plazasLibres, type Instalacion } from './instalaciones';
 import { generarTablon, probabilidadMision } from './misiones';
@@ -104,6 +105,7 @@ function combinaciones<T>(lista: readonly T[], k: number): T[][] {
 export function invertir(estado: EstadoJuego, azar: Azar, gremioId: string): void {
   const g = gremio(estado, gremioId);
   const p = perfil(g);
+  desarrollarRama(estado, g);
   if (!azar.probabilidad(R.probMejora * p.mejora * 2)) return;
   const opciones: Instalacion[] = plazasLibres(estado, gremioId) <= 1 ? ['sede', 'ojeadores'] : ['ojeadores', 'sede'];
   for (const tipo of opciones) {
@@ -111,6 +113,34 @@ export function invertir(estado: EstadoJuego, azar: Azar, gremioId: string): voi
     if (info.coste !== null && g.oro - info.coste >= 2 * sueldosDe(estado, gremioId)) {
       mejorar(estado, gremioId, tipo);
       return;
+    }
+  }
+}
+
+/**
+ * Desarrollo abstracto de un rival en su rama preferida (cada semana, si le sobran dos semanas de sueldos):
+ * la económica suma niveles de establecimiento que dan ingresos; la de investigación completa proyectos.
+ * Ambos dan prestigio, igual que al jugador.
+ */
+export function desarrollarRama(estado: EstadoJuego, g: Gremio): void {
+  const D = datosDesarrollo.rivales;
+  const colchon = 4 * sueldosDe(estado, g.id);
+  const rama = g.perfil?.rama;
+  if (rama === 'economico') {
+    const niveles = g.nivelesEstablecimientos ?? 0;
+    g.oro += niveles * D.ingresoSemanalPorNivel;
+    const coste = D.costeNivelEconomico[niveles];
+    if (coste !== undefined && g.oro - coste >= colchon) {
+      g.oro -= coste;
+      g.nivelesEstablecimientos = niveles + 1;
+      registrar(estado, 'rival', `${g.nombre} amplía sus negocios.`);
+    }
+  } else if (rama === 'investigacion') {
+    const hechas = g.investigaciones ?? 0;
+    if (hechas < D.maxInvestigaciones && g.oro - D.costeInvestigacion >= colchon) {
+      g.oro -= D.costeInvestigacion;
+      g.investigaciones = hechas + 1;
+      registrar(estado, 'rival', `${g.nombre} completa una investigación.`);
     }
   }
 }

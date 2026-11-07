@@ -11,3 +11,5 @@ Argumentos: número de temporadas y semilla inicial. El informe se imprime y se 
 - `bot.ts`: estrategias del jugador automático (prudente y arriesgada).
 - `simular.ts`: bucle de simulación e informe.
 - `analisis.ts`: evolución semana a semana (puesto, fuerza, prestigio, oro, sueldos, héroes al límite, categoría). Uso: `npx tsx herramientas/simulador/analisis.ts a` (ambiciosa) o `p` (prudente).
+- `ramas.ts`: qué rama acaba dominando cada estrategia y cuánto oro sale de misiones y de establecimientos. Uso: `npx tsx herramientas/simulador/ramas.ts`.
+- Estrategias: Prudente, Comerciante (prioriza los establecimientos) y Ambiciosa.

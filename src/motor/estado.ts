@@ -3,7 +3,7 @@
 import balance from '../datos/balance.json';
 import type { Reto } from './retos';
 import type { Subasta } from './subasta';
-import type { Gremio, Heroe, Mision } from './tipos';
+import type { Gremio, Heroe, Mision, Rama } from './tipos';
 
 export interface MisionEnCurso {
   mision: Mision;
@@ -31,6 +31,29 @@ export interface FilaRanking {
   puntos: number;
 }
 
+export interface Desarrollo {
+  puntos: Record<Rama, number>;
+  /** Rama dominante (la especialización del gremio), o null si aún no destaca ninguna. */
+  dominante: Rama | null;
+}
+
+export interface EstablecimientoConstruido {
+  tipo: string;
+  nivel: number;
+  trabajadores: string[];
+}
+
+export interface ProyectoEnCurso {
+  id: string;
+  progreso: number;
+  investigadores: string[];
+}
+
+export interface EstadoInvestigacion {
+  enCurso: ProyectoEnCurso[];
+  completadas: string[];
+}
+
 export interface PruebaNovatos {
   /** Novatos que aún no se han subastado, en orden de presentación. */
   pendientes: string[];
@@ -47,7 +70,7 @@ export interface PruebaNovatos {
 export type Fase = 'gestion' | 'prueba' | 'victoria';
 
 export interface EstadoJuego {
-  version: 8;
+  version: 9;
   semilla: number;
   /** Estado del generador aleatorio, para continuar la misma secuencia. */
   azar: number;
@@ -63,6 +86,14 @@ export interface EstadoJuego {
   prueba: PruebaNovatos | null;
   /** Héroes en la zona de entrenamiento y el día en que terminan. */
   entrenamientos: { heroeId: string; diaVuelta: number }[];
+  /** Tres ramas de desarrollo del jugador: puntos actuales y rama dominante (biblia, sección 4). */
+  desarrollo: Desarrollo;
+  /** Establecimientos productivos del jugador. */
+  establecimientos: EstablecimientoConstruido[];
+  /** Investigaciones: en curso y completadas. */
+  investigacion: EstadoInvestigacion;
+  /** Objetos que el gremio guarda (por ahora, elixires del techo). */
+  objetos: { elixires: number };
   /** Reto de un maestro rival pendiente o recién resuelto (uno por semana como mucho). */
   reto: Reto | null;
   /** Ranking oficial: se actualiza al terminar el día 7 de cada semana. */

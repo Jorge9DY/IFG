@@ -632,3 +632,62 @@ div.aviso-prueba { font-size: 12.5px; margin-top: 2px; }
 .avatar.caido .retrato { filter: grayscale(1) brightness(0.6); }
 .ficha-heroe .avatar { width: 36px; height: 36px; }
 .ascension-viaje .cabeza .avatar.mini { margin-right: 2px; }
+
+/* ---------- Tres ramas de desarrollo ---------- */
+.desarrollo { padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--linea-suave); background: rgba(255, 255, 255, 0.03); }
+.cabeza-desarrollo { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 8px; }
+.cabeza-desarrollo strong { font-family: var(--titulo); font-size: 17px; letter-spacing: 0.04em; }
+.cabeza-desarrollo .tenue { font-size: 12px; flex-basis: 100%; }
+.ramas { display: grid; gap: 4px; }
+.rama { display: grid; grid-template-columns: 100px minmax(0, 1fr) 36px; align-items: center; gap: 8px; font-size: 12.5px; color: var(--tenue); }
+.rama b { text-align: right; color: var(--texto); font-variant-numeric: tabular-nums; }
+.barra-rama { height: 7px; background: #34373a; }
+.barra-rama i { display: block; height: 100%; }
+.r-militar .barra-rama i { background: #d98a5f; }
+.r-economico .barra-rama i { background: #e9c46a; }
+.r-investigacion .barra-rama i { background: #a58be0; }
+.rama.dominante span:first-child { color: var(--texto); font-weight: 600; }
+.rama.dominante span:first-child::after { content: ' ★'; color: #e9c46a; }
+.niveles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 6px; font-size: 12px; }
+.niveles ol { margin: 4px 0 0; padding-left: 16px; color: var(--tenue); }
+.niveles li { margin: 3px 0; }
+.niveles li span { color: var(--texto); }
+.niveles li.activo, .niveles li.activo span { color: #8fd98a; }
+
+/* ---------- Establecimientos ---------- */
+.establecimientos, .proyectos { display: grid; gap: 8px; }
+.establecimiento, .proyecto { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; text-align: left; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--linea-suave); color: var(--texto); }
+.establecimiento header, .proyecto header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.establecimiento header strong, .proyecto header strong { font-family: var(--titulo); font-size: 16px; letter-spacing: 0.03em; }
+.establecimiento .produce { margin-left: auto; font-family: var(--titulo); font-weight: 700; color: #e9c46a; }
+.establecimiento .nivel-est { font-size: 12px; color: var(--cian); }
+.establecimiento p, .proyecto p { margin: 0; font-size: 12.5px; }
+.establecimiento .afin { font-size: 12px; color: var(--tenue); }
+.establecimiento.sin-construir { border-style: dashed; }
+.establecimiento footer { display: flex; justify-content: flex-end; }
+.trabajadores, .candidatos { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.trabajador { display: inline-flex; align-items: center; gap: 4px; padding: 2px 4px 2px 2px; font-size: 12.5px; background: var(--caja); border: 1px solid var(--linea-suave); }
+.panel-cuerpo .trabajador button { margin: 0 0 0 4px; padding: 1px 8px; font-size: 12px; }
+.panel-cuerpo button.candidato { display: inline-flex; align-items: center; gap: 4px; margin: 0; padding: 2px 8px 2px 2px; font-size: 12.5px; }
+.candidato b { color: #e9c46a; }
+
+/* ---------- Investigación ---------- */
+.panel-cuerpo button.proyecto { margin: 0; padding: 10px 12px; font-size: 13px; }
+.proyecto .tipo-proyecto { font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 1px 6px; border: 1px solid; }
+.proyecto.t-exploracion .tipo-proyecto { color: var(--cian); border-color: var(--cian); }
+.proyecto.t-magia .tipo-proyecto { color: #c9b4f5; border-color: #a58be0; }
+.proyecto .cifras { color: var(--tenue); font-size: 12px; }
+.proyecto.elegido { border-color: var(--cian); }
+.proyecto.en-curso { border-color: #a58be0; }
+.secretos { margin: 4px 0; padding-left: 18px; font-size: 13px; color: var(--texto); }
+.secretos li { margin: 6px 0; }
+.secretos b { color: var(--cian); margin-right: 4px; }
+.resultado.investigacion.t-exploracion { border-color: var(--cian); }
+.resultado.investigacion.t-magia { border-color: #a58be0; }
+.resultado.produccion b { color: #e9c46a; }
+.panel-cuerpo button.boton-elixir { border-color: #a58be0; color: #c9b4f5; }
+.fila-heroe.e-trabajando { border-left-color: #e9c46a; color: var(--texto); }
+.fila-heroe.e-investigando { border-left-color: #a58be0; color: var(--texto); }
+.estado-chip.e-trabajando { border-color: #e9c46a; color: #e9c46a; }
+.estado-chip.e-investigando { border-color: #a58be0; color: #c9b4f5; }
+.fila-heroe .accion-fila { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
