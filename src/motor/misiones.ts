@@ -6,14 +6,23 @@ import type { Azar } from './azar';
 import { ganarExperiencia, type Progreso } from './heroes';
 import { RANGOS_MISION, type Heroe, type Mision, type RangoMision } from './tipos';
 
+/** Multiplicadores de la categoría del gremio (1 y 1 en la categoría inicial). */
+export interface Escala {
+  dificultad: number;
+  recompensa: number;
+}
+
 const M = balance.misiones;
 
 export function datosMision(rango: RangoMision) {
   return M[rango];
 }
 
-/** Las tres misiones del día (rango bajo, medio y alto). La dificultad varía un poco cada día. */
-export function generarTablon(azar: Azar, nuevoId: () => string): Mision[] {
+/**
+ * Las tres misiones del día (rango bajo, medio y alto), al nivel de la categoría del gremio.
+ * La dificultad varía un poco cada día.
+ */
+export function generarTablon(azar: Azar, nuevoId: () => string, escala: Escala = { dificultad: 1, recompensa: 1 }): Mision[] {
   return RANGOS_MISION.map((rango) => {
     const d = M[rango];
     const variacion = 1 + (azar.siguiente() * 2 - 1) * M.variacionDificultad;
@@ -22,9 +31,9 @@ export function generarTablon(azar: Azar, nuevoId: () => string): Mision[] {
       id: nuevoId(),
       rango,
       titulo: azar.elegir(titulos),
-      dificultad: Math.round(d.dificultad * variacion),
+      dificultad: Math.round(d.dificultad * escala.dificultad * variacion),
       duracion: d.duracion,
-      recompensa: d.recompensa,
+      recompensa: Math.round((d.recompensa * escala.recompensa) / 50) * 50,
       equipo: d.equipo,
     };
   });

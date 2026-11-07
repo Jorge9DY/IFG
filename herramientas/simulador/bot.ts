@@ -9,6 +9,7 @@ import { poderEquipo, probabilidadExito } from '../../src/motor/misiones';
 import { lanzarMision, pujarNovato, siguienteCandidato } from '../../src/motor/partida';
 import { motivoNoPujar, siguientePrecio } from '../../src/motor/subasta';
 import { equipoRecomendado } from '../../src/ui/ayudas';
+import { condicionesAscension, iniciarAscension } from '../../src/motor/ascension';
 
 export interface Estrategia {
   nombre: string;
@@ -32,10 +33,11 @@ export interface MetricasBot {
   ventas: number;
   mejoras: number;
   compras: number;
+  ascensiones: number;
 }
 
 export function metricasVacias(): MetricasBot {
-  return { misiones: 0, exitos: 0, fichajesNovatos: 0, ventas: 0, mejoras: 0, compras: 0 };
+  return { misiones: 0, exitos: 0, fichajesNovatos: 0, ventas: 0, mejoras: 0, compras: 0, ascensiones: 0 };
 }
 
 /** Decisiones del día: invertir y lanzar misiones (de la más alta a la más baja). */
@@ -48,6 +50,16 @@ export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): vo
     if (necesita && !info.bloqueo && info.coste !== null && j.oro - info.coste >= reserva() + 1500) {
       mejorar(estado, j.id, tipo);
       m.mejoras++;
+    }
+  }
+  if (e.rota) {
+    // Arriesga en la Ascensión a los héroes al límite si las probabilidades son buenas.
+    for (const h of heroesDe(estado, j.id)) {
+      const a = condicionesAscension(estado, h.id);
+      if (!a.bloqueo && a.probabilidad >= 50 && j.oro - a.coste >= reserva()) {
+        iniciarAscension(estado, h.id);
+        m.ascensiones++;
+      }
     }
   }
   if (e.rota) comprarRefuerzo(estado, reserva(), m);

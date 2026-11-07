@@ -10,6 +10,8 @@ export interface MisionEnCurso {
   equipo: string[];
   /** Día (global) en cuyo cierre vuelve el equipo. */
   diaVuelta: number;
+  /** Misión de Ascensión (un héroe solo; si fracasa, muere). */
+  ascension?: boolean;
 }
 
 export interface Evento {
@@ -42,7 +44,7 @@ export interface PruebaNovatos {
 export type Fase = 'gestion' | 'prueba' | 'victoria';
 
 export interface EstadoJuego {
-  version: 5;
+  version: 6;
   semilla: number;
   /** Estado del generador aleatorio, para continuar la misma secuencia. */
   azar: number;

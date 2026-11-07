@@ -6,6 +6,7 @@ import type { Azar } from './azar';
 import { sueldosDe } from './economia';
 import { gremio, heroesDe, registrar, type EstadoJuego } from './estado';
 import { esDestacado, valor } from './heroes';
+import { categoria, multiplicadores } from './categorias';
 import { infoInstalacion, mejorar, plazasLibres, type Instalacion } from './instalaciones';
 import { probabilidadExito } from './misiones';
 import { RANGOS_MISION, type Gremio, type Heroe, type Mision, type PerfilRival } from './tipos';
@@ -58,9 +59,10 @@ export function limitePuja(estado: EstadoJuego, azar: Azar, g: Gremio, h: Heroe)
 }
 
 /** Misión «estándar» de un rango, para la simulación abstracta de los rivales. */
-function misionEstandar(rango: Mision['rango'], id: string): Mision {
+function misionEstandar(rango: Mision['rango'], id: string, g: Gremio): Mision {
   const d = balance.misiones[rango];
-  return { id, rango, titulo: '', dificultad: d.dificultad, duracion: d.duracion, recompensa: d.recompensa, equipo: d.equipo };
+  const m = multiplicadores(categoria(g));
+  return { id, rango, titulo: '', dificultad: Math.round(d.dificultad * m.dificultad), duracion: d.duracion, recompensa: Math.round(d.recompensa * m.recompensa), equipo: d.equipo };
 }
 
 /**
@@ -79,10 +81,11 @@ export function eligeMisiones(estado: EstadoJuego, gremioId: string, nuevoId: ()
     const equipo = libres.slice(0, d.equipo);
     if (equipo.length < d.equipo) continue;
     const poder = equipo.reduce((t, h) => t + h.poder, 0);
-    if (probabilidadExito(poder, d.dificultad) < R.probExitoMinima) continue;
+    const mision = misionEstandar(rango, '', gremio(estado, gremioId));
+    if (probabilidadExito(poder, mision.dificultad) < R.probExitoMinima) continue;
     libres.splice(0, d.equipo);
     huecos -= 1;
-    elegidas.push({ mision: misionEstandar(rango, nuevoId()), equipo });
+    elegidas.push({ mision: { ...mision, id: nuevoId() }, equipo });
   }
   return elegidas;
 }

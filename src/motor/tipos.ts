@@ -63,6 +63,8 @@ export interface Gremio {
   misionesAltas: number;
   /** Novatos destacados fichados en la Prueba (prestigio). */
   novatosDestacados: number;
+  /** Categoría del gremio (D–S): sube con el prestigio, nunca baja, y marca el nivel del tablón. */
+  categoria?: Letra;
   /** Solo los rivales. */
   personalidad?: string;
   estrategia?: string;

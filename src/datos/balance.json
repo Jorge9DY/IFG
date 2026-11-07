@@ -69,6 +69,20 @@
     "sede": { "plazas": [5, 7, 9, 11, 13, 15, 18], "coste": [3000, 8000, 15000, 25000, 40000, 60000] },
     "ojeadores": { "anchura": [4, 3, 2, 1], "coste": [3000, 9000, 20000] }
   },
+  "categorias": {
+    "_nota": "Decisión del propietario: el tablón crece con el gremio. La categoría sube por prestigio y nunca baja. Umbrales y multiplicadores provisionales.",
+    "letras": ["D", "C", "B", "A", "S"],
+    "prestigio": [0, 80, 160, 260, 380],
+    "dificultad": [1, 1.2, 1.4, 1.6, 1.8],
+    "recompensa": [1, 1.15, 1.3, 1.5, 1.75]
+  },
+  "ascension": {
+    "_nota": "Decisión del propietario: un héroe al límite puede intentar una misión de Ascensión. Si la supera, asciende de rango y su techo sube una letra; si fracasa, muere. Probabilidades y coste provisionales.",
+    "duracion": 3,
+    "probExito": { "F": 60, "D": 55, "C": 50, "B": 45, "A": 35 },
+    "factorCoste": 0.5,
+    "costeMinimo": 1500
+  },
   "ranking": {
     "_nota": "Sección 6: Puntos = Fuerza + Prestigio. Pesos provisionales, aproximadamente iguales al principio.",
     "heroesFuerza": 5,

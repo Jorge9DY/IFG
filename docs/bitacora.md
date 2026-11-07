@@ -2,6 +2,15 @@
 
 Entradas más recientes primero.
 
+## 2026-11-07 — Tablón que crece y Ascensión
+
+- Contra el estancamiento del medio juego (decisiones del propietario):
+  - **Categoría del gremio** D–S por prestigio, que nunca baja. Cada categoría ofrece misiones más difíciles y mejor pagadas (también para los rivales). Se anuncia al subir; el tablón muestra cuánto prestigio falta.
+  - **Ascensión:** un héroe al límite puede ir solo a una misión muy difícil. Si la supera, asciende de rango y su techo sube una letra; si fracasa, muere. Botón en el inventario con confirmación que avisa de la muerte; el resultado llega en el resumen del día.
+- Nuevos módulos `categorias.ts` y `ascension.ts` con sus tests (53 en total). Guardado versión 6.
+- Simulador: el bot ambicioso gana el 25% en 4 temporadas (intenta unas 5 Ascensiones por partida).
+- Retos de los maestros: anotados en la biblia como \[Propuesta\]; dependen de las clases de héroe, que son lo siguiente a diseñar (pregunta 15).
+
 ## 2026-11-07 — Mercado más barato
 
 - Petición del propietario: comprar en el mercado era tan caro que casi nunca se hacía. La reputación pesa menos en el valor (60 → 20 por punto), comprar cuesta el 90% del valor (antes el 130%) y vender da el 85% (antes el 90%), justo por debajo para que revender no dé beneficio.

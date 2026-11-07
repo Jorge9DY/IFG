@@ -49,6 +49,9 @@ No se pasa a la siguiente fase sin superar su puerta (biblia, sección 17). El r
 - [x] Inventario de héroes en Gestionar gremio: libres, de misión y lesionados
 - [x] Sueldos e instalaciones más caros para mantener la tensión económica
 - [x] Experiencia visible, subidas de poder de golpe, rangos F–S, techo y regreso de la misión en el resumen del día
+- [x] Tablón que crece con la categoría del gremio (D–S por prestigio, nunca baja)
+- [x] Ascensión: romper el límite de un héroe arriesgando su vida
+- [ ] Clases de héroe (en diseño) y, después, retos de los maestros
 - [ ] Puerta 1: prueba con jugadores de la economía sin narrativa
 
 ## Fase 2 — Competencia

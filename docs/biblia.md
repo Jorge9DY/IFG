@@ -145,6 +145,12 @@ Los sueldos son el gasto fijo semanal del gremio. El diseño ya los daba por hec
 
 Duraciones y recompensas: *ilustrativas*, sin equilibrar.
 
+### Un tablón que crece con el gremio \[Aceptado\]
+
+El gremio tiene una **categoría** (D, C, B, A, S) que sube con el **prestigio** y **nunca baja**, para no frustrar al jugador. Cada categoría mantiene las tres misiones diarias (bajo, medio, alto), pero más difíciles y mejor pagadas. Subir de categoría se anuncia como un hito («La Asociación asciende a tu gremio a categoría B») y el tablón muestra cuánto prestigio falta para la siguiente. Los rivales juegan con el tablón de su propia categoría. Umbrales y multiplicadores: *ilustrativos*.
+
+Motivo: sin esto, a partir de la segunda temporada los gastos subían y los ingresos no, y las misiones dejaban de ser un reto.
+
 ### Por qué varias misiones y no una
 
 El diseño original permitía elegir solo una de las tres. Con misiones de hasta 3 días, la mayoría de la plantilla habría estado parada, y eso dispararía sin parar el evento «El héroe olvidado» sin que el jugador pudiera evitarlo. Ahora el dilema es a quién mandas a cada misión.
@@ -269,6 +275,15 @@ Los héroes mejoran misión a misión y el jugador lo ve. No se añade ninguna e
 - **Techo:** al llegar a su potencial, el héroe deja de crecer, se avisa («Ha llegado a su límite») y se revela su potencial real.
 - **Regreso de la misión:** en el resumen del día, cada héroe enseña su barra llenándose, la subida de poder, el ascenso y la lesión. Sin pantallas ni botones nuevos.
 - **Descartado:** un «nivel» aparte del poder (dos números para lo mismo) y árboles de habilidades o reparto de puntos (trabajo administrativo).
+
+### Ascensión \[Aceptado\]
+
+Un héroe que ha llegado a su límite puede intentar romperlo. El jugador paga por enviarlo, **solo**, a una misión de Ascensión muy difícil durante unos días.
+
+- **Si la supera:** asciende de rango (su poder sube hasta la letra siguiente) y su techo sube a esa letra, así que vuelve a crecer.
+- **Si fracasa: muere.** Es la única forma de morir del juego y por eso pesa: ¿lo vendes o lo arriesgas todo para convertirlo en leyenda?
+- La probabilidad y el coste se muestran antes de enviarlo, con un paso de confirmación que avisa de la muerte. Cuanto más alto el rango, más difícil (*ilustrativo:* 60% desde F, 35% desde A). Desde S no se puede ascender.
+- Se puede repetir tras cada ascenso, siempre más difícil.
 
 Especializaciones, habilidades y rarezas: \[Abierto\].
 
@@ -508,6 +523,8 @@ Opción A: noticias pequeñas frecuentes (más vida). Opción B: solo lo que pro
 
 Ejemplo: el maestro del Dragón Carmesí se burla de ti por ser el último; semanas después le arrebatas un novato extraordinario en la subasta.
 
+**\[Propuesta\] Retos de los maestros** (idea del propietario): un maestro rival te reta a enfrentar héroes, por ejemplo «no tienes un mago de rango C más fuerte que el mío». Eliges a uno de los tuyos sin ver el suyo y gana el más fuerte. Para que sea justo, el rival no saca a su mejor héroe sino a uno del rango de los tuyos. Depende de las clases de héroe, que se diseñan antes.
+
 **\[Abierto\]** Qué acciones hacen cada día, cómo se simula su progreso y cómo puntúan en el ranking.
 
 ## 15. Resolución diaria
@@ -539,6 +556,8 @@ No se simula cada conversación: se hacen cálculos diarios y solo se generan la
 - Eventos breves, relevantes, con 2–3 opciones.
 - La pantalla principal sigue limpia aunque la simulación sea profunda.
 - **\[Aceptado\]** Ningún sistema debe castigar al jugador por algo que no puede evitar (motivo de permitir varias misiones, sección 5).
+- **\[Aceptado\]** La muerte solo llega por una decisión explícita del jugador (la Ascensión), nunca por azar en una misión normal, y siempre con aviso y confirmación.
+- **\[Aceptado\]** Lo que se gana no se pierde por mala suerte: la categoría del gremio nunca baja.
 
 ## 17. Alcance y hoja de ruta
 
@@ -577,7 +596,9 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 - [x] Temporadas de 4 semanas con premio final (sección 2).
 - [x] Condición de victoria: cerrar una temporada en el n.º 1.
 - [x] Fórmula de éxito de misión, lesiones y recuperación (base provisional aceptada de momento; curación con oro).
-- [ ] Cifras equilibradas: recompensas, sueldos, costes de reclutamiento y premios de temporada.
+- [x] Tablón que crece con la categoría del gremio (sube por prestigio, nunca baja).
+- [x] Ascensión: romper el límite de un héroe con riesgo de muerte.
+- [ ] Cifras equilibradas: recompensas, sueldos, costes y premios de temporada.
 - [x] No hay reclutamiento aparte: fuera de la Prueba de los Novatos, solo se ficha comprando a otros gremios en el mercado.
 - [x] Qué pasa si no puedes pagar los sueldos: tras varias semanas sin cobrar, el héroe se va.
 
@@ -602,6 +623,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-07 | Decisiones del propietario contra el estancamiento del medio juego: tablón que crece con la categoría del gremio (sube por prestigio, nunca baja); Ascensión para romper el límite de un héroe (si fracasa, muere: única muerte del juego, siempre por decisión del jugador); retos de los maestros como \[Propuesta\], pendientes de las clases de héroe. Mercado más barato. |
 | 2026-11-06 | Decisión del propietario: experiencia visible en barra, subidas de poder de golpe al llenarla, rangos F–S según el poder (ascender solo sube el sueldo), techo al llegar al potencial y regreso de la misión en el resumen del día. Sin experiencia extra. |
 | 2026-11-06 | Decisiones del propietario: se elimina el reclutamiento; fuera de la Prueba de los Novatos solo se ficha comprando a otros gremios en el mercado. Confirmado el orden de pago de sueldos (los más poderosos primero). |
 | 2026-11-06 | Decisiones del propietario tras probar el prototipo: victoria al cerrar una temporada en el n.º 1; un héroe que no cobra varias semanas seguidas se va a otro gremio; sueldos e instalaciones más caros para que el oro siga apretando; inventario de héroes con su estado en Gestionar gremio; curar lesionados con oro; la fórmula de éxito y lesiones vale de momento. |

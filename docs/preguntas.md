@@ -58,8 +58,13 @@ Con sueldos e instalaciones más caros, el oro aprieta toda la partida, pero sub
 
 Respuesta: el propietario acepta la propuesta completa. Barra de experiencia visible; al llenarse (21 puntos) el poder sube +3 de golpe; rangos F–S según el poder, y ascender solo sube el sueldo; techo al llegar al potencial; regreso de la misión en el resumen del día; sin experiencia extra. Recogido en la sección 9 de la biblia.
 
-## 14. El estancamiento a partir de la segunda temporada (en diseño con el propietario)
+## 14. El estancamiento a partir de la segunda temporada — RESUELTA
 
-Síntoma: los héroes llegan a su límite, los sueldos y las mejoras son caros y lo único que queda es vender a los que tocan techo y comprar otros. Causas: el tablón no crece (las mismas tres misiones y recompensas toda la partida), un héroe al límite ya no ofrece decisiones y no hay metas a medio plazo aparte del ranking.
+Respuesta del propietario:
+- **Tablón que crece:** sí. La categoría sube por prestigio y nunca baja. Aplicado: categorías D–S a 0/80/160/260/380 de prestigio; dificultad ×1–1,8 y recompensa ×1–1,75.
+- **Ascensión:** sí, pero si fracasa el héroe muere. Aplicado: cuesta la mitad de su valor (mínimo 1.500), dura 3 días, éxito del 60% (desde F) al 35% (desde A). Si la supera, sube a la letra siguiente y su techo también.
+- **Retos de los maestros:** sí, pero como duelos de héroes por clase y rango (ver la sección 14 de la biblia, \[Propuesta\]). Necesitan antes las clases (pregunta 15).
 
-Propuesta en estudio (ver la conversación con el propietario): 1) un tablón que crece con el gremio (misiones de rango superior al subir de categoría), 2) la Ascensión para romper el límite de un héroe una vez, con coste y riesgo, 3) retos de temporada de los maestros rivales. Nada se implementa hasta que el propietario decida.
+## 15. Clases y habilidades de los héroes (en diseño con el propietario)
+
+Siguiente tema por decisión del propietario. Propuesta en la conversación; nada se implementa hasta que decida.

@@ -459,3 +459,18 @@ td.tenue { color: var(--tenue); }
 }
 .regreso .barra-xp { flex: none; width: 100%; max-width: none; }
 .boton-grande.gastar, .boton-grande.ganar { padding-right: 44px; }
+
+/* ---------- Categoría del gremio y Ascensión ---------- */
+.meta-categoria { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 10px; margin-bottom: 10px; border: 1px solid var(--linea-suave); background: rgba(255, 255, 255, 0.03); }
+.meta-categoria .barra-xp { max-width: 180px; }
+.meta-categoria small { color: var(--tenue); font-size: 12px; }
+.panel-cuerpo button.boton-ascension { border-color: #e9c46a; color: #e9c46a; }
+.panel-cuerpo button.peligro { background: var(--alerta); border-color: var(--alerta); color: #111; font-weight: 700; }
+.confirmar-ascension { max-width: 320px; padding: 8px 10px; border: 1px solid var(--alerta); background: rgba(232, 87, 79, 0.08); font-size: 12.5px; }
+.confirmar-ascension p { margin: 0 0 4px; }
+.confirmar-ascension .botones { margin-top: 4px; }
+.resultado.ascenso-categoria { border-color: #e9c46a; }
+.resultado.ascenso-categoria b { color: #e9c46a; }
+@media (max-width: 700px) { .fila-heroe .accion-fila { grid-column: 1 / -1; } .confirmar-ascension { max-width: none; } }
+.fila-heroe .accion-fila:has(.confirmar-ascension) { grid-column: 1 / -1; }
+.fila-heroe .confirmar-ascension { max-width: none; }

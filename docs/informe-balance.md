@@ -28,6 +28,22 @@ Tras aplicar las decisiones del propietario (sueldos más altos, instalaciones m
 
 Versión anterior (sueldos e instalaciones baratos): el ambicioso ganaba en el 24% de las partidas y acababa con unos 22.000 de oro; el prudente acumulaba unos 89.000 sin usarlos.
 
+## Tras el tablón que crece y la Ascensión (2026-11-07)
+
+| Métrica | Prudente | Ambiciosa |
+| --- | --: | --: |
+| Puesto medio al cerrar la temporada 2 | 5,0 | 4,5 |
+| Puesto medio al cerrar la temporada 3 | 4,7 | 3,4 |
+| Puesto medio al cerrar la temporada 4 | 4,4 | 2,8 |
+| Victoria en 4 temporadas o menos | 0% | 25% |
+| Ascensiones intentadas | 0 | 4,7 |
+| Oro al final | 29.837 | 10.633 |
+| Fuerza final (top 5) | 279 | 391 |
+
+- El tablón que crece da al jugador activo ingresos que acompañan a los gastos: sin la Ascensión, el bot ambicioso ganaba el 46% de las partidas. Los rivales también juegan con el tablón de su categoría y les cuesta más llenarlo.
+- La Ascensión pesa: el bot la intenta con un 50% o más de probabilidad y pierde héroes; con ella gana el 25%. Una persona elegirá mejor a quién arriesgar.
+- Cifras provisionales: categorías a 0/80/160/260/380 de prestigio, dificultad ×1–1,8, recompensa ×1–1,75; Ascensión al 60–35% por la mitad del valor del héroe.
+
 ## Lectura
 
 - **El oro sobra mucho menos:** los sueldos crecen con la plantilla y cada nivel de la sede cuesta mucho más. El oro final baja de ~89.000 a ~29.000 (prudente) y de ~22.000 a ~13.000 (ambicioso). Aun así, el bot casi nunca baja de 1.000 de oro tras pagar sueldos: la tensión está en elegir entre pujar, mejorar o curar, no en quedarse sin nada.

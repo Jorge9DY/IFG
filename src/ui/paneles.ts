@@ -3,6 +3,9 @@
 // Mercado de héroes abajo en el centro. Todo lo demás vive dentro de sus menús. Solo lee el estado y llama al motor.
 
 import { condicionesCuracion, curar, sueldosDe } from '../motor/economia';
+import { condicionesAscension, iniciarAscension } from '../motor/ascension';
+import { categoria, siguienteCategoria } from '../motor/categorias';
+import { prestigio } from '../motor/ranking';
 import { diasParaPrueba, esDia7, heroe as obtenerHeroe, heroesDe, jugador, misionDe, puesto, rivales, type EstadoJuego } from '../motor/estado';
 import { alLimite, esDestacado, letraDe, rango, rangoPotencial, sueldo, textoPotencial } from '../motor/heroes';
 import { NOMBRE_INSTALACION, infoInstalacion, mejorar, plazas, type Instalacion } from '../motor/instalaciones';
@@ -70,6 +73,8 @@ export class Interfaz {
   private abierto: Panel | null = null;
   private mensaje = '';
   private misionId: string | null = null;
+  /** Héroe cuya Ascensión espera confirmación en el inventario. */
+  private confirmarAscension: string | null = null;
   private equipo: string[] = [];
   private pestanaMercado: 'comprar' | 'vender' = 'comprar';
   private gremioRival = 'dragon';
@@ -137,7 +142,7 @@ export class Interfaz {
       const j = jugador(estado);
       this.el.cabecera.innerHTML = `
         <div class="oro ${j.oro < 0 ? 'negativo' : ''}"><span>Oro</span><b>${num(j.oro)}</b></div>
-        <div class="calendario">${esc(textoCalendario(estado))} · ${esc(j.nombre)} · ${puesto(estado, j.id)}.º del ranking</div>`;
+        <div class="calendario">${esc(textoCalendario(estado))} · ${esc(j.nombre)} · categoría ${categoria(j)} · ${puesto(estado, j.id)}.º del ranking</div>`;
     } else {
       this.el.cabecera.innerHTML = '<div class="oro"><span>Gremio</span><b>de héroes</b></div>';
     }
@@ -261,6 +266,12 @@ export class Interfaz {
   }
 
   private tablon(estado: EstadoJuego): string {
+    const j = jugador(estado);
+    const sig = siguienteCategoria(j);
+    const p = prestigio(j);
+    const meta = sig
+      ? `<div class="meta-categoria"><span>Tablón de <strong>categoría ${categoria(j)}</strong></span><span class="barra-xp"><i style="--hasta:${Math.min(100, Math.round((100 * p) / sig.prestigio))}%"></i></span><small>Prestigio ${p}/${sig.prestigio} para la categoría ${sig.letra}</small></div>`
+      : `<div class="meta-categoria"><span>Tablón de <strong>categoría ${categoria(j)}</strong>, la más alta</span></div>`;
     const tarjetas = estado.tablon
       .map((m) => {
         const prob = probabilidadRecomendada(estado, m);
@@ -282,7 +293,7 @@ export class Interfaz {
         return `<li>«${esc(c.mision.titulo)}» · ${esc(nombres)} · ${vuelve === 0 ? 'vuelve hoy al finalizar el día' : `vuelve en ${vuelve + 1} días`}</li>`;
       })
       .join('');
-    return `${tarjetas ? `<p>Puedes lanzar las tres misiones si tienes héroes libres. Los enviados no vuelven hasta que termina la misión.</p><div class="tres">${tarjetas}</div>` : '<p>Ya has lanzado todas las misiones de hoy. Mañana habrá un tablón nuevo.</p>'}
+    return `${meta}${tarjetas ? `<p>Puedes lanzar las tres misiones si tienes héroes libres. Los enviados no vuelven hasta que termina la misión.</p><div class="tres">${tarjetas}</div>` : '<p>Ya has lanzado todas las misiones de hoy. Mañana habrá un tablón nuevo.</p>'}
       ${fuera ? `<h3>De misión</h3><ul class="lista">${fuera}</ul>` : ''}`;
   }
 
@@ -404,6 +415,16 @@ export class Interfaz {
         accion = `<button class="principal" data-accion="curar" data-id="${h.id}" ${c.bloqueo ? `disabled title="${esc(c.bloqueo)}"` : ''}>Curar por ${num(c.precio)}</button>`;
       } else {
         detalle = 'Listo para una misión';
+        const a = condicionesAscension(estado, h.id);
+        if (alLimite(h) && a.rangoNuevo) {
+          detalle = 'Ha llegado a su límite';
+          accion = this.confirmarAscension === h.id
+            ? `<div class="confirmar-ascension">
+                <p><strong>Misión de Ascensión:</strong> ${esc(h.nombre.split(' ')[0] ?? '')} parte solo durante ${balance.ascension.duracion} días. Con un <strong>${a.probabilidad}%</strong> vuelve con rango ${a.rangoNuevo} y su techo sube a ${a.rangoNuevo}. Si fracasa, <strong>muere</strong>.</p>
+                <div class="botones"><button data-accion="cancelar-ascension">Cancelar</button><button class="peligro" data-accion="ascension" data-id="${h.id}" ${a.bloqueo ? `disabled title="${esc(a.bloqueo)}"` : ''}>Enviar por ${num(a.coste)}</button></div>
+              </div>`
+            : `<button class="boton-ascension" data-accion="preparar-ascension" data-id="${h.id}" title="Arriesgarlo todo para romper su límite">Ascensión · ${a.probabilidad}%</button>`;
+        }
       }
       const aviso = h.semanasSinCobrar > 0
         ? `<span class="alerta-texto">Sin cobrar ${h.semanasSinCobrar} ${h.semanasSinCobrar === 1 ? 'semana' : 'semanas'}: se irá si no cobra el próximo día 7</span>`
@@ -546,7 +567,15 @@ export class Interfaz {
     const boton = r.prueba
       ? '<button class="principal" data-accion="ir-prueba">Ir a la Prueba de los Novatos</button>'
       : '<button class="principal" data-accion="cerrar">Seguir</button>';
-    return `${misiones || '<p>Hoy no ha vuelto ninguna misión.</p>'}${sueldos}${noticias}
+    const ascensiones = r.ascensiones
+      .map((a) =>
+        a.exito
+          ? `<div class="resultado r-exito ascension"><b>¡${esc(a.nombre)} supera su Ascensión!</b><span>Asciende a rango ${a.rangoDespues} (poder ${a.poderAntes} → ${a.poderDespues}) y su nuevo techo es ${a.techoNuevo}.</span></div>`
+          : `<div class="resultado r-fracaso ascension"><b>${esc(a.nombre)} no vuelve de su Ascensión</b><span>El gremio guarda luto.</span></div>`,
+      )
+      .join('');
+    const ascenso = r.categoriaNueva ? `<div class="resultado ascenso-categoria"><b>¡Categoría ${r.categoriaNueva}!</b><span>La Asociación asciende a tu gremio: desde mañana el tablón ofrece misiones más difíciles y mejor pagadas.</span></div>` : '';
+    return `${ascenso}${ascensiones}${misiones || (ascensiones ? '' : '<p>Hoy no ha vuelto ninguna misión.</p>')}${sueldos}${noticias}
       ${r.prueba ? '' : `<p class="tenue">Empieza el ${esc(textoCalendario(estado).split(' · ')[1] ?? '')}.</p>`}
       <div class="botones">${boton}</div>`;
   }
@@ -560,7 +589,8 @@ export class Interfaz {
     const temporada = r.temporada
       ? `<div class="resultado"><b>Fin de la temporada ${r.temporada.numero}</b><span>Terminas ${r.temporada.puesto}.º · premio +${num(r.temporada.premio)} oro</span></div>`
       : '';
-    return `<p><strong>${titular}</strong> Eres ${actual}.º.</p>${temporada}${this.tablaRanking(estado, r.ranking)}
+    const ascenso = r.categoriaNueva ? `<div class="resultado ascenso-categoria"><b>¡Categoría ${r.categoriaNueva}!</b><span>La Asociación asciende a tu gremio: desde mañana el tablón ofrece misiones más difíciles y mejor pagadas.</span></div>` : '';
+    return `<p><strong>${titular}</strong> Eres ${actual}.º.</p>${ascenso}${temporada}${this.tablaRanking(estado, r.ranking)}
       <div class="botones"><button class="principal" data-accion="${r.victoria ? 'ver-victoria' : 'cerrar'}">Seguir</button></div>`;
   }
 
@@ -673,6 +703,20 @@ export class Interfaz {
         this.mensaje = `¡${NOMBRE_INSTALACION[id as Instalacion]} mejorada!`;
         this.guardar();
         return this.repintar();
+      case 'preparar-ascension':
+        this.confirmarAscension = id;
+        return this.repintar();
+      case 'cancelar-ascension':
+        this.confirmarAscension = null;
+        return this.repintar();
+      case 'ascension': {
+        const h = obtenerHeroe(estado, id);
+        iniciarAscension(estado, id);
+        this.confirmarAscension = null;
+        this.mensaje = `${h.nombre} parte hacia su Ascensión. Vuelve (o no) en ${balance.ascension.duracion} días.`;
+        this.guardar();
+        return this.repintar();
+      }
       case 'curar': {
         const h = obtenerHeroe(estado, id);
         const precio = curar(estado, id);
