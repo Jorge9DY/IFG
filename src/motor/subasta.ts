@@ -4,7 +4,7 @@
 import balance from '../datos/balance.json';
 import type { Azar } from './azar';
 import { gremio, heroe as obtenerHeroe, registrar, rivales, type EstadoJuego } from './estado';
-import { esDestacado, valor } from './heroes';
+import { esDestacado, valorPublico } from './heroes';
 import { plazasLibres } from './instalaciones';
 import { limitePuja } from './rivales';
 
@@ -31,7 +31,7 @@ function redondear(n: number): number {
 }
 
 export function precioSalida(estado: EstadoJuego, heroeId: string): number {
-  return Math.max(N.incrementoMinimo, redondear(valor(obtenerHeroe(estado, heroeId)) * N.precioSalida));
+  return Math.max(N.incrementoMinimo, redondear(valorPublico(obtenerHeroe(estado, heroeId)) * N.precioSalida));
 }
 
 export function crearSubasta(estado: EstadoJuego, azar: Azar, heroeId: string): Subasta {
@@ -43,7 +43,7 @@ export function crearSubasta(estado: EstadoJuego, azar: Azar, heroeId: string): 
   return {
     heroeId,
     precio: salida,
-    incremento: Math.max(N.incrementoMinimo, redondear(valor(h) * N.incremento)),
+    incremento: Math.max(N.incrementoMinimo, redondear(valorPublico(h) * N.incremento)),
     lider: null,
     activos,
     limites,

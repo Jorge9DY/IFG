@@ -85,5 +85,5 @@ Análisis con el simulador (150 partidas, semana a semana; herramienta `herramie
 - **Los sueldos se comen el crecimiento:** a partir de la semana 6 son el 70–75% de lo que dan las misiones.
 - **Las instalaciones daban poco:** la sede da plazas, pero solo cuentan los 5 mejores héroes, y cada héroe más es otro sueldo. Los ojeadores solo dan información.
 
-Aplicado: zona de entrenamiento (idea del propietario). Propuestas pendientes de decidir: Prueba de los Novatos que crece con la categoría y categorías más seguidas.
+Aplicado: zona de entrenamiento (idea del propietario) y Prueba de los Novatos que crece con la categoría, con el ojeo rediseñado y la revelación tipo gacha (biblia, sección 8). Pendiente de decidir: categorías más seguidas y que la sede dé algo más que plazas.
 

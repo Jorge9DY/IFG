@@ -87,7 +87,7 @@ describe('partida', () => {
     expect(jugador(estado).oro).toBe(oro - sueldos);
     expect(r.prueba).toBe(true);
     expect(estado.fase).toBe('prueba');
-    expect(estado.prueba?.pendientes).toHaveLength(balance.novatos.porPrueba);
+    expect(estado.prueba?.pendientes).toHaveLength(balance.novatos.porCategoria.D.cantidad);
     expect(() => finalizarDia(estado)).toThrow();
   });
 
@@ -117,7 +117,7 @@ describe('partida', () => {
       if (s.lider === 'jugador') fichados++;
     }
     expect(fichados).toBeGreaterThan(0);
-    expect(estado.prueba!.resultados).toHaveLength(balance.novatos.porPrueba);
+    expect(estado.prueba!.resultados).toHaveLength(balance.novatos.porCategoria.D.cantidad);
     terminarPrueba(estado);
   });
 

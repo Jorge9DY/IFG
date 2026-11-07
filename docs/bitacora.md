@@ -2,6 +2,13 @@
 
 Entradas más recientes primero.
 
+## 2026-11-07 — Ojeo, fichajes ocultos y Prueba tipo gacha
+
+- Fallo de diseño corregido: los rivales conocían el potencial real de todos los héroes, y el precio de salida de la subasta lo delataba. Ahora cada gremio valora con lo que ven sus ojeadores (`potencialEstimado`, `valorEstimado`) y los precios salen del valor público (`valorPublico`), así que puede haber joyas ocultas que se escapan a los gremios con pocos ojeadores.
+- Cada héroe muestra por separado su rango actual (hexágono), su poder y su techo: las letras posibles más una interrogación, que desaparece al ver el techo exacto. A los héroes propios se les ve con un nivel más de ojeo. Etiquetas «Joya oculta» y «Sobrevalorado».
+- La Prueba de los Novatos mejora con la categoría (de 5 a 7 novatos, más poder y más techos altos) y se presenta como sobres que brillan según el techo que ven tus ojeadores; se revelan uno a uno o todos, con animación.
+- 77 tests; probado en navegador sin errores. Equilibrio: el bot ambicioso gana el 58% en 4 temporadas.
+
 ## 2026-11-07 — Análisis del estancamiento y zona de entrenamiento
 
 - Análisis semana a semana con el simulador (nuevo `analisis.ts`). Las causas del estancamiento hacia la temporada 2 están en la pregunta 16: héroes que tocan techo, una Prueba de los Novatos que no crece, hitos muy separados, sueldos que se comen el crecimiento e instalaciones que daban poco.

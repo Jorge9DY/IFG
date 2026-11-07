@@ -237,6 +237,24 @@ El jugador no conoce el valor real de todos los candidatos; la incertidumbre for
 
 **\[Aceptado\]** El potencial se muestra como un rango (p. ej. «Potencial: B–S»). La instalación de ojeadores lo estrecha.
 
+### Ojeo y fichajes ocultos \[Aceptado\]
+
+Decisión del propietario: que el jugador sienta que descubre fichajes ocultos, *underdogs* con mucho potencial que se les escapan a los grandes gremios.
+
+- **Tres datos separados en cada héroe:** el **rango actual** (hexágono, según su poder), el **poder** (número) y el **techo**, el rango máximo al que puede aspirar.
+- **El techo se ve como las letras posibles más una interrogación** (p. ej. «Techo B · A ?»). Cada nivel de ojeadores quita letras; al nivel máximo, o cuando el héroe llega a su límite, el techo es exacto y la interrogación desaparece. A los héroes propios se les ve con un nivel más (los ves entrenar cada día).
+- **Nadie conoce el techo real.** Cada gremio rival valora y puja con lo que ven sus propios ojeadores, así que los que tienen pocos (el Dragón Carmesí) dejan escapar joyas y los que tienen muchos (las Sombras Negras) compiten por ellas.
+- **Los precios no delatan a nadie:** el precio de salida de la subasta y los del mercado salen del valor público (lo que se ve sin ojeadores).
+- **Olfato:** cuando tus ojeadores ven un techo más alto del que aparenta, la carta lo marca como «Joya oculta»; si lo ven más bajo, «Sobrevalorado».
+
+### La Prueba como un gacha \[Aceptado\]
+
+Decisión del propietario: que la Prueba de los Novatos emocione como abrir sobres en un gacha.
+
+- Los novatos aparecen boca abajo, como sobres. Cada uno brilla según el mejor techo que ven tus ojeadores: dorado (hasta S), violeta (hasta A), azul (hasta B). Con mejores ojeadores, el brillo engaña menos.
+- Se revelan de uno en uno (o todos a la vez) con una animación; los dorados destellan al abrirse.
+- **La Prueba mejora con la categoría del gremio:** a más categoría, más novatos (de 5 a 7), más poder inicial y más techos altos. Cifras: *ilustrativas*.
+
 ### Formato de puja
 
 **\[Aceptado\]** Subasta ascendente por turnos: en cada ronda, cada gremio sube la puja o se retira. Sustituye a las pujas en tiempo real del diseño original.
@@ -652,6 +670,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-07 | Decisiones del propietario: la Prueba de los Novatos mejora con la categoría; rediseño del ojeo (rango actual, poder y techo por separado; techo con letras posibles e interrogación; cada rival valora con sus propios ojeadores; precios públicos que no delatan joyas); la Prueba se presenta como sobres de un gacha. |
 | 2026-11-07 | Idea del propietario: zona de entrenamiento como instalación (entrenar unos días a cambio de oro, sin lesiones, sin superar el límite). |
 | 2026-11-07 | Decisiones del propietario: cuatro clases (Guerrero, Mago, Explorador, Sanador) con un solo efecto pasivo; tipos de misión que favorecen a una clase o a una combinación; retos de los maestros con apuesta en oro (si ganas, oro y prestigio), pasan a \[Aceptado\]; el título por Ascensión queda apuntado para la fase 3. |
 | 2026-11-07 | Decisiones del propietario contra el estancamiento del medio juego: tablón que crece con la categoría del gremio (sube por prestigio, nunca baja); Ascensión para romper el límite de un héroe (si fracasa, muere: única muerte del juego, siempre por decisión del jugador); retos de los maestros como \[Propuesta\], pendientes de las clases de héroe. Mercado más barato. |

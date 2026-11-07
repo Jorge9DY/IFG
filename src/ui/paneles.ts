@@ -9,7 +9,8 @@ import type { Progreso } from '../motor/heroes';
 import { categoria, siguienteCategoria } from '../motor/categorias';
 import { prestigio } from '../motor/ranking';
 import { diasParaPrueba, esDia7, heroe as obtenerHeroe, heroesDe, jugador, misionDe, puesto, rivales, type EstadoJuego } from '../motor/estado';
-import { alLimite, esDestacado, letraDe, rango, rangoPotencial, sueldo, textoPotencial } from '../motor/heroes';
+import { alLimite, indiceLetra, letraDe, nivelOjeo, potencialEstimado, rango, rangoPotencial, sueldo } from '../motor/heroes';
+import { LETRAS } from '../motor/tipos';
 import { NOMBRE_INSTALACION, infoInstalacion, mejorar, plazas, type Instalacion } from '../motor/instalaciones';
 import { comprar, condicionesCompra, ofertaVenta, vender } from '../motor/mercado';
 import { clasesCubiertas, duracionMision, probabilidadMision } from '../motor/misiones';
@@ -57,6 +58,9 @@ const EFECTO_CLASE: Record<string, string> = {
   Sanador: 'Sanador: sus compañeros se lesionan menos.',
 };
 
+/** Brillo del sobre de un novato según el mejor techo que ven tus ojeadores. */
+const BRILLO: Record<string, string> = { S: 'oro', A: 'violeta', B: 'azul' };
+
 const RANGO: Record<RangoMision, { nombre: string; riesgo: string }> = {
   bajo: { nombre: 'Rango bajo', riesgo: 'Riesgo bajo' },
   medio: { nombre: 'Rango medio', riesgo: 'Riesgo medio' },
@@ -88,6 +92,10 @@ export class Interfaz {
   private misionId: string | null = null;
   /** Héroe cuya Ascensión espera confirmación en el inventario. */
   private confirmarAscension: string | null = null;
+  /** Novatos ya revelados en la Prueba (como sobres de un gacha) y los que se acaban de abrir. */
+  private revelados = new Set<string>();
+  private recienRevelados = new Set<string>();
+  private claveRevelado = '';
   private equipo: string[] = [];
   private pestanaMercado: 'comprar' | 'vender' = 'comprar';
   private gremioRival = 'dragon';
@@ -228,9 +236,37 @@ export class Interfaz {
   // Piezas
   // ---------------------------------------------------------------------------
 
-  private potencial(estado: EstadoJuego, h: Heroe): string {
-    const [, max] = rangoPotencial(h, jugador(estado).nivelOjeadores);
-    return `<span class="rango potencial r${max}" title="Potencial: hasta dónde puede crecer. La instalación de ojeadores estrecha el rango.">${esc(textoPotencial(h, jugador(estado).nivelOjeadores))}</span>`;
+  /** Hexágono con el rango actual del héroe (según su poder). */
+  private hexRango(h: Heroe): string {
+    const r = rango(h);
+    return `<span class="rango r${r}" title="Rango actual: ${r} (según su poder)">${r}</span>`;
+  }
+
+  /**
+   * Techo: el rango máximo al que puede aspirar, tal como lo ven tus ojeadores. Muestra las letras
+   * posibles y una interrogación mientras haya duda; con mejores ojeadores quedan menos letras.
+   */
+  private techo(estado: EstadoJuego, h: Heroe): string {
+    const nivel = nivelOjeo(jugador(estado), h.id);
+    const [a, b] = rangoPotencial(h, nivel);
+    if (alLimite(h)) return `<span class="techo"><span class="etq">Techo</span><span class="letra-techo r${a}">${a}</span><span class="tenue">alcanzado</span></span>`;
+    const letras: string[] = [];
+    for (let i = indiceLetra(a); i <= indiceLetra(b); i++) letras.push(LETRAS[i] ?? 'F');
+    const duda = letras.length > 1;
+    const ayuda = duda
+      ? `Tus ojeadores (nivel ${jugador(estado).nivelOjeadores}${jugador(estado).plantilla.includes(h.id) ? ', +1 por ser de tu gremio' : ''}) dudan entre ${letras.join(', ')}. Mejóralos para saberlo.`
+      : 'Tus ojeadores saben su techo exacto.';
+    return `<span class="techo ${duda ? 'con-duda' : ''}" title="${esc(ayuda)}"><span class="etq">Techo</span>${letras.map((l) => `<span class="letra-techo r${l}">${l}</span>`).join('')}${duda ? '<span class="incognita">?</span>' : ''}</span>`;
+  }
+
+  /** Aviso de joya oculta (o de héroe sobrevalorado) cuando tus ojeadores ven más (o menos) que el precio público. */
+  private olfato(estado: EstadoJuego, h: Heroe): string {
+    if (alLimite(h)) return '';
+    const mio = letraDe(potencialEstimado(h, nivelOjeo(jugador(estado), h.id)));
+    const publico = letraDe(potencialEstimado(h, 0));
+    if (indiceLetra(mio) > indiceLetra(publico)) return '<span class="olfato joya" title="Tus ojeadores ven un techo más alto del que aparenta. Los gremios con peores ojeadores pueden dejarlo escapar.">◆ Joya oculta</span>';
+    if (indiceLetra(mio) < indiceLetra(publico)) return '<span class="olfato humo" title="Tus ojeadores creen que su techo es más bajo de lo que aparenta.">Sobrevalorado</span>';
+    return '';
   }
 
   private claseChip(clase: string, extra = ''): string {
@@ -255,12 +291,14 @@ export class Interfaz {
         : `<span class="estado-chip e-${h.estado.replace(' ', '-')}">${esc(h.estado === 'lesionado' ? `lesionado · ${h.diasLesion} d.` : h.estado)}</span>`;
     return `<article class="carta ${extraClase}">
       <header>
-        ${this.potencial(estado, h)}
+        ${this.hexRango(h)}
         <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} Reputación ${h.reputacion} · Lealtad ${h.lealtad}</span></div>
         ${estadoTexto}
       </header>
-      <div class="poder"><b>${num(h.poder)}</b><span>Poder · ${this.rangoChip(rango(h))}</span><p>Sueldo ${num(sueldo(h))} de oro por semana</p></div>
-      ${this.barraXp(h)}
+      <div class="identidad"><span class="dato"><span class="etq">Poder</span><b>${num(h.poder)}</b></span>${this.techo(estado, h)}</div>
+      ${this.olfato(estado, h)}
+      <p class="sueldo tenue">Sueldo ${num(sueldo(h))} de oro por semana</p>
+      ${jugador(estado).plantilla.includes(h.id) ? this.barraXp(h) : ''}
       <footer>${pie}</footer>
     </article>`;
   }
@@ -328,7 +366,7 @@ export class Interfaz {
       .map((h) => {
         const va = this.equipo.includes(h.id);
         return `<button class="ficha-heroe ${va ? 'va' : ''}" data-accion="alternar" data-id="${h.id}" aria-pressed="${va}">
-          ${this.potencial(estado, h)}
+          ${this.hexRango(h)}
           <span class="quien"><strong>${esc(h.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${ICONO_CLASE[h.clase] ?? ''} ${h.clase} · poder ${num(h.poder)}</span></span>
           <span class="marca">${va ? '✓' : '+'}</span>
         </button>`;
@@ -501,8 +539,8 @@ export class Interfaz {
         ? `<span class="alerta-texto">Sin cobrar ${h.semanasSinCobrar} ${h.semanasSinCobrar === 1 ? 'semana' : 'semanas'}: se irá si no cobra el próximo día 7</span>`
         : '';
       return `<div class="fila-heroe e-${h.estado.replace(' ', '-')}">
-        ${this.potencial(estado, h)}
-        <div class="quien"><strong>${esc(h.nombre)} ${this.rangoChip(rango(h))}</strong><span class="tenue">${this.claseChip(h.clase)} Poder ${h.poder} · sueldo ${num(sueldo(h))} · lealtad ${h.lealtad}</span>${this.barraXp(h)}${aviso}</div>
+        ${this.hexRango(h)}
+        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} Poder ${h.poder} · sueldo ${num(sueldo(h))} · lealtad ${h.lealtad}</span>${this.techo(estado, h)}${this.barraXp(h)}${aviso}</div>
         <div class="situacion"><span class="estado-chip e-${h.estado.replace(' ', '-')}">${h.estado === 'en mision' ? 'de misión' : h.estado}</span><span class="tenue">${detalle}</span></div>
         <div class="accion-fila">${accion}</div>
       </div>`;
@@ -534,16 +572,32 @@ export class Interfaz {
     const s = prueba.subasta;
     // 1. Presentación de los novatos.
     if (!s && prueba.resultados.length === 0) {
+      const clave = prueba.pendientes.join(',');
+      if (clave !== this.claveRevelado) {
+        this.claveRevelado = clave;
+        this.revelados.clear();
+      }
+      const todos = prueba.pendientes.every((id) => this.revelados.has(id));
       const cartas = prueba.pendientes
-        .map((id) => {
+        .map((id, i) => {
           const h = obtenerHeroe(estado, id);
-          return this.carta(estado, h, `<span class="precio">Despierta con poder <b>${h.poder}</b></span>`);
+          const [, mejor] = rangoPotencial(h, nivelOjeo(jugador(estado), id));
+          const brillo = BRILLO[mejor] ?? 'gris';
+          if (!this.revelados.has(id)) {
+            return `<button class="sobre brillo-${brillo}" data-accion="revelar" data-id="${id}" style="--i:${i}" aria-label="Revelar novato">
+              <span class="interrogante">?</span><small>Toca para revelar</small></button>`;
+          }
+          const nuevo = this.recienRevelados.has(id) ? 'girando' : '';
+          return `<div class="sobre-abierto brillo-${brillo} ${nuevo}" style="--i:${i}">${this.carta(estado, h, `<span class="precio">Despierta con poder <b>${h.poder}</b></span>`)}</div>`;
         })
         .join('');
-      return `<p>Ya has pagado los sueldos de la semana: te quedan <strong>${num(jugador(estado).oro)}</strong> de oro. Hoy ${prueba.pendientes.length} jóvenes despiertan sus poderes y los gremios pujan por ellos.</p>
-        <p class="tenue">No sabes cuánto valen de verdad: el potencial es un rango. La subasta es por turnos: en cada ronda subes la puja o te retiras.</p>
-        <div class="cartas">${cartas}</div>
-        <div class="botones"><button data-accion="terminar-prueba">No pujar esta semana</button><button class="principal" data-accion="siguiente-candidato">Empezar la subasta</button></div>`;
+      this.recienRevelados.clear();
+      return `<p>Ya has pagado los sueldos: te quedan <strong>${num(jugador(estado).oro)}</strong> de oro. Tu gremio es de <strong>categoría ${categoria(jugador(estado))}</strong>: hoy ${prueba.pendientes.length} jóvenes despiertan sus poderes.</p>
+        <p class="tenue">Los sobres que brillan son los que tus ojeadores creen que pueden llegar lejos: dorado, hasta S; violeta, hasta A; azul, hasta B. Con mejores ojeadores, el brillo engaña menos.</p>
+        <div class="sobres">${cartas}</div>
+        <div class="botones"><button data-accion="terminar-prueba">No pujar esta semana</button>${
+          todos ? '<button class="principal" data-accion="siguiente-candidato">Empezar la subasta</button>' : '<button class="principal" data-accion="revelar-todos">Revelar todos</button>'
+        }</div>`;
     }
     // 2. Subasta en curso o recién terminada.
     if (s) {
@@ -562,7 +616,7 @@ export class Interfaz {
         : `<button class="pasar" data-accion="retirarse">Retirarse</button><button class="pujar" data-accion="pujar" ${motivo ? 'disabled' : ''}>Subir a ${num(siguientePrecio(s))}</button>${motivo ? `<span class="tenue aviso-puja">${esc(motivo)}</span>` : ''}`;
       const final = s.terminada
         ? s.lider === estado.jugadorId
-          ? `¡${esc(h.nombre)} se une a tu gremio!${esDestacado(h) ? ' Es un novato destacado.' : ''}`
+          ? `¡${esc(h.nombre)} se une a tu gremio!`
           : s.lider
             ? `Se lo lleva ${esc(nombre(s.lider))}.`
             : 'Nadie lo quiere: vuelve a su aldea.'
@@ -797,6 +851,16 @@ export class Interfaz {
         this.guardar();
         return this.repintar();
       }
+      case 'revelar':
+        this.revelados.add(id);
+        this.recienRevelados.add(id);
+        return this.repintar();
+      case 'revelar-todos':
+        for (const x of estado.prueba?.pendientes ?? []) {
+          if (!this.revelados.has(x)) this.recienRevelados.add(x);
+          this.revelados.add(x);
+        }
+        return this.repintar();
       case 'preparar-ascension':
         this.confirmarAscension = id;
         return this.repintar();

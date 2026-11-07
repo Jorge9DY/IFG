@@ -3,7 +3,7 @@
 
 import balance from '../datos/balance.json';
 import { dueño, gremio, heroe as obtenerHeroe, jugador, registrar, type EstadoJuego } from './estado';
-import { valor } from './heroes';
+import { valorPublico } from './heroes';
 import { plazasLibres } from './instalaciones';
 import { comprador } from './rivales';
 
@@ -20,7 +20,7 @@ export interface Condiciones {
 }
 
 export function precioCompra(estado: EstadoJuego, heroeId: string): number {
-  return redondear(valor(obtenerHeroe(estado, heroeId)) * V.factorCompra);
+  return redondear(valorPublico(obtenerHeroe(estado, heroeId)) * V.factorCompra);
 }
 
 /** Comprar un héroe de otro gremio. */
@@ -58,7 +58,7 @@ export interface Oferta {
 export function ofertaVenta(estado: EstadoJuego, heroeId: string): Oferta | null {
   const h = obtenerHeroe(estado, heroeId);
   if (!jugador(estado).plantilla.includes(heroeId) || h.estado === 'en mision' || h.estado === 'entrenando') return null;
-  const precio = redondear(valor(h) * V.factorVenta);
+  const precio = redondear(valorPublico(h) * V.factorVenta);
   const g = comprador(estado, h, precio);
   return g ? { compradorId: g.id, precio } : null;
 }

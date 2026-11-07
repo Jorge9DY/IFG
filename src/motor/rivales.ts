@@ -5,7 +5,7 @@ import balance from '../datos/balance.json';
 import type { Azar } from './azar';
 import { sueldosDe } from './economia';
 import { gremio, heroesDe, registrar, type EstadoJuego } from './estado';
-import { esDestacado, valor } from './heroes';
+import { letraDe, nivelOjeo, potencialEstimado, valorEstimado } from './heroes';
 import { categoria, multiplicadores } from './categorias';
 import { infoInstalacion, mejorar, plazasLibres, type Instalacion } from './instalaciones';
 import { generarTablon, probabilidadMision } from './misiones';
@@ -18,6 +18,11 @@ export function perfil(g: Gremio): PerfilRival {
   return g.perfil;
 }
 
+/** Potencial que estima un rival con sus ojeadores: puede equivocarse con las joyas ocultas. */
+export function potencialVisto(g: Gremio, h: Heroe): number {
+  return potencialEstimado(h, nivelOjeo(g, h.id));
+}
+
 /** Cuánto le importa a un rival este héroe según su estrategia (≈0,5–1,6). */
 export function prioridad(g: Gremio, h: Heroe): number {
   const p = perfil(g);
@@ -27,10 +32,10 @@ export function prioridad(g: Gremio, h: Heroe): number {
       base = 0.6 + h.poder / 40;
       break;
     case 'potencial':
-      base = 0.5 + h.potencial / 80;
+      base = 0.5 + potencialVisto(g, h) / 80;
       break;
     case 'destacado':
-      base = esDestacado(h) ? 1.5 : 0.7;
+      base = (balance.heroes.letrasDestacado as string[]).includes(letraDe(potencialVisto(g, h))) ? 1.5 : 0.7;
       break;
     default:
       base = 0.6;
@@ -43,7 +48,7 @@ export function prioridad(g: Gremio, h: Heroe): number {
 /** Fracción (0–1) de su presupuesto que el rival está dispuesto a usar en este héroe. */
 export function factorPresupuesto(estado: EstadoJuego, g: Gremio, h: Heroe): number {
   const disponible = g.oro - R.reservaSueldos * sueldosDe(estado, g.id);
-  return Math.max(0, Math.min(1, disponible / (valor(h) * 2)));
+  return Math.max(0, Math.min(1, disponible / (valorEstimado(h, nivelOjeo(g, h.id)) * 2)));
 }
 
 /**
@@ -54,8 +59,9 @@ export function limitePuja(estado: EstadoJuego, azar: Azar, g: Gremio, h: Heroe)
   if (plazasLibres(estado, g.id) <= 0) return 0;
   // Con la plantilla completa solo pujan por alguien mejor que su héroe más flojo.
   const flojo = masFlojo(estado, g.id);
-  if (g.plantilla.length >= R.plantillaObjetivo && flojo && h.potencial <= flojo.potencial) return 0;
-  const percibido = valor(h) * (1 + (azar.siguiente() * 2 - 1) * R.ruidoValor);
+  if (g.plantilla.length >= R.plantillaObjetivo && flojo && potencialVisto(g, h) <= potencialVisto(g, flojo)) return 0;
+  // El rival valora con lo que ven sus ojeadores, no con el potencial real.
+  const percibido = valorEstimado(h, nivelOjeo(g, h.id)) * (1 + (azar.siguiente() * 2 - 1) * R.ruidoValor);
   const disponible = Math.max(0, g.oro - R.reservaSueldos * sueldosDe(estado, g.id));
   return Math.floor(Math.min(disponible, percibido * prioridad(g, h) * factorPresupuesto(estado, g, h)));
 }

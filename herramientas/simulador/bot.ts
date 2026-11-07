@@ -2,7 +2,8 @@
 
 import { sueldosDe } from '../../src/motor/economia';
 import { heroe, heroesDe, jugador, rivales, type EstadoJuego } from '../../src/motor/estado';
-import { valor } from '../../src/motor/heroes';
+import { nivelOjeo, potencialEstimado, valorEstimado } from '../../src/motor/heroes';
+import type { Heroe } from '../../src/motor/tipos';
 import { infoInstalacion, mejorar, plazasLibres } from '../../src/motor/instalaciones';
 import { comprar, condicionesCompra, ofertaVenta, vender } from '../../src/motor/mercado';
 import { probabilidadMision } from '../../src/motor/misiones';
@@ -44,6 +45,11 @@ export interface MetricasBot {
 
 export function metricasVacias(): MetricasBot {
   return { misiones: 0, exitos: 0, fichajesNovatos: 0, ventas: 0, mejoras: 0, compras: 0, ascensiones: 0, retos: 0, retosGanados: 0, entrenamientos: 0 };
+}
+
+/** El bot solo ve lo que ven sus ojeadores, como una persona. */
+function techoVisto(estado: EstadoJuego, h: Heroe): number {
+  return potencialEstimado(h, nivelOjeo(jugador(estado), h.id));
 }
 
 /** Decisiones del día: invertir y lanzar misiones (de la más alta a la más baja). */
@@ -93,7 +99,7 @@ export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): vo
 /** Después de lanzar misiones, manda a entrenar a los libres que no llegan al límite, si sobra oro. */
 export function entrenarLibres(estado: EstadoJuego, e: Estrategia, m: MetricasBot): void {
   const j = jugador(estado);
-  for (const h of heroesDe(estado, j.id).sort((a, b) => b.potencial - b.poder - (a.potencial - a.poder))) {
+  for (const h of heroesDe(estado, j.id).sort((a, b) => techoVisto(estado, b) - b.poder - (techoVisto(estado, a) - a.poder))) {
     const c = condicionesEntrenamiento(estado, h.id);
     if (!c.bloqueo && j.oro - c.coste >= e.reservaSemanas * sueldosDe(estado, j.id)) {
       entrenar(estado, h.id);
@@ -106,10 +112,10 @@ export function jugarPrueba(estado: EstadoJuego, e: Estrategia, m: MetricasBot):
   while (siguienteCandidato(estado)) {
     const s = estado.prueba!.subasta!;
     const novato = heroe(estado, s.heroeId);
-    const tope = valor(novato) * e.pujaMaxima;
+    const tope = valorEstimado(novato, nivelOjeo(jugador(estado), novato.id)) * e.pujaMaxima;
     if (e.rota && plazasLibres(estado, estado.jugadorId) <= 0) {
-      const flojo = jugador(estado).plantilla.map((id) => heroe(estado, id)).sort((a, b) => a.potencial - b.potencial)[0];
-      if (flojo && flojo.potencial + 10 < novato.potencial && ofertaVenta(estado, flojo.id)) {
+      const flojo = jugador(estado).plantilla.map((id) => heroe(estado, id)).sort((a, b) => techoVisto(estado, a) - techoVisto(estado, b))[0];
+      if (flojo && techoVisto(estado, flojo) + 10 < techoVisto(estado, novato) && ofertaVenta(estado, flojo.id)) {
         vender(estado, flojo.id);
         m.ventas++;
       }
@@ -132,7 +138,7 @@ function comprarRefuerzo(estado: EstadoJuego, reserva: number, m: MetricasBot): 
     .sort((a, b) => b.poder - a.poder);
   for (const h of candidatos) {
     if (plazasLibres(estado, j.id) <= 0) {
-      const flojo = heroesDe(estado, j.id).filter((x) => x.estado === 'libre').sort((a, b) => a.potencial - b.potencial)[0];
+      const flojo = heroesDe(estado, j.id).filter((x) => x.estado === 'libre').sort((a, b) => techoVisto(estado, a) - techoVisto(estado, b))[0];
       if (!flojo || !ofertaVenta(estado, flojo.id)) return;
       const c = condicionesCompra(estado, h.id);
       if (j.oro - c.precio < reserva) continue;

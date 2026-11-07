@@ -57,8 +57,14 @@
     "factorVenta": 0.85
   },
   "novatos": {
-    "porPrueba": 5,
-    "poder": [10, 35],
+    "_nota": "Decisión del propietario: la Prueba de los Novatos mejora con la categoría del gremio (más novatos, más poder y más techo). Cifras provisionales.",
+    "porCategoria": {
+      "D": { "cantidad": 5, "poder": [10, 35], "potencial": { "D": 20, "C": 30, "B": 28, "A": 15, "S": 7 } },
+      "C": { "cantidad": 6, "poder": [14, 40], "potencial": { "D": 10, "C": 25, "B": 33, "A": 22, "S": 10 } },
+      "B": { "cantidad": 6, "poder": [18, 45], "potencial": { "C": 20, "B": 35, "A": 30, "S": 15 } },
+      "A": { "cantidad": 7, "poder": [22, 50], "potencial": { "C": 10, "B": 30, "A": 38, "S": 22 } },
+      "S": { "cantidad": 7, "poder": [26, 55], "potencial": { "B": 25, "A": 45, "S": 30 } }
+    },
     "precioSalida": 0.3,
     "incremento": 0.1,
     "incrementoMinimo": 50,

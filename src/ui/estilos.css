@@ -500,3 +500,51 @@ td.tenue { color: var(--tenue); }
 .estado-chip.e-entrenando { border-color: #e9c46a; color: #e9c46a; }
 .resultado.entreno { border-color: #e9c46a; }
 .fila-heroe.e-entrenando { color: var(--texto); border-top-color: var(--linea-suave); border-right-color: var(--linea-suave); border-bottom-color: var(--linea-suave); }
+
+/* ---------- Rango, poder y techo ---------- */
+.identidad { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; }
+.identidad .dato { display: flex; align-items: baseline; gap: 6px; }
+.identidad .dato b { font-family: var(--titulo); font-size: 30px; line-height: 1; color: var(--cian); font-variant-numeric: tabular-nums; }
+.etq { font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--tenue); }
+.techo { display: inline-flex; align-items: center; gap: 3px; flex-wrap: wrap; }
+.techo .etq { margin-right: 4px; }
+.letra-techo {
+  display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 3px; font-family: var(--titulo); font-weight: 700; font-size: 13px; color: #111;
+}
+.techo.con-duda .letra-techo { opacity: 0.75; }
+.incognita {
+  display: inline-grid; place-items: center; width: 20px; height: 20px; margin-left: 2px; border: 1px solid #e9c46a; border-radius: 50%;
+  color: #e9c46a; font-weight: 700; font-size: 13px; cursor: help;
+}
+.fila-heroe .techo { margin: 3px 0 1px; font-size: 12px; }
+.olfato { align-self: flex-start; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 8px; border: 1px solid; }
+.olfato.joya { color: #e9c46a; border-color: #e9c46a; background: rgba(233, 196, 106, 0.08); }
+.olfato.humo { color: var(--tenue); border-color: var(--linea-suave); }
+.carta .sueldo { margin: 0; font-size: 12px; }
+
+/* ---------- Prueba de los Novatos: sobres como en un gacha ---------- */
+.sobres { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; perspective: 900px; }
+.sobre {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 200px;
+  background: repeating-linear-gradient(45deg, #1d1f22 0 10px, #232629 10px 20px); border: 1px solid var(--linea-suave); color: var(--tenue);
+  animation: sobre-entra 0.5s ease-out calc(var(--i) * 0.12s) both;
+}
+.sobre .interrogante { font-family: var(--titulo); font-size: 56px; line-height: 1; color: var(--texto); }
+.sobre small { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+.sobre:hover { transform: translateY(-3px); }
+.sobre.brillo-oro { border-color: #e9c46a; box-shadow: 0 0 18px rgba(233, 196, 106, 0.45), inset 0 0 24px rgba(233, 196, 106, 0.15); animation: sobre-entra 0.5s ease-out calc(var(--i) * 0.12s) both, latido-oro 1.8s ease-in-out infinite; }
+.sobre.brillo-violeta { border-color: #b9a3e3; box-shadow: 0 0 14px rgba(185, 163, 227, 0.35); }
+.sobre.brillo-azul { border-color: #7fb2e5; box-shadow: 0 0 10px rgba(127, 178, 229, 0.25); }
+.sobre-abierto { border-radius: 0; }
+.sobre-abierto.brillo-oro .carta { border-color: #e9c46a; box-shadow: 0 0 16px rgba(233, 196, 106, 0.35); }
+.sobre-abierto.brillo-violeta .carta { border-color: #b9a3e3; }
+.sobre-abierto.brillo-azul .carta { border-color: #7fb2e5; }
+.sobre-abierto.girando { animation: girar-sobre 0.6s ease-out calc(var(--i) * 0.15s) both; }
+.sobre-abierto.girando.brillo-oro .carta { animation: destello-oro 1.2s ease-out calc(var(--i) * 0.15s + 0.4s) both; }
+@keyframes sobre-entra { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes girar-sobre { from { transform: rotateY(90deg); opacity: 0.2; } to { transform: rotateY(0); opacity: 1; } }
+@keyframes latido-oro { 50% { box-shadow: 0 0 28px rgba(233, 196, 106, 0.7), inset 0 0 30px rgba(233, 196, 106, 0.25); } }
+@keyframes destello-oro { 0% { box-shadow: 0 0 0 rgba(233, 196, 106, 0); } 30% { box-shadow: 0 0 40px rgba(233, 196, 106, 0.9); } 100% { box-shadow: 0 0 16px rgba(233, 196, 106, 0.35); } }
+@media (prefers-reduced-motion: reduce) {
+  .sobre, .sobre.brillo-oro, .sobre-abierto.girando, .sobre-abierto.girando.brillo-oro .carta { animation: none; }
+}

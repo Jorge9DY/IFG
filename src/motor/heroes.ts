@@ -57,9 +57,8 @@ export function generarHeroe(azar: Azar, id: string, o: OpcionesHeroe): Heroe {
   };
 }
 
-/** Letra de potencial de un novato, según las probabilidades de balance.json. */
-export function letraPotencialNovato(azar: Azar): Letra {
-  const tabla = balance.heroes.potencialPorLetra as Record<string, number>;
+/** Letra de potencial al azar según una tabla de probabilidades (%) por letra. */
+export function letraPotencialNovato(azar: Azar, tabla: Record<string, number> = balance.heroes.potencialPorLetra as Record<string, number>): Letra {
   let tirada = azar.siguiente() * 100;
   for (const letra of LETRAS) {
     const p = tabla[letra] ?? 0;
@@ -69,9 +68,22 @@ export function letraPotencialNovato(azar: Azar): Letra {
   return 'C';
 }
 
+/** Nivel de ojeo máximo: a ese nivel se ve el techo exacto. */
+export const OJEO_MAXIMO = balance.instalaciones.ojeadores.anchura.length - 1;
+
 /**
- * Rango de potencial que ve el jugador (p. ej. B–S). La instalación de ojeadores lo estrecha.
- * Siempre contiene la letra real y nunca baja de la letra del poder actual.
+ * Nivel de ojeo con el que un gremio mira a un héroe: el de sus ojeadores, y uno más si el héroe es
+ * suyo (lo ve entrenar cada día).
+ */
+export function nivelOjeo(g: { nivelOjeadores: number; plantilla: string[] }, heroeId: string): number {
+  return Math.min(OJEO_MAXIMO, g.nivelOjeadores + (g.plantilla.includes(heroeId) ? 1 : 0));
+}
+
+/**
+ * Techo (rango máximo) que puede ver un gremio: un abanico de letras posibles (p. ej. C, B, A).
+ * Los ojeadores lo estrechan; al nivel máximo, o cuando el héroe llega a su límite, es exacto.
+ * Siempre contiene la letra real y nunca baja del rango actual. Todos los gremios ven la misma
+ * ventana para el mismo nivel: la diferencia está en cuántos ojeadores tiene cada uno.
  */
 export function rangoPotencial(h: Heroe, nivelOjeadores: number): [Letra, Letra] {
   const anchuras = balance.instalaciones.ojeadores.anchura;
@@ -90,6 +102,22 @@ export function textoPotencial(h: Heroe, nivelOjeadores: number): string {
   return a === b ? a : `${a}–${b}`;
 }
 
+/** true si el techo visto con ese nivel de ojeo es una sola letra segura. */
+export function techoSeguro(h: Heroe, nivel: number): boolean {
+  const [a, b] = rangoPotencial(h, nivel);
+  return a === b;
+}
+
+/** Potencial que estima quien mira con ese nivel de ojeo: el centro de las letras posibles. */
+export function potencialEstimado(h: Heroe, nivel: number): number {
+  const U = balance.letras.umbral;
+  const [a, b] = rangoPotencial(h, nivel);
+  const min = U[indiceLetra(a)] ?? 0;
+  const max = (U[indiceLetra(b) + 1] ?? 101) - 1;
+  if (a === b && h.poder >= h.potencial) return h.potencial;
+  return Math.max(h.poder, Math.round((min + max) / 2));
+}
+
 /** Novato destacado (prestigio del ranking): potencial real A o S. */
 export function esDestacado(h: Heroe): boolean {
   return (balance.heroes.letrasDestacado as string[]).includes(letraDe(h.potencial));
@@ -102,11 +130,28 @@ export function sueldo(h: Heroe): number {
   return Math.round(bruto / s.redondeo) * s.redondeo;
 }
 
-/** Valor de referencia de un héroe: lo que rinde hoy, su margen de crecimiento y su reputación. */
-export function valor(h: Heroe): number {
+function valorCon(h: Heroe, potencial: number): number {
   const v = balance.valor;
-  const bruto = v.porPoder * h.poder + v.porMargen * (h.potencial - h.poder) + v.porReputacion * h.reputacion;
+  const bruto = v.porPoder * h.poder + v.porMargen * Math.max(0, potencial - h.poder) + v.porReputacion * h.reputacion;
   return Math.max(v.minimo, Math.round(bruto / 50) * 50);
+}
+
+/** Valor real de un héroe (lo que rinde hoy, su margen de crecimiento real y su reputación). Nadie lo ve tal cual. */
+export function valor(h: Heroe): number {
+  return valorCon(h, h.potencial);
+}
+
+/** Valor que le da quien mira con ese nivel de ojeo: con el potencial que estima, no con el real. */
+export function valorEstimado(h: Heroe, nivel: number): number {
+  return valorCon(h, potencialEstimado(h, nivel));
+}
+
+/**
+ * Valor público: el que ve cualquiera sin ojeadores. Marca los precios de salida y del mercado, para que
+ * el precio nunca delate a una joya oculta.
+ */
+export function valorPublico(h: Heroe): number {
+  return valorEstimado(h, 0);
 }
 
 /** Rango del héroe según su poder actual (F, D, C, B, A, S): las mismas letras que el potencial. */

@@ -274,17 +274,24 @@ function avanzarDia(estado: EstadoJuego, azar: Azar): void {
 // Prueba de los Novatos
 // ---------------------------------------------------------------------------
 
+/** Cómo es la Prueba de los Novatos para la categoría del gremio del jugador: cuántos llegan y cómo son. */
+export function pruebaDeCategoria(estado: EstadoJuego): { cantidad: number; poder: [number, number]; potencial: Record<string, number> } {
+  const t = balance.novatos.porCategoria as Record<string, { cantidad: number; poder: number[]; potencial: Record<string, number> }>;
+  const d = t[categoria(jugador(estado))] ?? t.D!;
+  return { cantidad: d.cantidad, poder: [d.poder[0] ?? 10, d.poder[1] ?? 35], potencial: d.potencial };
+}
+
 function empezarPrueba(estado: EstadoJuego, azar: Azar): void {
-  const N = balance.novatos;
+  const N = pruebaDeCategoria(estado);
   const pendientes: string[] = [];
-  for (let i = 0; i < N.porPrueba; i++) {
-    const h = generarHeroe(azar, nuevoId(estado, 'h'), { poder: N.poder as [number, number], potencial: [letraPotencialNovato(azar)] });
+  for (let i = 0; i < N.cantidad; i++) {
+    const h = generarHeroe(azar, nuevoId(estado, 'h'), { poder: N.poder, potencial: [letraPotencialNovato(azar, N.potencial)] });
     estado.heroes[h.id] = h;
     pendientes.push(h.id);
   }
   estado.fase = 'prueba';
   estado.prueba = { pendientes, subasta: null, resultados: [] };
-  registrar(estado, 'novatos', `Prueba de los Novatos: ${N.porPrueba} jóvenes despiertan sus poderes.`);
+  registrar(estado, 'novatos', `Prueba de los Novatos: ${N.cantidad} jóvenes despiertan sus poderes.`);
 }
 
 function pruebaEnCurso(estado: EstadoJuego) {
