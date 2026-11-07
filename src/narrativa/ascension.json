@@ -29,5 +29,7 @@
   "fracaso": [
     "No es {nombre}. Es un mensajero de la Asociación.",
     "Trae su arma y una carta. {nombre} no volverá."
-  ]
+  ],
+  "extraordinario": "Una luz violeta lo envuelve. Sus ojos ya no son los de antes.",
+  "legendario": "El cielo se abre sobre la sede. Los ancianos dicen que esto no pasaba desde hace cien años."
 }

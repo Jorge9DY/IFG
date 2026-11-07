@@ -4,7 +4,7 @@ import { Azar } from '../src/motor/azar';
 import { condicionesAscension, iniciarAscension, resolverAscension } from '../src/motor/ascension';
 import { actualizarCategoria, categoria, categoriaPorPrestigio, multiplicadores, siguienteCategoria } from '../src/motor/categorias';
 import { jugador } from '../src/motor/estado';
-import { letraDe } from '../src/motor/heroes';
+import { letraDe, rangoPotencial } from '../src/motor/heroes';
 import { generarTablon } from '../src/motor/misiones';
 import { finalizarDia } from '../src/motor/partida';
 import { fichar, heroe, partida } from './fabrica';
@@ -98,7 +98,10 @@ describe('Ascensión', () => {
         exitos++;
         expect(r.rangoAntes).toBe('C');
         expect(r.rangoDespues).toBe('B');
-        expect(letraDe(estado.heroes[h.id]!.potencial)).toBe('B');
+        // El techo queda al menos un rango por encima del nuevo rango (A, S…), y se conoce.
+        expect('FDCBAS'.indexOf(letraDe(estado.heroes[h.id]!.potencial))).toBeGreaterThanOrEqual('FDCBAS'.indexOf('A'));
+        expect(r.despertar).toBeGreaterThanOrEqual(1);
+        expect(rangoPotencial(estado.heroes[h.id]!, 0)).toEqual([r.techoNuevo, r.techoNuevo]);
         expect(estado.heroes[h.id]!.estado).toBe('libre');
       } else {
         muertes++;
@@ -116,5 +119,24 @@ describe('Ascensión', () => {
     let ascensiones: unknown[] = [];
     for (let i = 0; i < balance.ascension.duracion; i++) ascensiones = finalizarDia(estado).ascensiones;
     expect(ascensiones).toHaveLength(1);
+  });
+
+  it('casi siempre el techo sube un rango; a veces dos (extraordinario) y rara vez tres (legendario)', () => {
+    const cuenta: Record<number, number> = {};
+    let exitos = 0;
+    for (let semilla = 1; exitos < 400 && semilla < 5000; semilla++) {
+      const estado = partida();
+      jugador(estado).oro = 1_000_000;
+      const h = fichar(estado, 'jugador', heroe({ id: 'v', poder: 22, potencial: 22 })); // rango D: techo puede llegar a S
+      iniciarAscension(estado, h.id);
+      const r = resolverAscension(estado, new Azar(semilla), estado.enCurso.find((x) => x.ascension)!)!;
+      if (!r.exito) continue;
+      exitos++;
+      cuenta[r.despertar] = (cuenta[r.despertar] ?? 0) + 1;
+    }
+    expect(cuenta[1]! / exitos).toBeGreaterThan(0.6);
+    expect(cuenta[2] ?? 0).toBeGreaterThan(0);
+    expect(cuenta[3] ?? 0).toBeGreaterThan(0);
+    expect((cuenta[3] ?? 0) / exitos).toBeLessThan(0.15);
   });
 });

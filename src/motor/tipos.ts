@@ -29,6 +29,8 @@ export interface Heroe {
   estado: EstadoHeroe;
   /** Días que faltan para recuperarse de una lesión. */
   diasLesion: number;
+  /** El techo real se conoce (tras una Ascensión, el héroe ha mostrado hasta dónde llega). */
+  techoConocido?: boolean;
   /** Semanas seguidas sin cobrar el sueldo. */
   semanasSinCobrar: number;
 }

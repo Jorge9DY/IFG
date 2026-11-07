@@ -304,7 +304,7 @@ Los héroes mejoran misión a misión y el jugador lo ve. No se añade ninguna e
 
 Un héroe que ha llegado a su límite puede intentar romperlo. El jugador paga por enviarlo, **solo**, a una misión de Ascensión muy difícil durante unos días.
 
-- **Si la supera:** asciende de rango (su poder sube hasta la letra siguiente) y su techo sube a esa letra, así que vuelve a crecer.
+- **Si la supera:** asciende de rango (su poder sube hasta la letra siguiente) y su techo queda **por encima de ese nuevo rango**: normalmente un rango más; a veces dos (**despertar extraordinario**) y rara vez tres (**despertar legendario**), con S como máximo (*ilustrativo:* 75%, 20% y 5%). El nuevo techo se conoce con exactitud, porque el héroe acaba de mostrar hasta dónde llega.
 - **Si fracasa: muere.** Es la única forma de morir del juego y por eso pesa: ¿lo vendes o lo arriesgas todo para convertirlo en leyenda?
 - La probabilidad y el coste se muestran antes de enviarlo, con un paso de confirmación que avisa de la muerte. Cuanto más alto el rango, más difícil (*ilustrativo:* 60% desde F, 35% desde A). Desde S no se puede ascender.
 - Se puede repetir tras cada ascenso, siempre más difícil.
@@ -672,6 +672,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-07 | Decisión del propietario: tras una Ascensión el techo queda al menos un rango por encima del nuevo rango (+1, +2 extraordinario, +3 legendario) y se conoce. |
 | 2026-11-07 | Decisiones del propietario: el inventario muestra primero a los héroes libres; la Ascensión se sigue con una barra diaria en la pantalla principal y termina con un gran reveal en el centro. |
 | 2026-11-07 | Decisiones del propietario: la Prueba de los Novatos mejora con la categoría; rediseño del ojeo (rango actual, poder y techo por separado; techo con letras posibles e interrogación; cada rival valora con sus propios ojeadores; precios públicos que no delatan joyas); la Prueba se presenta como sobres de un gacha. |
 | 2026-11-07 | Idea del propietario: zona de entrenamiento como instalación (entrenar unos días a cambio de oro, sin lesiones, sin superar el límite). |

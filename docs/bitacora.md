@@ -2,6 +2,13 @@
 
 Entradas más recientes primero.
 
+## 2026-11-07 — Techo tras la Ascensión
+
+- Petición del propietario: era raro que, al ascender a C, el techo fuera también C. Ahora el techo queda por encima del nuevo rango: +1 (75%), +2 «despertar extraordinario» (20%) o +3 «despertar legendario» (5%), con S como máximo. El techo nuevo se conoce con exactitud (campo `techoConocido`).
+- El gran reveal lo celebra: línea extra y veredicto violeta (extraordinario) o dorado con destello (legendario).
+- Equilibrio: la Ascensión rinde más y el bot ambicioso gana el 68% en 4 temporadas (antes el 58%). Se probó bajar su probabilidad de éxito, pero el bot deja de intentarla y la medida se distorsiona; queda como estaba (35–60%) a falta de probarlo jugando.
+- 78 tests; probado en navegador sin errores.
+
 ## 2026-11-07 — Ascensión en la pantalla principal y gran reveal
 
 - Peticiones del propietario:

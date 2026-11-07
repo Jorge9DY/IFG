@@ -601,3 +601,17 @@ td.tenue { color: var(--tenue); }
 .veredicto .rango { color: #111; }
 .ascension-hud { left: auto; right: 24px; top: 112px; transform: none; width: min(380px, 30vw); }
 @media (max-width: 900px) { .ascension-hud { left: 12px; right: 12px; top: 74px; width: auto; } }
+/* Despertares extraordinarios y legendarios en el reveal de la Ascensión. */
+.veredicto em { display: block; font-style: normal; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; margin-bottom: 2px; }
+.veredicto strong { padding: 0 6px; color: #111; }
+.caja-reveal .linea.extraordinaria { color: #c9b4f5; }
+.caja-reveal .linea.legendaria { color: #fff1c2; text-shadow: 0 0 12px rgba(233, 196, 106, 0.9); }
+.veredicto.extraordinario { border-color: #b9a3e3; background: rgba(185, 163, 227, 0.12); box-shadow: 0 0 34px rgba(185, 163, 227, 0.45); }
+.veredicto.extraordinario em { color: #c9b4f5; }
+.veredicto.legendario {
+  border-color: #fff1c2; background: linear-gradient(120deg, rgba(233, 196, 106, 0.25), rgba(185, 163, 227, 0.2), rgba(63, 216, 232, 0.2));
+  box-shadow: 0 0 50px rgba(233, 196, 106, 0.7); animation: veredicto 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) var(--d) forwards, legendario 2.4s ease-in-out calc(var(--d) + 0.9s) infinite;
+}
+.veredicto.legendario em { color: #fff1c2; }
+@keyframes legendario { 50% { box-shadow: 0 0 80px rgba(233, 196, 106, 0.95); } }
+@media (prefers-reduced-motion: reduce) { .veredicto.legendario { animation: none; opacity: 1; } }

@@ -28,6 +28,10 @@ Tras aplicar las decisiones del propietario (sueldos más altos, instalaciones m
 
 Versión anterior (sueldos e instalaciones baratos): el ambicioso ganaba en el 24% de las partidas y acababa con unos 22.000 de oro; el prudente acumulaba unos 89.000 sin usarlos.
 
+## Techo tras la Ascensión (2026-11-07)
+
+Tras ascender, el techo queda 1–3 rangos por encima. El bot ambicioso gana el 68% de las partidas en 4 temporadas (antes el 58%) e intenta unas 4 Ascensiones por partida. El prudente no cambia (0%). Pendiente de confirmar jugando si la Ascensión compensa demasiado.
+
 ## Con clases, tipos de misión y retos (2026-11-07)
 
 | Métrica | Prudente | Ambiciosa |

@@ -111,6 +111,8 @@
     "_nota": "Decisión del propietario: un héroe al límite puede intentar una misión de Ascensión. Si la supera, asciende de rango y su techo sube una letra; si fracasa, muere. Probabilidades y coste provisionales.",
     "duracion": 3,
     "probExito": { "F": 60, "D": 55, "C": 50, "B": 45, "A": 35 },
+    "_notaTecho": "Decisión del propietario: tras ascender, el techo queda por encima del nuevo rango: +1 (normal), +2 (extraordinario) o +3 (legendario), con S como máximo. Probabilidades (%) provisionales.",
+    "techoExtra": { "1": 75, "2": 20, "3": 5 },
     "factorCoste": 0.5,
     "costeMinimo": 1500
   },

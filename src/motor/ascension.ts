@@ -53,6 +53,17 @@ export function iniciarAscension(estado: EstadoJuego, heroeId: string): void {
   registrar(estado, 'mision', `${h.nombre} parte hacia su Ascensión (${c.probabilidad}% de volver).`);
 }
 
+/** Cuántos rangos sube el techo por encima del nuevo rango: casi siempre 1, a veces 2, rara vez 3. */
+function tirarDespertar(azar: Azar): number {
+  const tabla = A.techoExtra as Record<string, number>;
+  let tirada = azar.siguiente() * 100;
+  for (const [extra, p] of Object.entries(tabla)) {
+    if (tirada < p) return Number(extra);
+    tirada -= p;
+  }
+  return 1;
+}
+
 export interface ResultadoAscension {
   heroeId: string;
   nombre: string;
@@ -63,6 +74,8 @@ export interface ResultadoAscension {
   poderDespues: number;
   /** Letra del nuevo techo (si lo consigue). */
   techoNuevo: Letra | null;
+  /** Rangos que el techo queda por encima del nuevo rango: 1 normal, 2 extraordinario, 3 legendario. */
+  despertar: number;
 }
 
 /**
@@ -79,17 +92,22 @@ export function resolverAscension(estado: EstadoJuego, azar: Azar, c: MisionEnCu
   const prob = (A.probExito as Record<string, number>)[rangoAntes] ?? 0;
   if (azar.d100() <= prob) {
     const i = indiceLetra(rangoAntes) + 1;
+    const despertar = tirarDespertar(azar);
+    // El techo queda 1, 2 o 3 rangos por encima del nuevo rango (S como máximo) y se conoce.
+    const techo = Math.min(LETRAS.length - 1, i + despertar);
     h.poder = Math.max(h.poder, U[i] ?? h.poder);
-    h.potencial = Math.max(h.poder, (U[i + 1] ?? 101) - 1);
+    h.potencial = Math.max(h.poder, (U[techo + 1] ?? 101) - 1);
+    h.techoConocido = true;
     h.experiencia = 0;
     h.estado = 'libre';
     h.reputacion = Math.min(100, h.reputacion + 10);
     const rangoDespues = letraDe(h.poder);
-    registrar(estado, 'mision', `¡${h.nombre} supera su Ascensión y asciende a rango ${rangoDespues}! Su nuevo techo es ${letraDe(h.potencial)}.`);
-    return { heroeId: h.id, nombre: h.nombre, exito: true, rangoAntes, rangoDespues, poderAntes, poderDespues: h.poder, techoNuevo: letraDe(h.potencial) };
+    const tipo = despertar >= 3 ? ' (despertar legendario)' : despertar === 2 ? ' (despertar extraordinario)' : '';
+    registrar(estado, 'mision', `¡${h.nombre} supera su Ascensión y asciende a rango ${rangoDespues}! Su nuevo techo es ${letraDe(h.potencial)}${tipo}.`);
+    return { heroeId: h.id, nombre: h.nombre, exito: true, rangoAntes, rangoDespues, poderAntes, poderDespues: h.poder, techoNuevo: letraDe(h.potencial), despertar: indiceLetra(letraDe(h.potencial)) - indiceLetra(rangoDespues) };
   }
   if (g) g.plantilla = g.plantilla.filter((x) => x !== h.id);
   delete estado.heroes[h.id];
   registrar(estado, 'mision', `${h.nombre} no vuelve de su Ascensión. El gremio guarda luto.`);
-  return { heroeId: h.id, nombre: h.nombre, exito: false, rangoAntes, rangoDespues: rangoAntes, poderAntes, poderDespues: poderAntes, techoNuevo: null };
+  return { heroeId: h.id, nombre: h.nombre, exito: false, rangoAntes, rangoDespues: rangoAntes, poderAntes, poderDespues: poderAntes, techoNuevo: null, despertar: 0 };
 }

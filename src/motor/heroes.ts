@@ -90,7 +90,7 @@ export function rangoPotencial(h: Heroe, nivelOjeadores: number): [Letra, Letra]
   const ancho = anchuras[Math.min(nivelOjeadores, anchuras.length - 1)] ?? 1;
   const real = indiceLetra(letraDe(h.potencial));
   // Al llegar a su límite se revela su potencial real.
-  if (h.poder >= h.potencial) return [letraDe(h.potencial), letraDe(h.potencial)];
+  if (h.poder >= h.potencial || h.techoConocido) return [letraDe(h.potencial), letraDe(h.potencial)];
   let inicio = Math.min(Math.max(real - Math.floor(h.sesgoOjeo * ancho), 0), LETRAS.length - ancho);
   const fin = Math.min(inicio + ancho - 1, LETRAS.length - 1);
   inicio = Math.max(inicio, indiceLetra(letraDe(h.poder)));

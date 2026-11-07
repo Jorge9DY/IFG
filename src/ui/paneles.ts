@@ -60,6 +60,12 @@ const EFECTO_CLASE: Record<string, string> = {
   Sanador: 'Sanador: sus compañeros se lesionan menos.',
 };
 
+/** Cómo se anuncia un despertar según cuántos rangos sube su techo por encima del nuevo rango. */
+const DESPERTAR: Record<number, { titulo: string; clase: string }> = {
+  2: { titulo: 'Despertar extraordinario', clase: 'extraordinario' },
+  3: { titulo: 'Despertar legendario', clase: 'legendario' },
+};
+
 /** Brillo del sobre de un novato según el mejor techo que ven tus ojeadores. */
 const BRILLO: Record<string, string> = { S: 'oro', A: 'violeta', B: 'azul' };
 
@@ -698,7 +704,7 @@ export class Interfaz {
     const ascensiones = r.ascensiones
       .map((a) =>
         a.exito
-          ? `<div class="resultado r-exito ascension"><b>¡${esc(a.nombre)} supera su Ascensión!</b><span>Asciende a rango ${a.rangoDespues} (poder ${a.poderAntes} → ${a.poderDespues}) y su nuevo techo es ${a.techoNuevo}.</span></div>`
+          ? `<div class="resultado r-exito ascension"><b>¡${esc(a.nombre)} supera su Ascensión!</b><span>Asciende a rango ${a.rangoDespues} (poder ${a.poderAntes} → ${a.poderDespues}) y su nuevo techo es ${a.techoNuevo}${a.despertar >= 3 ? ': ¡despertar legendario!' : a.despertar === 2 ? ': ¡despertar extraordinario!' : ''}.</span></div>`
           : `<div class="resultado r-fracaso ascension"><b>${esc(a.nombre)} no vuelve de su Ascensión</b><span>El gremio guarda luto.</span></div>`,
       )
       .join('');
@@ -987,9 +993,10 @@ export class Interfaz {
           return html;
         };
         const preambulo = t.preambulo.map((x) => linea(x)).join('');
-        const desenlace = (r.exito ? t.exito : t.fracaso).map((x) => linea(x, r.exito ? 'luz' : 'sombra')).join('');
+        const extra = r.exito && r.despertar >= 3 ? linea(t.legendario, 'legendaria') : r.exito && r.despertar === 2 ? linea(t.extraordinario, 'extraordinaria') : '';
+        const desenlace = (r.exito ? t.exito : t.fracaso).map((x) => linea(x, r.exito ? 'luz' : 'sombra')).join('') + extra;
         const veredicto = r.exito
-          ? `<div class="veredicto exito" style="--d:${retraso.toFixed(1)}s"><span class="rango r${r.rangoDespues}">${r.rangoDespues}</span><div><b>¡${esc(r.nombre)} asciende a rango ${r.rangoDespues}!</b><span>Poder ${r.poderAntes} → ${r.poderDespues} · nuevo techo ${r.techoNuevo ?? r.rangoDespues}</span></div></div>`
+          ? `<div class="veredicto exito ${DESPERTAR[r.despertar]?.clase ?? ''}" style="--d:${retraso.toFixed(1)}s"><span class="rango r${r.rangoDespues}">${r.rangoDespues}</span><div>${DESPERTAR[r.despertar]?.titulo ? `<em>${DESPERTAR[r.despertar]!.titulo}</em>` : ''}<b>¡${esc(r.nombre)} asciende a rango ${r.rangoDespues}!</b><span>Poder ${r.poderAntes} → ${r.poderDespues} · ${r.despertar === 0 ? 'ha alcanzado la cima' : `nuevo techo <strong class="r${r.techoNuevo}">${r.techoNuevo}</strong>`}</span></div></div>`
           : `<div class="veredicto fracaso" style="--d:${retraso.toFixed(1)}s"><div><b>${esc(r.nombre)} ha caído en su Ascensión</b><span>El gremio guarda luto.</span></div></div>`;
         retraso += paso;
         return `<div class="bloque-reveal">${preambulo}${desenlace}${veredicto}</div>`;
