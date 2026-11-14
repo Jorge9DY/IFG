@@ -40,6 +40,7 @@ import type { ResultadoAscension } from '../motor/ascension';
 import { equipoRecomendado, heroesLibres, nivelDificultad, probabilidadRecomendada } from './ayudas';
 import { borrar, cargar, guardar } from './guardado';
 import { esc, num, pct } from './html';
+import type { CombateTorneo } from '../motor/torneo';
 import { retrato } from './retrato';
 
 export type Panel = 'nueva' | 'misiones' | 'mercado' | 'gremio' | 'prueba' | 'dia' | 'semana' | 'victoria';
@@ -612,6 +613,21 @@ export class Interfaz {
       ${bloques || '<p class="tenue">No tienes héroes.</p>'}`;
   }
 
+  /** Resultados del torneo de fin de temporada: tu campeón y el ganador de cada categoría. */
+  private tablaTorneo(estado: EstadoJuego, combates: CombateTorneo[]): string {
+    const filas = combates
+      .map((c) => {
+        const mio = c.campeones.find((x) => x.gremioId === estado.jugadorId);
+        const ganador = c.campeones.find((x) => x.gremioId === c.ganador);
+        const gano = c.ganador === estado.jugadorId;
+        return `<tr class="${gano ? 'propio' : ''}"><td>${esc(c.categoria)}</td><td>${mio ? `${esc(mio.nombre.split(' ')[0] ?? '')} (${mio.poder})` : '<span class="tenue">nadie</span>'}</td><td>${ganador ? `${esc(estado.gremios[ganador.gremioId]?.nombre ?? '')} · ${esc(ganador.nombre.split(' ')[0] ?? '')} (${ganador.poder})` : '—'}</td></tr>`;
+      })
+      .join('');
+    const ganadas = combates.filter((c) => c.ganador === estado.jugadorId).length;
+    return `<h3>Torneo de fin de temporada</h3><p>${ganadas ? `¡Ganas ${ganadas} ${ganadas === 1 ? 'categoría' : 'categorías'}!` : 'Esta vez no ganas ninguna categoría.'} <span class="tenue">Cada gremio presenta a su mejor héroe de cada clase y al mejor de todos; gana el de más poder.</span></p>
+      <table><thead><tr><th>Categoría</th><th>Tu campeón</th><th>Ganador</th></tr></thead><tbody>${filas}</tbody></table>`;
+  }
+
   private tablaRanking(estado: EstadoJuego, filas = estado.ranking): string {
     const ahora = new Map(calcularRanking(estado).map((f) => [f.gremioId, f]));
     return `<table><thead><tr><th></th><th>Gremio</th><th class="num">Fuerza</th><th class="num">Prestigio</th><th class="num">Puntos</th><th class="num">Ahora</th></tr></thead><tbody>${filas
@@ -777,7 +793,7 @@ export class Interfaz {
       : '';
     const ascenso = r.categoriaNueva ? `<div class="resultado ascenso-categoria"><b>¡Categoría ${r.categoriaNueva}!</b><span>La Asociación asciende a tu gremio: desde mañana el tablón ofrece misiones más difíciles y mejor pagadas.</span></div>` : '';
     const reto = estado.reto && !estado.reto.resultado ? `<div class="resultado reto-aviso"><b>Nuevo reto</b><span>El maestro de ${esc(estado.gremios[estado.reto.gremioId]?.nombre ?? '')} te reta con un ${estado.reto.clase.toLowerCase()} de rango ${estado.reto.rango}. Respóndele en el Mercado de héroes.</span></div>` : '';
-    return `<p><strong>${titular}</strong> Eres ${actual}.º.</p>${ascenso}${reto}${temporada}${this.tablaRanking(estado, r.ranking)}
+    return `<p><strong>${titular}</strong> Eres ${actual}.º.</p>${ascenso}${reto}${temporada}${r.torneo ? this.tablaTorneo(estado, r.torneo) : ''}${this.tablaRanking(estado, r.ranking)}
       <div class="botones"><button class="principal" data-accion="${r.victoria ? 'ver-victoria' : 'cerrar'}">Seguir</button></div>`;
   }
 

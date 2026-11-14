@@ -78,6 +78,8 @@ export interface Gremio {
   novatosDestacados: number;
   /** Retos de maestros ganados (prestigio). */
   retosGanados?: number;
+  /** Categorías del torneo de fin de temporada ganadas (prestigio). */
+  torneosGanados?: number;
   /** Clase en la que se especializa un rival: puja más por ella. */
   clase?: Clase;
   /** Categoría del gremio (D–S): sube con el prestigio, nunca baja, y marca el nivel del tablón. */

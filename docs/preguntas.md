@@ -87,3 +87,17 @@ Análisis con el simulador (150 partidas, semana a semana; herramienta `herramie
 
 Aplicado: zona de entrenamiento (idea del propietario) y Prueba de los Novatos que crece con la categoría, con el ojeo rediseñado y la revelación tipo gacha (biblia, sección 8). Pendiente de decidir: categorías más seguidas y que la sede dé algo más que plazas.
 
+## 18. Modo historia (decisión del propietario, 2026-11-14)
+
+Para adaptar el prototipo hace falta decidir:
+
+1. **Enlace a la hoja de cálculo** con los héroes diseñados (y si es la versión definitiva o va a cambiar).
+2. **Duración:** ¿cuántas temporadas dura el modo historia?
+3. **Plantilla inicial:** ¿con qué héroes empieza el jugador?
+4. **Rivales:** ¿sus héroes también son diseñados y vienen en la hoja?
+5. **Prueba de los Novatos:** ¿qué novatos llegan cada semana? ¿Siempre los mismos en el mismo orden, o hay una bolsa de la que salen?
+6. **Potencial:** ¿cada héroe tiene un techo fijo de diseño, o hay algo de variación entre partidas?
+7. **Eventos y finales:** ¿qué eventos y finales hay, y qué inversión en qué héroe desbloquea cada uno?
+8. **Torneo de fin de temporada:** ¿qué formato y qué papel tiene en la historia?
+9. **Condición de final:** ¿el modo historia termina siempre tras X temporadas, con un final según lo conseguido?
+

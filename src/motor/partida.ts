@@ -25,6 +25,7 @@ import {
 import { generarHeroe, letraPotencialNovato } from './heroes';
 import { duracionMision, generarTablon, resolverMision, type InformeMision } from './misiones';
 import { caducarReto, generarReto } from './retos';
+import { celebrarTorneo, type CombateTorneo } from './torneo';
 import { resolverEntrenamientos, type ResultadoEntrenamiento } from './entrenamiento';
 import { resolverAscension, type ResultadoAscension } from './ascension';
 import { actualizarCategoria, categoria, categoriaPorPrestigio, multiplicadores } from './categorias';
@@ -349,6 +350,8 @@ export interface ResumenSemana {
   /** Cierre de temporada (cada 4 semanas). */
   temporada: { numero: number; puesto: number; premio: number } | null;
   victoria: boolean;
+  /** Torneo de fin de temporada (solo al cerrar la temporada). */
+  torneo: CombateTorneo[] | null;
   /** Nueva categoría del gremio del jugador, si ha subido (por ejemplo, al fichar un novato destacado). */
   categoriaNueva: Letra | null;
 }
@@ -371,6 +374,8 @@ export function terminarPrueba(estado: EstadoJuego): ResumenSemana {
     for (const r of prueba.resultados) if (!r.ganador) delete estado.heroes[r.heroeId];
     estado.prueba = null;
 
+    // Al cerrar la temporada, antes del ranking final, se celebra el torneo.
+    const torneo = esFinDeTemporada(estado.dia) ? celebrarTorneo(estado, azar) : null;
     const categoriaNueva = actualizarCategorias(estado);
     const puestoAnterior = puesto(estado, estado.jugadorId);
     estado.ranking = calcularRanking(estado);
@@ -394,7 +399,7 @@ export function terminarPrueba(estado: EstadoJuego): ResumenSemana {
     } else {
       avanzarDia(estado, azar);
     }
-    return { ranking: estado.ranking, puestoAnterior, temporada, victoria, categoriaNueva };
+    return { ranking: estado.ranking, puestoAnterior, temporada, victoria, torneo, categoriaNueva };
   });
 }
 

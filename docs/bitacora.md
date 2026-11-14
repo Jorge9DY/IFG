@@ -2,6 +2,14 @@
 
 Entradas más recientes primero.
 
+## 2026-11-14 — Nueva dirección: modo historia
+
+- Decisión del propietario: se descartan las tres ramas de desarrollo (economía e investigación). La rama `claude/tres-ramas-desarrollo` se conserva en GitHub sin integrar; el trabajo sigue en `claude/nifty-brown-p6ih7z`.
+- Nueva dirección: modo historia con héroes diseñados (catálogo en una hoja de cálculo del propietario), duración de X temporadas, eventos con guion y rejugabilidad según en qué héroes se invierte (eventos y finales distintos). Foco en misiones, héroes y fichajes.
+- El torneo de fin de temporada, que solo existía en la rama descartada, pasa a la versión principal (módulo `torneo.ts`, cifras en `balance.json`, resultados en el ranking de fin de temporada).
+- Biblia, plan y preguntas (pregunta 18) actualizados. 83 tests.
+- Pendiente: el enlace a la hoja de héroes y las decisiones de la pregunta 18.
+
 ## 2026-11-07 — Misiones repetibles y retratos de los héroes
 
 - Petición del propietario: cada misión del tablón se puede lanzar tantas veces como equipos libres tengas, para decidir entre varias bajas o una alta. La carta muestra cuántas veces se ha lanzado hoy («×2 hoy») y avisa si el oro llegaría después de la Prueba de los Novatos; la formación indica qué día vuelve el equipo. Los rivales también reparten a todos sus héroes (ya no tienen tope de 2 misiones).

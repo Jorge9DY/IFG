@@ -116,6 +116,12 @@
     "factorCoste": 0.5,
     "costeMinimo": 1500
   },
+  "torneo": {
+    "_nota": "Propuesta: al cerrar la temporada, cada gremio presenta a su mejor héroe de cada clase y al mejor de todos (categoría absoluta). Gana el de más poder. Premios provisionales por categoría ganada.",
+    "categorias": ["Guerrero", "Mago", "Explorador", "Sanador", "Absoluta"],
+    "oroPorCategoria": 2500,
+    "prestigioPorCategoria": 12
+  },
   "ranking": {
     "_nota": "Sección 6: Puntos = Fuerza + Prestigio. Pesos provisionales, aproximadamente iguales al principio.",
     "heroesFuerza": 5,

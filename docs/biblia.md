@@ -48,6 +48,19 @@ No es solo administrar una empresa: es levantar una organización legendaria con
 
 > **Regla de oro:** el sistema puede ser profundo por dentro, pero la experiencia del jugador debe ser sencilla, intuitiva y emocionalmente significativa.
 
+### Modo historia \[Aceptado\] (decisión del propietario, 2026-11-14)
+
+El juego deja de generar héroes nuevos en cada partida. Pasa a ser un **modo historia**:
+
+- **Héroes ya diseñados.** Cada héroe tiene nombre, clase, estadísticas, potencial y personalidad decididos por el equipo de diseño. El catálogo vive en una hoja de cálculo del propietario.
+- **Duración fija:** el modo historia dura un número cerrado de temporadas (\[Abierto\]: cuántas).
+- **Eventos con guion:** los acontecimientos importantes ocurren cuando lo decide el diseño (qué semana, qué temporada, con qué condiciones), no al azar.
+- **Rejugabilidad por inversión:** en cada partida el jugador reparte sus recursos (oro, tiempo, misiones, entrenamientos, Ascensiones, fichajes) entre unos héroes u otros. Esas elecciones **desbloquean eventos y finales distintos**.
+
+### Foco del diseño \[Aceptado\] (2026-11-14)
+
+El juego se centra en **misiones, héroes y fichajes**. No se añaden sistemas nuevos: cualquier mecánica nueva debe dar profundidad a las que ya existen (la Prueba de los Novatos, el torneo de fin de temporada, la Ascensión, el mercado, los retos…). Queda descartada la propuesta de las tres ramas de desarrollo (economía con establecimientos e investigación), que se quedó en la rama `claude/tres-ramas-desarrollo` sin integrar.
+
 ## 2. Bucle de juego y calendario
 
 **\[Aceptado\]** El juego avanza por días con el botón «Finalizar día»; cada 7 días se celebra la Prueba de los Novatos. («Terminar semana» quedó descartado.)
@@ -68,7 +81,7 @@ No es solo administrar una empresa: es levantar una organización legendaria con
 | Día | 1 turno | Misiones, mercado, eventos. |
 | Semana | 7 días | Día 7: pago de sueldos y después Prueba de los Novatos. Se actualiza el ranking. |
 | Temporada | 4 semanas (28 días) | Cierre oficial del ranking y premio en oro según la posición. |
-| Partida | Varias temporadas | Termina al cerrar una temporada en el n.º 1 **\[Aceptado\]**. |
+| Partida | Modo historia de X temporadas | Duración y final(es) según el modo historia \[Abierto\]. El prototipo aún termina al cerrar una temporada en el n.º 1. |
 
 Motivo: sin temporadas no hay presión de tiempo ni un final claro. Pagar sueldos justo antes de la subasta genera cada semana el dilema «¿pago a todos o pujo fuerte?».
 
@@ -134,6 +147,10 @@ Los sueldos son el gasto fijo semanal del gremio. El diseño ya los daba por hec
 **\[Aceptado\]** Las instalaciones son caras: junto con los sueldos, son el gran destino del oro y evitan que se acumule sin uso.
 
 **\[Abierto\]** Lista de instalaciones, niveles, costes y efectos concretos.
+
+### Torneo de fin de temporada \[Propuesta\]
+
+Al cerrar la temporada, antes del ranking final, cada gremio presenta a su mejor héroe de cada clase y al mejor de todos (categoría absoluta). Gana el de más poder; cada categoría ganada da oro y prestigio. Premia una plantilla capaz de competir en todas las categorías. **\[Abierto\]** Formato definitivo (¿elige el jugador a sus campeones?, ¿combates?, ¿por equipos?) y su papel en el modo historia.
 
 ## 5. Misiones
 
@@ -637,6 +654,16 @@ La fase 1 es el foco actual; la narrativa entra cuando ya hay algo que la multip
 
 **Fuera de alcance por ahora:** romances complejos, familias y matrimonios, traiciones elaboradas, árboles narrativos gigantes.
 
+### Qué cambia con el modo historia \[Abierto: por adaptar\]
+
+Partes del prototipo que se hicieron para partidas generadas y que hay que adaptar a héroes diseñados y eventos con guion:
+
+- **Héroes del jugador y de los rivales:** hoy se generan al azar; pasarán a cargarse del catálogo diseñado.
+- **Prueba de los Novatos:** hoy los novatos se generan cada semana; pasarán a ser novatos diseñados que llegan en semanas concretas. Se mantienen la subasta, el ojeo del techo y la revelación tipo gacha.
+- **Ojeo y techo oculto:** el potencial de cada héroe será un dato de diseño, pero el jugador lo seguirá viendo como letras con duda.
+- **Retos de los maestros y eventos:** pasarán a tener momentos y condiciones fijados por guion.
+- **Final:** de «gana quien cierre una temporada en el n.º 1» a varios finales según las decisiones del jugador.
+
 ## 18. Decisiones pendientes
 
 Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
@@ -676,6 +703,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-14 | Decisión del propietario: **modo historia** con héroes diseñados, duración de X temporadas, eventos con guion y rejugabilidad por inversión que desbloquea eventos y finales. Foco en misiones, héroes y fichajes; las mecánicas nuevas solo profundizan las existentes. Se descarta la propuesta de las tres ramas (economía e investigación). El torneo de fin de temporada pasa a la versión principal como \[Propuesta\]. |
 | 2026-11-07 | Decisiones del propietario: cada misión del tablón se puede repetir mientras haya equipos libres (con aviso si el oro llega después de la Prueba); retratos provisionales generados para cada héroe. |
 | 2026-11-07 | Decisión del propietario: tras una Ascensión el techo queda al menos un rango por encima del nuevo rango (+1, +2 extraordinario, +3 legendario) y se conoce. |
 | 2026-11-07 | Decisiones del propietario: el inventario muestra primero a los héroes libres; la Ascensión se sigue con una barra diaria en la pantalla principal y termina con un gran reveal en el centro. |

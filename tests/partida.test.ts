@@ -148,8 +148,11 @@ describe('partida', () => {
     const oros = Object.fromEntries(Object.values(estado.gremios).map((g) => [g.id, g.oro]));
     const semana = terminarPrueba(estado);
     expect(semana.temporada?.numero).toBe(1);
+    // Además del premio por posición, cada categoría del torneo ganada da oro.
+    expect(semana.torneo).toHaveLength(balance.torneo.categorias.length);
     for (const fila of semana.ranking) {
-      expect(estado.gremios[fila.gremioId]!.oro).toBe((oros[fila.gremioId] ?? 0) + (balance.temporada.premios[fila.puesto - 1] ?? 0));
+      const ganadas = semana.torneo!.filter((c) => c.ganador === fila.gremioId).length;
+      expect(estado.gremios[fila.gremioId]!.oro).toBe((oros[fila.gremioId] ?? 0) + (balance.temporada.premios[fila.puesto - 1] ?? 0) + ganadas * balance.torneo.oroPorCategoria);
     }
     expect(estado.dia).toBe(29);
   });

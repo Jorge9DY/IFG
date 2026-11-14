@@ -30,6 +30,17 @@ No se pasa a la siguiente fase sin superar su puerta (biblia, sección 17). El r
 
 **Reglas de arquitectura:** el motor (`src/motor/`) es lógica pura y no importa nada de `ui/`, `escena3d/` ni del navegador; la interfaz solo lee el estado y llama a acciones del motor; toda la aleatoriedad pasa por `Azar` con semilla; el estado es un objeto plano serializable.
 
+## Nueva dirección: modo historia (2026-11-14)
+
+Decisión del propietario: el juego pasa a un **modo historia** con héroes diseñados, duración de X temporadas y eventos con guion. La rejugabilidad viene de en qué héroes invierte el jugador, que desbloquea eventos y finales distintos. El foco son las misiones, los héroes y los fichajes; no se añaden sistemas nuevos, solo profundidad a los existentes. Se descartan las tres ramas de desarrollo (rama `claude/tres-ramas-desarrollo`, sin integrar).
+
+- [x] Torneo de fin de temporada en la versión principal (propuesta)
+- [ ] Importar el catálogo de héroes diseñados desde la hoja de cálculo del propietario
+- [ ] Cargar la plantilla inicial, los rivales y los novatos desde el catálogo en lugar de generarlos
+- [ ] Guion de temporadas: duración, qué novatos llegan cada semana y qué eventos ocurren
+- [ ] Condiciones de eventos y finales según la inversión del jugador en cada héroe
+- [ ] Profundizar misiones, héroes y fichajes (Prueba de los Novatos, torneo, Ascensión, mercado, retos)
+
 ## Fase 1 — Núcleo económico (foco actual)
 
 - [x] Calendario por días con «Finalizar día»; semanas de 7 días y temporadas de 28

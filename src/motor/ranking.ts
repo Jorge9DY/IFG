@@ -21,7 +21,8 @@ export function prestigio(g: Gremio): number {
     R.prestigioPorNivelInstalacion * (g.nivelSede + g.nivelOjeadores + (g.nivelEntrenamiento ?? 0)) +
     R.prestigioPorMisionAlta * g.misionesAltas +
     R.prestigioPorNovatoDestacado * g.novatosDestacados +
-    R.prestigioPorReto * (g.retosGanados ?? 0)
+    R.prestigioPorReto * (g.retosGanados ?? 0) +
+    balance.torneo.prestigioPorCategoria * (g.torneosGanados ?? 0)
   );
 }
 
