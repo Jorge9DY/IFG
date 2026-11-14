@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import balance from '../src/datos/balance.json';
 import { jugador } from '../src/motor/estado';
-import { nivelOjeo, OJEO_MAXIMO, potencialEstimado, rangoPotencial, techoSeguro, valor, valorPublico } from '../src/motor/heroes';
+import { indiceLetra, nivelOjeo, OJEO_MAXIMO, potencialEstimado, rangoPotencial, techoSeguro, valor, valorPublico } from '../src/motor/heroes';
 import { pruebaDeCategoria, finalizarDia, terminarPrueba } from '../src/motor/partida';
 import { potencialVisto } from '../src/motor/rivales';
 import { precioSalida } from '../src/motor/subasta';
@@ -25,7 +25,7 @@ describe('ojeo: lo que cada gremio sabe del techo', () => {
 
   it('con más ojeadores quedan menos letras posibles; al máximo, el techo es exacto', () => {
     const h = heroe({ id: 'h', poder: 20, potencial: 70, sesgoOjeo: 0.7 });
-    const anchos = [0, 1, 2, 3].map((n) => { const [a, b] = rangoPotencial(h, n); return 'FDCBAS'.indexOf(b) - 'FDCBAS'.indexOf(a); });
+    const anchos = [0, 1, 2, 3].map((n) => { const [a, b] = rangoPotencial(h, n); return indiceLetra(b) - indiceLetra(a); });
     for (let i = 1; i < anchos.length; i++) expect(anchos[i]!).toBeLessThanOrEqual(anchos[i - 1]!);
     expect(techoSeguro(h, OJEO_MAXIMO)).toBe(true);
     expect(potencialEstimado(h, OJEO_MAXIMO)).toBeGreaterThanOrEqual(65);
@@ -53,14 +53,26 @@ describe('ojeo: lo que cada gremio sabe del techo', () => {
 });
 
 describe('Prueba de los Novatos que crece con la categoría', () => {
-  it('a más categoría, más novatos y más fuertes', () => {
+  it('a más categoría, más novatos y más probables los de techo alto (todos empiezan en F)', () => {
     const estado = partida();
     const d = pruebaDeCategoria(estado);
     jugador(estado).categoria = 'B';
     const b = pruebaDeCategoria(estado);
     expect(b.cantidad).toBeGreaterThan(d.cantidad);
-    expect(b.poder[0]).toBeGreaterThan(d.poder[0]);
-    expect((b.potencial.S ?? 0) + (b.potencial.A ?? 0)).toBeGreaterThan((d.potencial.S ?? 0) + (d.potencial.A ?? 0));
+    expect(b.pesoTecho).toBeGreaterThan(d.pesoTecho);
+    expect(b.poder).toEqual([1, 9]);
+  });
+
+  it('los candidatos salen de la bolsa de héroes libres del catálogo, en rango F, y los no fichados vuelven a ella', () => {
+    const estado = partida();
+    const bolsa = estado.bolsaNovatos.length;
+    while (!estado.prueba) finalizarDia(estado);
+    const candidatos = estado.prueba!.pendientes.map((id) => estado.heroes[id]!);
+    expect(candidatos.every((h) => h.catalogo && h.poder <= 9)).toBe(true);
+    expect(estado.bolsaNovatos.length).toBe(bolsa - candidatos.length);
+    terminarPrueba(estado);
+    const fichados = candidatos.filter((h) => estado.heroes[h.id]).length;
+    expect(estado.bolsaNovatos.length).toBe(bolsa - fichados);
   });
 
   it('el día 7 llegan tantos novatos como marca la categoría', () => {

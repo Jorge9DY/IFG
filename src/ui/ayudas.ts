@@ -2,7 +2,9 @@
 // Solo leen el estado y usan reglas del motor.
 
 import { heroesDe, type EstadoJuego } from '../motor/estado';
-import { poderEquipo, probabilidadMision } from '../motor/misiones';
+import { motivoNoIr } from '../motor/habilidades';
+import { equiposPosibles, poderEquipo } from '../motor/misiones';
+import { probabilidadJugador } from '../motor/partida';
 import type { Heroe, Mision } from '../motor/tipos';
 
 /** Héroes del jugador que pueden salir de misión ahora. */
@@ -10,26 +12,21 @@ export function heroesLibres(estado: EstadoJuego): Heroe[] {
   return heroesDe(estado, estado.jugadorId).filter((h) => h.estado === 'libre');
 }
 
-function combinaciones<T>(lista: readonly T[], k: number): T[][] {
-  if (k === 0) return [[]];
-  const resultado: T[][] = [];
-  lista.forEach((x, i) => {
-    for (const resto of combinaciones(lista.slice(i + 1), k - 1)) resultado.push([x, ...resto]);
-  });
-  return resultado;
-}
-
 /**
- * Equipo recomendado: de los equipos del tamaño exacto que llegan al 80% de éxito (contando las clases
- * que favorece la misión), el de menos poder, para no gastar a los mejores. Si ninguno llega, el de más éxito. Vacío si no hay héroes suficientes.
+ * Equipo recomendado: de los equipos que llenan los huecos de la misión y llegan al 80% de éxito (con
+ * clases, habilidades, ánimo y química), el de menos poder, para no gastar a los mejores. Si ninguno llega,
+ * el de más éxito. Vacío si no hay héroes suficientes.
  */
 export function equipoRecomendado(estado: EstadoJuego, mision: Mision, candidatos = heroesLibres(estado)): Heroe[] {
-  if (candidatos.length < mision.equipo) return [];
-  const opciones = combinaciones([...candidatos].sort((a, b) => b.poder - a.poder).slice(0, 12), mision.equipo);
-  const llegan = opciones.filter((e) => probabilidadMision(mision, e) >= 80);
+  const ordenados = [...candidatos].sort((a, b) => b.poder - a.poder);
+  const opciones = equiposPosibles(ordenados, mision.equipo)
+    .filter((e) => e.every((h) => !motivoNoIr(estado, h, e.map((x) => x.id))))
+    .map((e) => ({ e, p: probabilidadJugador(estado, mision, e) }));
+  if (opciones.length === 0) return [];
   const orden = (a: Heroe[], b: Heroe[]): number => poderEquipo(a) - poderEquipo(b);
-  if (llegan.length > 0) return llegan.sort(orden)[0] ?? [];
-  return opciones.sort((a, b) => probabilidadMision(mision, a) - probabilidadMision(mision, b) || orden(a, b)).at(-1) ?? [];
+  const llegan = opciones.filter((o) => o.p >= 80);
+  if (llegan.length > 0) return llegan.sort((a, b) => orden(a.e, b.e))[0]?.e ?? [];
+  return opciones.sort((a, b) => a.p - b.p || orden(a.e, b.e)).at(-1)?.e ?? [];
 }
 
 export type NivelDificultad = 'facil' | 'asequible' | 'arriesgada' | 'muy-dificil' | 'sin-equipo';
@@ -46,5 +43,5 @@ export function nivelDificultad(probabilidad: number | null): NivelDificultad {
 export function probabilidadRecomendada(estado: EstadoJuego, mision: Mision): number | null {
   const equipo = equipoRecomendado(estado, mision);
   if (equipo.length === 0) return null;
-  return probabilidadMision(mision, equipo);
+  return probabilidadJugador(estado, mision, equipo);
 }

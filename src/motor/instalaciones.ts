@@ -4,6 +4,7 @@
 import balance from '../datos/balance.json';
 import { gremio, registrar, type EstadoJuego } from './estado';
 import type { Gremio } from './tipos';
+import { alGastar } from './habilidades';
 
 const I = balance.instalaciones;
 
@@ -32,7 +33,9 @@ export function costeMejora(g: Gremio, tipo: Instalacion): number | null {
   const tabla = tipo === 'sede' ? I.sede.coste : tipo === 'ojeadores' ? I.ojeadores.coste : I.entrenamiento.coste;
   // La sede empieza en el nivel 1; los ojeadores y la zona de entrenamiento, en el 0.
   const indice = tipo === 'sede' ? g.nivelSede - 1 : nivel(g, tipo);
-  return tabla[indice] ?? null;
+  const coste = tabla[indice];
+  // Chapuzas: cada semana las obras salen más baratas o más caras.
+  return coste === undefined ? null : Math.round((coste * (g.factorObras ?? 1)) / 50) * 50;
 }
 
 export interface InfoInstalacion {
@@ -60,5 +63,6 @@ export function mejorar(estado: EstadoJuego, gremioId: string, tipo: Instalacion
   if (tipo === 'sede') g.nivelSede += 1;
   else if (tipo === 'ojeadores') g.nivelOjeadores += 1;
   else g.nivelEntrenamiento = (g.nivelEntrenamiento ?? 0) + 1;
+  alGastar(estado, gremioId);
   registrar(estado, g.esJugador ? 'instalacion' : 'rival', `${g.nombre} mejora ${NOMBRE_INSTALACION[tipo].toLowerCase()} al nivel ${nivel(g, tipo)}.`);
 }

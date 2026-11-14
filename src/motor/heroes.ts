@@ -1,9 +1,10 @@
 // Héroes (biblia, sección 9): generación, potencial visible como rango, sueldo, valor y progresión.
 
 import balance from '../datos/balance.json';
+import catalogo from '../datos/heroes.json';
 import nombres from '../datos/nombres.json';
 import type { Azar } from './azar';
-import { CLASES, LETRAS, type Clase, type Heroe, type Letra } from './tipos';
+import { CLASES, LETRAS, type Clase, type Genero, type Heroe, type Letra } from './tipos';
 
 const L = balance.letras;
 
@@ -18,6 +19,73 @@ export function letraDe(valor: number): Letra {
 
 export function indiceLetra(letra: Letra): number {
   return LETRAS.indexOf(letra);
+}
+
+/** Poder mínimo de un rango. */
+export function pisoDe(letra: Letra): number {
+  return L.umbral[indiceLetra(letra)] ?? 0;
+}
+
+/** Poder máximo de un rango (S llega a 100). */
+export function techoDe(letra: Letra): number {
+  return (L.umbral[indiceLetra(letra) + 1] ?? 101) - 1;
+}
+
+/** Ficha de un héroe diseñado (src/datos/heroes.json). */
+export interface FichaHeroe {
+  id: string;
+  nombre: string;
+  clase: string;
+  genero: string;
+  gremio: string;
+  techo: string;
+  techoFinal: string;
+  rangoInicial: string;
+  poder: number;
+  habilidad: string;
+  nombreHabilidad: string;
+  texto: string;
+  ascension?: string;
+}
+
+export const CATALOGO: readonly FichaHeroe[] = catalogo.heroes as FichaHeroe[];
+
+export function ficha(catalogoId: string | undefined): FichaHeroe | null {
+  return CATALOGO.find((f) => f.id === catalogoId) ?? null;
+}
+
+/**
+ * Crea un héroe del catálogo. Modo «rival»: ya está en su rango máximo (el techo de la hoja).
+ * Modo «novato»: llega por la Prueba en rango F con el poder de la hoja. Modo «hoja»: rango y poder de la hoja
+ * (los del jugador al empezar). El potencial es siempre lo más alto de su techo.
+ */
+export function heroeDeCatalogo(azar: Azar, f: FichaHeroe, modo: 'rival' | 'novato' | 'hoja', id = f.id): Heroe {
+  const techo = f.techo as Letra;
+  const potencial = techoDe(techo);
+  let poder = f.poder;
+  if (modo === 'rival') poder = Math.min(potencial, Math.max(pisoDe(techo), f.poder));
+  if (modo === 'novato') poder = Math.min(techoDe('F'), Math.max(1, f.poder));
+  const h: Heroe = {
+    id,
+    nombre: f.nombre,
+    clase: f.clase as Clase,
+    poder,
+    potencial: Math.max(poder, potencial),
+    sesgoOjeo: azar.siguiente(),
+    experiencia: 0,
+    reputacion: modo === 'rival' ? Math.round(poder / 2) : 0,
+    lealtad: balance.heroes.lealtadInicial,
+    estado: 'libre',
+    diasLesion: 0,
+    semanasSinCobrar: 0,
+    animo: balance.animo.inicial,
+    genero: f.genero as Genero,
+    catalogo: f.id,
+    habilidad: f.habilidad,
+    amor: null,
+    memoria: {},
+  };
+  return h;
 }
 
 /** Valor numérico de potencial al azar dentro de la franja de una letra. */
@@ -54,6 +122,8 @@ export function generarHeroe(azar: Azar, id: string, o: OpcionesHeroe): Heroe {
     estado: 'libre',
     diasLesion: 0,
     semanasSinCobrar: 0,
+    animo: balance.animo.inicial,
+    genero: azar.elegir(['Hombre', 'Mujer'] as const),
   };
 }
 
@@ -68,6 +138,8 @@ export function letraPotencialNovato(azar: Azar, tabla: Record<string, number> =
   return 'C';
 }
 
+const LUCRE = (catalogo.heroes as { id: string; habilidad: string }[]).find((f) => f.habilidad === 'ojoDeOro')?.id;
+
 /** Nivel de ojeo máximo: a ese nivel se ve el techo exacto. */
 export const OJEO_MAXIMO = balance.instalaciones.ojeadores.anchura.length - 1;
 
@@ -76,6 +148,8 @@ export const OJEO_MAXIMO = balance.instalaciones.ojeadores.anchura.length - 1;
  * suyo (lo ve entrenar cada día).
  */
 export function nivelOjeo(g: { nivelOjeadores: number; plantilla: string[] }, heroeId: string): number {
+  // Lucre (Ojo de oro) ve el techo real de todos.
+  if (LUCRE && g.plantilla.includes(LUCRE)) return OJEO_MAXIMO;
   return Math.min(OJEO_MAXIMO, g.nivelOjeadores + (g.plantilla.includes(heroeId) ? 1 : 0));
 }
 
@@ -132,7 +206,7 @@ export function sueldo(h: Heroe): number {
 
 function valorCon(h: Heroe, potencial: number): number {
   const v = balance.valor;
-  const bruto = v.porPoder * h.poder + v.porMargen * Math.max(0, potencial - h.poder) + v.porReputacion * h.reputacion;
+  const bruto = v.porPoder * h.poder + v.porPoderCuadrado * h.poder * h.poder + v.porMargen * Math.max(0, potencial - h.poder) + v.porReputacion * h.reputacion;
   return Math.max(v.minimo, Math.round(bruto / 50) * 50);
 }
 

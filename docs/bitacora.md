@@ -2,6 +2,21 @@
 
 Entradas más recientes primero.
 
+## 2026-11-14 — Catálogo de héroes, relaciones y muerte
+
+- Petición del propietario: clases y géneros del catálogo a criterio de Claude, escala de rangos de la hoja (rivales en su rango máximo, libres en F por la Prueba), crear los sistemas que falten con las relaciones como pilar, y resolver la muerte.
+- Hoja de cálculo: columna O «Clase» y columna G «Género» rellenas (20 por clase; 40/40, 5 y 5 por rival).
+- `src/datos/heroes.json`: los 80 héroes. El jugador empieza con los 4 «Prota»; cada rival, con sus 10 héroes; los 36 libres forman la bolsa de la Prueba (los no fichados vuelven a ella; si se vacía, llegan genéricos).
+- Escala de diez rangos (F, E, D, C, C+, B, B+, A, A+, S); misiones, ojeo, Ascensión, retos y estilos adaptados.
+- `relaciones.ts`: afinidad, compatibilidad oculta, química del equipo, amor y parejas, celos, ánimo (±15% de poder) y lealtad (a 0, se va).
+- `muerte.ts`: muerte por Ascensión, por misiones altas con menos del 35% de éxito (marcadas), por habilidades (Chimoku, Segador, InsectLover); muro de los caídos, Nox hereda, Beato salva una vez por temporada.
+- `habilidades.ts`: las 80 habilidades, enganchadas en misión, lesiones, oro, experiencia, semana, mercado, Prueba, sueldos, instalaciones y Ascensión. Las misiones piden huecos (AllBlack ocupa 3; Pacto, 2).
+- Modo historia de 5 temporadas con tres finales por puesto (provisional).
+- Interfaz: habilidad plegada, ánimo y vínculos en las cartas y el inventario; química y «Riesgo de muerte» al formar equipo; «En el gremio» en el resumen del día; muro de los caídos.
+- Simulador: ahora juega la historia completa. El bot ambicioso termina 1.º el 37% de las veces; el prudente se queda último (no compra en el mercado).
+- 117 tests; probado en navegador sin errores.
+- Pendiente: supuestos de la pregunta 19; ascensiones de Bastión y Roble; eventos y finales por héroe.
+
 ## 2026-11-14 — Nueva dirección: modo historia
 
 - Decisión del propietario: se descartan las tres ramas de desarrollo (economía e investigación). La rama `claude/tres-ramas-desarrollo` se conserva en GitHub sin integrar; el trabajo sigue en `claude/nifty-brown-p6ih7z`.

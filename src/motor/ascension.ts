@@ -6,6 +6,8 @@ import balance from '../datos/balance.json';
 import type { Azar } from './azar';
 import { heroe as obtenerHeroe, jugador, nuevoId, registrar, type EstadoJuego, type MisionEnCurso } from './estado';
 import { alLimite, indiceLetra, letraDe, valor } from './heroes';
+import { alGastar, bonusAscension, trasAscension } from './habilidades';
+import { morir } from './muerte';
 import { LETRAS, type Clase, type Letra } from './tipos';
 
 const A = balance.ascension;
@@ -25,7 +27,7 @@ export function condicionesAscension(estado: EstadoJuego, heroeId: string): Cond
   const actual = letraDe(h.poder);
   const rangoNuevo = (LETRAS[indiceLetra(actual) + 1] as Letra | undefined) ?? null;
   const coste = Math.max(A.costeMinimo, Math.round((valor(h) * A.factorCoste) / 50) * 50);
-  const probabilidad = (A.probExito as Record<string, number>)[actual] ?? 0;
+  const probabilidad = Math.min(95, ((A.probExito as Record<string, number>)[actual] ?? 0) + bonusAscension(estado, estado.jugadorId, heroeId));
   const base = { coste, probabilidad, rangoNuevo };
   if (!jugador(estado).plantilla.includes(heroeId)) return { ...base, bloqueo: 'No es de tu gremio' };
   if (!rangoNuevo) return { ...base, bloqueo: 'Ya tiene el rango máximo' };
@@ -51,6 +53,7 @@ export function iniciarAscension(estado: EstadoJuego, heroeId: string): void {
     ascension: true,
   });
   registrar(estado, 'mision', `${h.nombre} parte hacia su Ascensión (${c.probabilidad}% de volver).`);
+  alGastar(estado, estado.jugadorId);
 }
 
 /** Cuántos rangos sube el techo por encima del nuevo rango: casi siempre 1, a veces 2, rara vez 3. */
@@ -77,6 +80,8 @@ export interface ResultadoAscension {
   techoNuevo: Letra | null;
   /** Rangos que el techo queda por encima del nuevo rango: 1 normal, 2 extraordinario, 3 legendario. */
   despertar: number;
+  /** Fracasó pero Beato lo salvó. */
+  salvado?: boolean;
 }
 
 /**
@@ -90,8 +95,36 @@ export function resolverAscension(estado: EstadoJuego, azar: Azar, c: MisionEnCu
   const g = estado.gremios[c.gremioId];
   const rangoAntes = letraDe(h.poder);
   const poderAntes = h.poder;
-  const prob = (A.probExito as Record<string, number>)[rangoAntes] ?? 0;
+  const prob = Math.min(95, ((A.probExito as Record<string, number>)[rangoAntes] ?? 0) + bonusAscension(estado, c.gremioId, h.id));
   if (azar.d100() <= prob) {
+    trasAscension(estado, c.gremioId, h.id);
+    // InsectLover: el insecto que le crecía dentro sale y ocupa su lugar.
+    if (h.habilidad === 'insectos') {
+      const poderAntesGod = h.poder;
+      const nombre = h.nombre;
+      const clase = h.clase;
+      morir(estado, h.id, 'metamorfosis');
+      const god = {
+        ...h,
+        id: nuevoId(estado, 'h'),
+        nombre: 'GodInsect',
+        clase: 'Mago' as Clase,
+        poder: balance.habilidades.insectos.poderGodInsect,
+        potencial: 100,
+        techoConocido: true,
+        experiencia: 0,
+        estado: 'libre' as const,
+        habilidad: undefined,
+        catalogo: undefined,
+        amor: null,
+        memoria: {},
+        reputacion: Math.min(100, h.reputacion + 30),
+      };
+      estado.heroes[god.id] = god;
+      if (g) g.plantilla.push(god.id);
+      registrar(estado, 'muerte', `${nombre} se abre en dos y de dentro sale GodInsect. Rango S.`);
+      return { heroeId: god.id, nombre: 'GodInsect', clase, exito: true, rangoAntes, rangoDespues: letraDe(god.poder), poderAntes: poderAntesGod, poderDespues: god.poder, techoNuevo: 'S', despertar: 0 };
+    }
     const i = indiceLetra(rangoAntes) + 1;
     const despertar = tirarDespertar(azar);
     // El techo queda 1, 2 o 3 rangos por encima del nuevo rango (S como máximo) y se conoce.
@@ -107,8 +140,9 @@ export function resolverAscension(estado: EstadoJuego, azar: Azar, c: MisionEnCu
     registrar(estado, 'mision', `¡${h.nombre} supera su Ascensión y asciende a rango ${rangoDespues}! Su nuevo techo es ${letraDe(h.potencial)}${tipo}.`);
     return { heroeId: h.id, nombre: h.nombre, clase: h.clase, exito: true, rangoAntes, rangoDespues, poderAntes, poderDespues: h.poder, techoNuevo: letraDe(h.potencial), despertar: indiceLetra(letraDe(h.potencial)) - indiceLetra(rangoDespues) };
   }
-  if (g) g.plantilla = g.plantilla.filter((x) => x !== h.id);
-  delete estado.heroes[h.id];
-  registrar(estado, 'mision', `${h.nombre} no vuelve de su Ascensión. El gremio guarda luto.`);
+  const r = morir(estado, h.id, 'ascension');
+  if (!r.murio) {
+    return { heroeId: h.id, nombre: h.nombre, clase: h.clase, exito: false, rangoAntes, rangoDespues: rangoAntes, poderAntes, poderDespues: poderAntes, techoNuevo: null, despertar: 0, salvado: true };
+  }
   return { heroeId: h.id, nombre: h.nombre, clase: h.clase, exito: false, rangoAntes, rangoDespues: rangoAntes, poderAntes, poderDespues: poderAntes, techoNuevo: null, despertar: 0 };
 }

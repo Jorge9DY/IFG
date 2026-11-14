@@ -22,8 +22,12 @@ import {
   type EstadoJuego,
   type FilaRanking,
 } from './estado';
-import { generarHeroe, letraPotencialNovato } from './heroes';
-import { duracionMision, generarTablon, resolverMision, type InformeMision } from './misiones';
+import { CATALOGO, generarHeroe, heroeDeCatalogo, indiceLetra, letraPotencialNovato, pisoDe } from './heroes';
+import { duracionMision, generarTablon, probabilidadMision, resolverMision, salirDeMision, type InformeMision } from './misiones';
+import { alFicharNovato, cadaDia, cadaSemana, huecosEquipo, motivoNoIr } from './habilidades';
+import { riesgoDeMuerte } from './muerte';
+import { semanaRelaciones } from './relaciones';
+import { marcharse } from './economia';
 import { caducarReto, generarReto } from './retos';
 import { celebrarTorneo, type CombateTorneo } from './torneo';
 import { resolverEntrenamientos, type ResultadoEntrenamiento } from './entrenamiento';
@@ -33,7 +37,7 @@ import { prestigio } from './ranking';
 import { calcularRanking, premioTemporada } from './ranking';
 import { ajustarPlantilla, eligeMisiones, invertir } from './rivales';
 import { accionJugador, cerrarSubasta, crearSubasta } from './subasta';
-import type { Clase, Gremio, Letra, Mision, PerfilRival } from './tipos';
+import type { Clase, Gremio, Heroe, Letra, Mision, PerfilRival } from './tipos';
 
 export interface OpcionesPartida {
   nombreGremio?: string;
@@ -54,7 +58,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
   const semilla = opciones.semilla ?? Math.floor(Math.random() * 2 ** 31);
   const J = balance.jugador;
   const estado: EstadoJuego = {
-    version: 8,
+    version: 9,
     semilla,
     azar: semilla,
     dia: 1,
@@ -70,6 +74,9 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
     ranking: [],
     registro: [],
     contadorIds: 0,
+    relaciones: {},
+    bolsaNovatos: CATALOGO.filter((f) => f.gremio === 'libre').map((f) => f.id),
+    caidos: [],
   };
   const nuevoGremio = (g: Omit<Gremio, 'plantilla' | 'misionesAltas' | 'novatosDestacados'> & Partial<Gremio>): Gremio => {
     const completo: Gremio = { plantilla: [], misionesAltas: 0, novatosDestacados: 0, ...g };
@@ -86,8 +93,11 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
       nivelSede: J.nivelSede,
       nivelOjeadores: J.nivelOjeadores,
     });
-    for (let i = 0; i < J.heroes; i++) {
-      const h = generarHeroe(azar, nuevoId(estado, 'h'), { poder: J.poder as [number, number], potencial: J.potencial as Letra[] });
+    // Modo historia: el jugador empieza con los héroes «Prota» del catálogo, tal como vienen en la hoja.
+    // Los que ocupan más de un hueco (AllBlack), al final de la lista.
+    const protas = CATALOGO.filter((x) => x.gremio === 'jugador').sort((a, b) => Number(a.habilidad === 'multiplicacion') - Number(b.habilidad === 'multiplicacion'));
+    for (const f of protas) {
+      const h = heroeDeCatalogo(azar, f, 'hoja');
       estado.heroes[h.id] = h;
       j.plantilla.push(h.id);
     }
@@ -97,7 +107,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
         nombre: d.nombre,
         esJugador: false,
         oro: d.oro,
-        nivelSede: d.nivelSede,
+        nivelSede: Math.max(d.nivelSede, balance.rivales.nivelSedeMinimo),
         nivelOjeadores: d.nivelOjeadores,
         misionesAltas: d.misionesAltas,
         novatosDestacados: d.novatosDestacados,
@@ -106,19 +116,15 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
         perfil: d.perfil as PerfilRival,
         clase: d.clase as Clase,
       });
-      for (let i = 0; i < d.heroes; i++) {
-        const h = generarHeroe(azar, nuevoId(estado, 'h'), {
-          poder: d.poder as [number, number],
-          potencial: d.potencial as Letra[],
-          reputacion: d.reputacion as [number, number],
-          // La mitad de su plantilla es de la clase en la que se especializa.
-          clase: azar.probabilidad(balance.clases.probClaseRival) ? (d.clase as Clase) : undefined,
-        });
+      // Sus héroes son los del catálogo y ya están en su rango máximo (decisión del propietario).
+      for (const f of CATALOGO.filter((x) => x.gremio === d.id)) {
+        const h = heroeDeCatalogo(azar, f, 'rival');
         estado.heroes[h.id] = h;
         g.plantilla.push(h.id);
       }
     }
     for (const g of Object.values(estado.gremios)) g.categoria = categoriaPorPrestigio(prestigio(g));
+    cadaDia(estado, azar);
     estado.tablon = generarTablon(azar, () => nuevoId(estado, 'm'), multiplicadores(categoria(j)));
     generarReto(estado, azar);
   });
@@ -136,14 +142,17 @@ export function motivoNoLanzar(estado: EstadoJuego, misionId: string, equipo: re
   if (estado.fase !== 'gestion') return 'Ahora no se pueden lanzar misiones';
   const mision = estado.tablon.find((m) => m.id === misionId);
   if (!mision) return 'La misión no está en el tablón';
-  if (equipo.length !== mision.equipo) return `Esta misión necesita ${mision.equipo} ${mision.equipo === 1 ? 'héroe' : 'héroes'}`;
   if (new Set(equipo).size !== equipo.length) return 'Héroe repetido en el equipo';
   const j = jugador(estado);
   for (const id of equipo) {
     if (!j.plantilla.includes(id)) return 'Ese héroe no es de tu gremio';
     const h = obtenerHeroe(estado, id);
     if (h.estado !== 'libre') return `${h.nombre} no está disponible`;
+    const motivo = motivoNoIr(estado, h, equipo);
+    if (motivo) return motivo;
   }
+  const huecos = huecosEquipo(equipo.map((id) => obtenerHeroe(estado, id)));
+  if (huecos !== mision.equipo) return `Esta misión necesita ${mision.equipo} ${mision.equipo === 1 ? 'hueco' : 'huecos'} (este equipo ocupa ${huecos})`;
   return null;
 }
 
@@ -157,8 +166,23 @@ export function lanzarMision(estado: EstadoJuego, misionId: string, equipo: read
   if (motivo) throw new Error(motivo);
   const carta = estado.tablon.find((m) => m.id === misionId)!;
   const mision = { ...carta, id: nuevoId(estado, 'm') };
-  for (const id of equipo) obtenerHeroe(estado, id).estado = 'en mision';
-  estado.enCurso.push({ mision, gremioId: estado.jugadorId, equipo: [...equipo], diaVuelta: diaDeVuelta(estado, carta, equipo), cartaId: carta.id });
+  const heroes = equipo.map((id) => obtenerHeroe(estado, id));
+  const entorno = { estado, gremioId: estado.jugadorId };
+  const probabilidad = probabilidadMision(carta, heroes, entorno);
+  const diaVuelta = diaDeVuelta(estado, carta, equipo);
+  conAzar(estado, (azar) => salirDeMision(azar, mision, heroes, entorno));
+  for (const h of heroes) h.estado = 'en mision';
+  estado.enCurso.push({ mision, gremioId: estado.jugadorId, equipo: [...equipo], diaVuelta, cartaId: carta.id, probabilidad, diaSalida: estado.dia });
+}
+
+/** Probabilidad de éxito de un equipo del jugador en una misión, con todo (habilidades, ánimo, química). */
+export function probabilidadJugador(estado: EstadoJuego, mision: Mision, equipo: readonly Heroe[]): number {
+  return probabilidadMision(mision, equipo, { estado, gremioId: estado.jugadorId });
+}
+
+/** true si mandar a este equipo a esta misión pone vidas en juego. */
+export function hayRiesgoDeMuerte(estado: EstadoJuego, mision: Mision, equipo: readonly Heroe[]): boolean {
+  return equipo.length > 0 && riesgoDeMuerte(mision, probabilidadJugador(estado, mision, equipo));
 }
 
 /** Día (al finalizarlo) en que volvería esta misión con este equipo. */
@@ -199,6 +223,10 @@ export interface ResumenDia {
   ascensiones: ResultadoAscension[];
   /** Nueva categoría del gremio del jugador, si ha subido. */
   categoriaNueva: Letra | null;
+  /** Héroes del jugador que han muerto hoy. */
+  muertes: string[];
+  /** Lo que ha pasado entre tus héroes (relaciones y habilidades). */
+  vida: string[];
 }
 
 export function finalizarDia(estado: EstadoJuego): ResumenDia {
@@ -208,9 +236,10 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
   return conAzar(estado, (azar) => {
     // Los rivales también lanzan sus misiones del día.
     for (const rival of rivales(estado)) {
-      for (const { mision, equipo } of eligeMisiones(estado, azar, rival.id, () => nuevoId(estado, 'm'))) {
+      for (const { mision, equipo, probabilidad } of eligeMisiones(estado, azar, rival.id, () => nuevoId(estado, 'm'))) {
+        salirDeMision(azar, mision, equipo, { estado, gremioId: rival.id });
         for (const h of equipo) h.estado = 'en mision';
-        estado.enCurso.push({ mision, gremioId: rival.id, equipo: equipo.map((h) => h.id), diaVuelta: dia + duracionMision(mision, equipo) - 1 });
+        estado.enCurso.push({ mision, gremioId: rival.id, equipo: equipo.map((h) => h.id), diaVuelta: dia + duracionMision(mision, equipo) - 1, probabilidad, diaSalida: dia });
       }
     }
 
@@ -229,7 +258,7 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
     const categoriaNueva = actualizarCategorias(estado);
     caducarReto(estado);
 
-    // Día 7: sueldos y, después, Prueba de los Novatos.
+    // Día 7: sueldos, la semana de relaciones y habilidades y, después, Prueba de los Novatos.
     let sueldos: PagoSueldos | null = null;
     if (esDia7(dia)) {
       sueldos = pagarSueldos(estado, estado.jugadorId);
@@ -237,12 +266,16 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
         pagarSueldos(estado, rival.id);
         invertir(estado, azar, rival.id);
       }
+      semanaDeVida(estado, azar);
       empezarPrueba(estado, azar);
     } else {
       avanzarDia(estado, azar);
     }
-    const noticias = estado.registro.slice(desde).filter((e) => e.tipo === 'rival' || e.tipo === 'reto').map((e) => e.texto);
-    return { dia, informes: informes.filter((i) => i.gremioId === estado.jugadorId), sueldos, noticias, prueba: estado.fase === 'prueba', ascensiones, entrenamientos, categoriaNueva };
+    const nuevos = estado.registro.slice(desde);
+    const noticias = nuevos.filter((e) => e.tipo === 'rival' || e.tipo === 'reto').map((e) => e.texto);
+    const vida = nuevos.filter((e) => e.tipo === 'relacion' || e.tipo === 'habilidad' || e.tipo === 'muerte').map((e) => e.texto);
+    const muertes = estado.caidos.filter((c) => c.dia === dia && c.gremioId === estado.jugadorId).map((c) => c.nombre);
+    return { dia, informes: informes.filter((i) => i.gremioId === estado.jugadorId), sueldos, noticias, prueba: estado.fase === 'prueba', ascensiones, entrenamientos, categoriaNueva, muertes, vida };
   });
 }
 
@@ -269,7 +302,7 @@ function resolverRegresos(estado: EstadoJuego, azar: Azar, ascensiones: Resultad
     const g = estado.gremios[c.gremioId];
     // Un héroe en misión no se puede vender ni comprar: el equipo vuelve completo.
     const equipo = c.equipo.map((id) => obtenerHeroe(estado, id));
-    const informe = resolverMision(azar, c.mision, equipo, c.gremioId);
+    const informe = resolverMision(azar, c.mision, equipo, c.gremioId, { estado, gremioId: c.gremioId, dia: c.diaSalida }, c.probabilidad);
     informes.push(informe);
     if (!g) continue;
     g.oro += informe.oro;
@@ -284,9 +317,27 @@ function resolverRegresos(estado: EstadoJuego, azar: Azar, ascensiones: Resultad
   return informes;
 }
 
+/** El día 7: relaciones (deriva, amor, celos, ánimo y lealtad) y habilidades semanales. Quien pierde la lealtad, se va. */
+function semanaDeVida(estado: EstadoJuego, azar: Azar): void {
+  for (const g of Object.values(estado.gremios)) {
+    const r = semanaRelaciones(estado, g.id, azar);
+    for (const id of r.seVan) {
+      const h = estado.heroes[id];
+      if (h && g.plantilla.includes(id)) marcharse(estado, h, g, `${h.nombre} ha perdido la fe en ${g.nombre}`);
+    }
+  }
+  const s = cadaSemana(estado, azar);
+  for (const { heroeId, motivo } of s.seVan) {
+    const h = estado.heroes[heroeId];
+    const g = Object.values(estado.gremios).find((x) => x.plantilla.includes(heroeId));
+    if (h && g) marcharse(estado, h, g, motivo.replace(/\.$/, ''));
+  }
+}
+
 function avanzarDia(estado: EstadoJuego, azar: Azar): void {
   estado.dia += 1;
   estado.fase = 'gestion';
+  cadaDia(estado, azar);
   estado.tablon = generarTablon(azar, () => nuevoId(estado, 'm'), multiplicadores(categoria(jugador(estado))));
   // Cada semana, un maestro rival puede lanzar un reto.
   if ((estado.dia - 1) % balance.calendario.diasPorSemana === 0) generarReto(estado, azar);
@@ -298,17 +349,39 @@ function avanzarDia(estado: EstadoJuego, azar: Azar): void {
 // ---------------------------------------------------------------------------
 
 /** Cómo es la Prueba de los Novatos para la categoría del gremio del jugador: cuántos llegan y cómo son. */
-export function pruebaDeCategoria(estado: EstadoJuego): { cantidad: number; poder: [number, number]; potencial: Record<string, number> } {
-  const t = balance.novatos.porCategoria as Record<string, { cantidad: number; poder: number[]; potencial: Record<string, number> }>;
+export function pruebaDeCategoria(estado: EstadoJuego): { cantidad: number; poder: [number, number]; potencial: Record<string, number>; pesoTecho: number } {
+  const t = balance.novatos.porCategoria as Record<string, { cantidad: number; poder: number[]; potencial: Record<string, number>; pesoTecho?: number }>;
   const d = t[categoria(jugador(estado))] ?? t.D!;
-  return { cantidad: d.cantidad, poder: [d.poder[0] ?? 10, d.poder[1] ?? 35], potencial: d.potencial };
+  return { cantidad: d.cantidad, poder: [d.poder[0] ?? 1, d.poder[1] ?? 9], potencial: d.potencial, pesoTecho: d.pesoTecho ?? 0 };
 }
 
+/**
+ * Los candidatos salen de la bolsa de héroes libres del catálogo, todos en rango F (decisión del propietario).
+ * Con más categoría llegan más y es más fácil que salgan los de techo alto. Si la bolsa se vacía, llegan genéricos.
+ */
 function empezarPrueba(estado: EstadoJuego, azar: Azar): void {
   const N = pruebaDeCategoria(estado);
+  const pesoTecho = N.pesoTecho;
   const pendientes: string[] = [];
   for (let i = 0; i < N.cantidad; i++) {
-    const h = generarHeroe(azar, nuevoId(estado, 'h'), { poder: N.poder, potencial: [letraPotencialNovato(azar, N.potencial)] });
+    const bolsa = estado.bolsaNovatos.map((id) => CATALOGO.find((f) => f.id === id)).filter((f) => f !== undefined);
+    let h: Heroe;
+    if (bolsa.length > 0) {
+      const pesos = bolsa.map((f) => 1 + (pesoTecho * indiceLetra(f.techo as Letra)) / 9);
+      let tirada = azar.siguiente() * pesos.reduce((a, b) => a + b, 0);
+      let elegida = bolsa[0]!;
+      for (let k = 0; k < bolsa.length; k++) {
+        tirada -= pesos[k]!;
+        if (tirada < 0) {
+          elegida = bolsa[k]!;
+          break;
+        }
+      }
+      estado.bolsaNovatos = estado.bolsaNovatos.filter((id) => id !== elegida.id);
+      h = heroeDeCatalogo(azar, elegida, 'novato');
+    } else {
+      h = generarHeroe(azar, nuevoId(estado, 'h'), { poder: N.poder, potencial: [letraPotencialNovato(azar, N.potencial)] });
+    }
     estado.heroes[h.id] = h;
     pendientes.push(h.id);
   }
@@ -370,8 +443,17 @@ export function terminarPrueba(estado: EstadoJuego): ResumenSemana {
       prueba.resultados.push({ heroeId: id, ganador: cerrarSubasta(estado, s), precio: s.precio });
     }
     for (const rival of rivales(estado)) ajustarPlantilla(estado, rival.id);
-    // Los novatos que nadie fichó vuelven a casa.
-    for (const r of prueba.resultados) if (!r.ganador) delete estado.heroes[r.heroeId];
+    // Los novatos que nadie fichó vuelven a casa (los del catálogo, a la bolsa: pueden volver otra semana).
+    for (const r of prueba.resultados) {
+      if (r.ganador) {
+        const h = estado.heroes[r.heroeId];
+        if (h) alFicharNovato(estado, azar, h, r.ganador);
+        continue;
+      }
+      const h = estado.heroes[r.heroeId];
+      if (h?.catalogo && !estado.bolsaNovatos.includes(h.catalogo)) estado.bolsaNovatos.push(h.catalogo);
+      delete estado.heroes[r.heroeId];
+    }
     estado.prueba = null;
 
     // Al cerrar la temporada, antes del ranking final, se celebra el torneo.
@@ -390,17 +472,24 @@ export function terminarPrueba(estado: EstadoJuego): ResumenSemana {
       for (const fila of estado.ranking) gremio(estado, fila.gremioId).oro += premioTemporada(fila.puesto);
       temporada = { numero, puesto: actual, premio: premioTemporada(actual) };
       registrar(estado, 'temporada', `Fin de la temporada ${numero}: ${j.nombre} termina ${actual}.º y cobra ${temporada.premio} de oro.`);
-      // Condición de victoria provisional (biblia [Abierto]): cerrar una temporada en el n.º 1.
-      victoria = actual === 1;
+      // Modo historia (provisional, pregunta 18): la historia termina al cerrar la última temporada.
+      victoria = numero >= balance.historia.temporadas;
     }
     if (victoria) {
       estado.fase = 'victoria';
-      registrar(estado, 'temporada', `${j.nombre} es el gremio número uno.`);
+      registrar(estado, 'temporada', textoFinal(actual));
     } else {
       avanzarDia(estado, azar);
     }
     return { ranking: estado.ranking, puestoAnterior, temporada, victoria, torneo, categoriaNueva };
   });
+}
+
+/** Final del modo historia según el puesto (provisional: los finales por héroe están por diseñar). */
+export function textoFinal(puesto: number): string {
+  if (puesto === 1) return 'Final «Leyenda»: tu gremio termina la historia como el número uno.';
+  if (puesto <= 3) return 'Final «Respeto»: no sois los primeros, pero nadie se ríe ya de vosotros.';
+  return 'Final «Olvido»: la historia de tu gremio se pierde entre las demás.';
 }
 
 /** Texto corto del calendario: «Temporada 1 · Día 3 de 28». */

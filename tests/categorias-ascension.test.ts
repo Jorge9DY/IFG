@@ -4,7 +4,7 @@ import { Azar } from '../src/motor/azar';
 import { condicionesAscension, iniciarAscension, resolverAscension } from '../src/motor/ascension';
 import { actualizarCategoria, categoria, categoriaPorPrestigio, multiplicadores, siguienteCategoria } from '../src/motor/categorias';
 import { jugador } from '../src/motor/estado';
-import { letraDe, rangoPotencial } from '../src/motor/heroes';
+import { indiceLetra, letraDe, rangoPotencial } from '../src/motor/heroes';
 import { generarTablon } from '../src/motor/misiones';
 import { finalizarDia } from '../src/motor/partida';
 import { fichar, heroe, partida } from './fabrica';
@@ -60,14 +60,14 @@ describe('Ascensión', () => {
   function preparar() {
     const estado = partida();
     jugador(estado).oro = 100_000;
-    const h = fichar(estado, 'jugador', heroe({ id: 'veterano', poder: 45, potencial: 45 }));
+    const h = fichar(estado, 'jugador', heroe({ id: 'veterano', poder: 35, potencial: 35 }));
     return { estado, h };
   }
 
   it('solo la intenta quien ha llegado a su límite, y no se puede pasar de S', () => {
     const { estado, h } = preparar();
     expect(condicionesAscension(estado, h.id).bloqueo).toBeNull();
-    expect(condicionesAscension(estado, h.id).rangoNuevo).toBe('B');
+    expect(condicionesAscension(estado, h.id).rangoNuevo).toBe('C+');
     h.potencial = 60;
     expect(condicionesAscension(estado, h.id).bloqueo).toMatch(/límite/);
     h.poder = 90;
@@ -97,9 +97,9 @@ describe('Ascensión', () => {
       if (r.exito) {
         exitos++;
         expect(r.rangoAntes).toBe('C');
-        expect(r.rangoDespues).toBe('B');
+        expect(r.rangoDespues).toBe('C+');
         // El techo queda al menos un rango por encima del nuevo rango (A, S…), y se conoce.
-        expect('FDCBAS'.indexOf(letraDe(estado.heroes[h.id]!.potencial))).toBeGreaterThanOrEqual('FDCBAS'.indexOf('A'));
+        expect(indiceLetra(letraDe(estado.heroes[h.id]!.potencial))).toBeGreaterThanOrEqual(indiceLetra('B'));
         expect(r.despertar).toBeGreaterThanOrEqual(1);
         expect(rangoPotencial(estado.heroes[h.id]!, 0)).toEqual([r.techoNuevo, r.techoNuevo]);
         expect(estado.heroes[h.id]!.estado).toBe('libre');

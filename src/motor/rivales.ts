@@ -8,7 +8,8 @@ import { gremio, heroesDe, registrar, type EstadoJuego } from './estado';
 import { letraDe, nivelOjeo, potencialEstimado, valorEstimado } from './heroes';
 import { categoria, multiplicadores } from './categorias';
 import { infoInstalacion, mejorar, plazasLibres, type Instalacion } from './instalaciones';
-import { generarTablon, probabilidadMision } from './misiones';
+import { equiposPosibles, generarTablon, probabilidadMision } from './misiones';
+import { motivoNoIr } from './habilidades';
 import { RANGOS_MISION, type Gremio, type Heroe, type Mision, type PerfilRival } from './tipos';
 
 const R = balance.rivales;
@@ -71,33 +72,29 @@ export function limitePuja(estado: EstadoJuego, azar: Azar, g: Gremio, h: Heroe)
  * igual que el jugador) y, de la más alta a la más baja, manda el equipo libre con más éxito si supera su
  * mínimo. Devuelve las misiones con su equipo.
  */
-export function eligeMisiones(estado: EstadoJuego, azar: Azar, gremioId: string, nuevoId: () => string): { mision: Mision; equipo: Heroe[] }[] {
+export function eligeMisiones(estado: EstadoJuego, azar: Azar, gremioId: string, nuevoId: () => string): { mision: Mision; equipo: Heroe[]; probabilidad: number }[] {
   const libres = heroesDe(estado, gremioId)
-    .filter((h) => h.estado === 'libre')
+    // Los rivales guardan a Chimoku cuando le queda poca vida (para el torneo).
+    .filter((h) => h.estado === 'libre' && h.habilidad !== 'mimo' && !(h.habilidad === 'porLasUltimas' && Number(h.memoria?.vida ?? 10) <= 3))
     .sort((a, b) => b.poder - a.poder)
     .slice(0, 10);
+  const entorno = { estado, gremioId };
   const tablon = generarTablon(azar, nuevoId, multiplicadores(categoria(gremio(estado, gremioId))));
-  const elegidas: { mision: Mision; equipo: Heroe[] }[] = [];
+  const elegidas: { mision: Mision; equipo: Heroe[]; probabilidad: number }[] = [];
   // Igual que el jugador: cada misión se puede repetir mientras queden equipos libres. De la más alta a la más baja.
   for (const carta of [...tablon].reverse()) {
     for (;;) {
       const disponibles = libres.filter((h) => !elegidas.some((e) => e.equipo.includes(h)));
-      if (disponibles.length < carta.equipo) break;
-      const equipo = combinaciones(disponibles, carta.equipo).sort((a, b) => probabilidadMision(carta, b) - probabilidadMision(carta, a))[0];
-      if (!equipo || probabilidadMision(carta, equipo) < R.probExitoMinima) break;
-      elegidas.push({ mision: { ...carta, id: nuevoId() }, equipo });
+      const opciones = equiposPosibles(disponibles, carta.equipo)
+        .filter((e) => e.every((h) => !motivoNoIr(estado, h, e.map((x) => x.id))))
+        .map((e) => ({ equipo: e, probabilidad: probabilidadMision(carta, e, entorno) }))
+        .sort((a, b) => b.probabilidad - a.probabilidad);
+      const mejor = opciones[0];
+      if (!mejor || mejor.probabilidad < R.probExitoMinima) break;
+      elegidas.push({ mision: { ...carta, id: nuevoId() }, ...mejor });
     }
   }
   return elegidas;
-}
-
-function combinaciones<T>(lista: readonly T[], k: number): T[][] {
-  if (k === 0) return [[]];
-  const resultado: T[][] = [];
-  lista.forEach((x, i) => {
-    for (const resto of combinaciones(lista.slice(i + 1), k - 1)) resultado.push([x, ...resto]);
-  });
-  return resultado;
 }
 
 /** Al terminar la semana, un rival puede invertir en instalaciones según su estrategia. */
@@ -137,6 +134,7 @@ export function ajustarPlantilla(estado: EstadoJuego, gremioId: string): void {
       .sort((a, b) => a.potencial - b.potencial || a.poder - b.poder)[0];
     if (!flojo) return;
     g.plantilla = g.plantilla.filter((id) => id !== flojo.id);
+    if (flojo.catalogo && !estado.bolsaNovatos.includes(flojo.catalogo)) estado.bolsaNovatos.push(flojo.catalogo);
     delete estado.heroes[flojo.id];
     registrar(estado, 'rival', `${flojo.nombre} deja ${g.nombre}.`);
   }

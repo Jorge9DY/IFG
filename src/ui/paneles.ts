@@ -13,13 +13,19 @@ import { alLimite, indiceLetra, letraDe, nivelOjeo, potencialEstimado, rango, ra
 import { LETRAS } from '../motor/tipos';
 import { NOMBRE_INSTALACION, infoInstalacion, mejorar, plazas, type Instalacion } from '../motor/instalaciones';
 import { comprar, condicionesCompra, ofertaVenta, vender } from '../motor/mercado';
-import { clasesCubiertas, duracionMision, probabilidadMision } from '../motor/misiones';
+import { clasesCubiertas, duracionMision, quimicaEquipo } from '../motor/misiones';
+import { ficha, huecos, huecosEquipo, poderBestia } from '../motor/habilidades';
+import { relacionesDe, textoAnimo, animo, type Vinculo } from '../motor/relaciones';
+import { sueldoEn } from '../motor/economia';
 import { fraseReto, heroesParaReto, motivoNoAceptar, aceptarReto, rechazarReto } from '../motor/retos';
 import {
   conAzar,
   crearPartida,
   diaDeVuelta,
   lanzadasHoy,
+  hayRiesgoDeMuerte,
+  probabilidadJugador,
+  textoFinal,
   vuelveTrasPrueba,
   finalizarDia,
   lanzarMision,
@@ -54,7 +60,7 @@ const TITULOS: Record<Panel, string> = {
   prueba: 'Prueba de los Novatos',
   dia: 'Resumen del día',
   semana: 'Ranking de la semana',
-  victoria: '¡Número uno!',
+  victoria: 'Fin de la historia',
 };
 
 const ICONO_CLASE: Record<string, string> = { Guerrero: '⚔', Mago: '✦', Explorador: '➶', Sanador: '✚' };
@@ -72,7 +78,7 @@ const DESPERTAR: Record<number, { titulo: string; clase: string }> = {
 };
 
 /** Brillo del sobre de un novato según el mejor techo que ven tus ojeadores. */
-const BRILLO: Record<string, string> = { S: 'oro', A: 'violeta', B: 'azul' };
+const BRILLO: Record<string, string> = { S: 'oro', 'A+': 'violeta', A: 'violeta', 'B+': 'azul', B: 'azul' };
 
 const RANGO: Record<RangoMision, { nombre: string; riesgo: string }> = {
   bajo: { nombre: 'Rango bajo', riesgo: 'Riesgo bajo' },
@@ -273,6 +279,11 @@ export class Interfaz {
   // ---------------------------------------------------------------------------
 
   /** Retrato del héroe con su rango actual en una esquina. */
+  /** Clase CSS de un rango («C+» → «rCp»). */
+  private cr(letra: string | null): string {
+    return `r${(letra ?? '').replace('+', 'p')}`;
+  }
+
   private avatar(h: Heroe): string {
     return `<span class="avatar">${retrato(h)}${this.hexRango(h)}</span>`;
   }
@@ -280,7 +291,7 @@ export class Interfaz {
   /** Hexágono con el rango actual del héroe (según su poder). */
   private hexRango(h: Heroe): string {
     const r = rango(h);
-    return `<span class="rango r${r}" title="Rango actual: ${r} (según su poder)">${r}</span>`;
+    return `<span class="rango ${this.cr(r)}" title="Rango actual: ${r} (según su poder)">${r}</span>`;
   }
 
   /**
@@ -290,14 +301,14 @@ export class Interfaz {
   private techo(estado: EstadoJuego, h: Heroe): string {
     const nivel = nivelOjeo(jugador(estado), h.id);
     const [a, b] = rangoPotencial(h, nivel);
-    if (alLimite(h)) return `<span class="techo"><span class="etq">Techo</span><span class="letra-techo r${a}">${a}</span><span class="tenue">alcanzado</span></span>`;
+    if (alLimite(h)) return `<span class="techo"><span class="etq">Techo</span><span class="letra-techo ${this.cr(a)}">${a}</span><span class="tenue">alcanzado</span></span>`;
     const letras: string[] = [];
     for (let i = indiceLetra(a); i <= indiceLetra(b); i++) letras.push(LETRAS[i] ?? 'F');
     const duda = letras.length > 1;
     const ayuda = duda
       ? `Tus ojeadores (nivel ${jugador(estado).nivelOjeadores}${jugador(estado).plantilla.includes(h.id) ? ', +1 por ser de tu gremio' : ''}) dudan entre ${letras.join(', ')}. Mejóralos para saberlo.`
       : 'Tus ojeadores saben su techo exacto.';
-    return `<span class="techo ${duda ? 'con-duda' : ''}" title="${esc(ayuda)}"><span class="etq">Techo</span>${letras.map((l) => `<span class="letra-techo r${l}">${l}</span>`).join('')}${duda ? '<span class="incognita">?</span>' : ''}</span>`;
+    return `<span class="techo ${duda ? 'con-duda' : ''}" title="${esc(ayuda)}"><span class="etq">Techo</span>${letras.map((l) => `<span class="letra-techo ${this.cr(l)}">${l}</span>`).join('')}${duda ? '<span class="incognita">?</span>' : ''}</span>`;
   }
 
   /** Aviso de joya oculta (o de héroe sobrevalorado) cuando tus ojeadores ven más (o menos) que el precio público. */
@@ -315,7 +326,7 @@ export class Interfaz {
   }
 
   private rangoChip(letra: string): string {
-    return `<span class="rango-chip r${letra}" title="Rango según su poder: F, D, C, B, A, S">Rango ${letra}</span>`;
+    return `<span class="rango-chip ${this.cr(letra)}" title="Rango según su poder: F, E, D, C, C+, B, B+, A, A+, S">Rango ${letra}</span>`;
   }
 
   /** Barra de experiencia hacia la siguiente subida de poder (o «Al límite» si ya no crece). */
@@ -326,11 +337,37 @@ export class Interfaz {
     return `<span class="xp" title="Experiencia: al llenar la barra, +${balance.heroes.poderPorBarra} de poder"><span class="barra-xp"><i style="--hasta:${Math.round((100 * h.experiencia) / total)}%"></i></span><small>${h.experiencia}/${total} exp</small></span>`;
   }
 
+  /** Habilidad única del héroe, plegada: el nombre a la vista y el texto al abrirla. */
+  private habilidad(h: Heroe): string {
+    const f = ficha(h.catalogo);
+    if (!f) return '';
+    const extra = h.habilidad === 'invocacion' ? ` Bestia: poder ${poderBestia(h)}.` : h.habilidad === 'porLasUltimas' ? ` Vida: ${Number(h.memoria?.vida ?? 10)}.` : h.habilidad === 'racha' ? ` Racha: ${Number(h.memoria?.racha ?? 0)}.` : '';
+    return `<details class="habilidad"><summary>✦ ${esc(f.nombreHabilidad)}${h.zombie ? ' · Zombie' : ''}</summary><p>${esc(f.texto)}${extra}</p>${f.ascension && f.ascension !== 'Por definir.' ? `<p class="tenue">Ascensión: ${esc(f.ascension)}</p>` : ''}</details>`;
+  }
+
+  /** Lo que siente: ánimo y sus relaciones más fuertes dentro del gremio. */
+  private sentimientos(estado: EstadoJuego, h: Heroe, gremioId: string): string {
+    const ICONO: Record<Vinculo, string> = { pareja: '♥', 'mejores amigos': '★', amigos: '☺', neutral: '', 'mala relación': '☹', enemigos: '✖' };
+    const fuertes = relacionesDe(estado, gremioId, h.id).filter((r) => r.vinculo !== 'neutral' || r.laAma || r.leAma);
+    const chips = fuertes
+      .slice(0, 4)
+      .map((r) => {
+        const texto = r.laAma && r.vinculo !== 'pareja' ? `enamorado de ${r.heroe.nombre}` : `${r.vinculo} con ${r.heroe.nombre}`;
+        const icono = r.laAma && r.vinculo !== 'pareja' ? '♡' : ICONO[r.vinculo];
+        return `<span class="vinculo v-${r.vinculo.replace(' ', '-')}" title="${esc(texto)} (afinidad ${r.afinidad})">${icono} ${esc(r.heroe.nombre)}</span>`;
+      })
+      .join('');
+    const a = animo(h);
+    return `<div class="sentimientos"><span class="animo" title="Ánimo ${a}/100: cambia su poder en misión hasta un ±15%">Ánimo: <b>${textoAnimo(h)}</b></span>${chips}</div>`;
+  }
+
   private carta(estado: EstadoJuego, h: Heroe, pie: string, extraClase = ''): string {
     const estadoTexto =
       h.estado === 'libre'
         ? ''
         : `<span class="estado-chip e-${h.estado.replace(' ', '-')}">${esc(h.estado === 'lesionado' ? `lesionado · ${h.diasLesion} d.` : h.estado)}</span>`;
+    const mio = jugador(estado).plantilla.includes(h.id);
+    const sueldoTexto = mio ? sueldoEn(estado, estado.jugadorId, h) : sueldo(h);
     return `<article class="carta ${extraClase}">
       <header>
         ${this.avatar(h)}
@@ -339,8 +376,10 @@ export class Interfaz {
       </header>
       <div class="identidad"><span class="dato"><span class="etq">Poder</span><b>${num(h.poder)}</b></span>${this.techo(estado, h)}</div>
       ${this.olfato(estado, h)}
-      <p class="sueldo tenue">Sueldo ${num(sueldo(h))} de oro por semana</p>
-      ${jugador(estado).plantilla.includes(h.id) ? this.barraXp(h) : ''}
+      ${this.habilidad(h)}
+      ${mio ? this.sentimientos(estado, h, estado.jugadorId) : ''}
+      <p class="sueldo tenue">Sueldo ${num(sueldoTexto)} de oro por semana${huecos(h) > 1 ? ` · ocupa ${huecos(h)} huecos en misión` : ''}</p>
+      ${mio ? this.barraXp(h) : ''}
       <footer>${pie}</footer>
     </article>`;
   }
@@ -351,7 +390,7 @@ export class Interfaz {
 
   private panelNueva(): string {
     return `
-      <p>Diriges el <strong>peor gremio de héroes</strong> del reino: último del ranking, con poco oro y tres aventureros sin fama.</p>
+      <p>Diriges el <strong>peor gremio de héroes</strong> del reino: último del ranking, con poco oro y cuatro aventureros sin fama. La historia dura ${balance.historia.temporadas} temporadas.</p>
       <p><strong>Tu reto:</strong> gana oro con misiones, invierte en héroes y en tu sede, y lleva al gremio al número uno. Cada día pulsa <em>Finalizar día</em>; cada 7 días se pagan los sueldos y se celebra la Prueba de los Novatos.</p>
       <label class="campo">Nombre del gremio <input id="nombre" maxlength="28" value="Llama Menguante" /></label>
       <button data-accion="empezar" class="principal">Empezar</button>`;
@@ -405,7 +444,10 @@ export class Interfaz {
     const libres = heroesLibres(estado).sort((a, b) => b.poder - a.poder);
     this.equipo = this.equipo.filter((id) => libres.some((h) => h.id === id));
     const equipo = this.equipo.map((id) => obtenerHeroe(estado, id));
-    const prob = equipo.length ? probabilidadMision(mision, equipo) : null;
+    const prob = equipo.length ? probabilidadJugador(estado, mision, equipo) : null;
+    const quimica = equipo.length > 1 ? quimicaEquipo(estado, equipo) : 0;
+    const riesgo = hayRiesgoDeMuerte(estado, mision, equipo);
+    const ocupa = huecosEquipo(equipo);
     const { cubiertas, faltan } = clasesCubiertas(mision, equipo);
     const duracion = equipo.length ? duracionMision(mision, equipo) : mision.duracion;
     const clases = `<div class="clases-mision"><span class="tenue">${esc(mision.tipo)}: ideal</span>${cubiertas.map((c) => this.claseChip(c, 'cubierta')).join('')}${faltan.map((c) => this.claseChip(c, 'falta')).join('')}<span class="tenue">+${balance.clases.bonusPorClase}% de éxito por cada una${mision.clases.length > 1 ? `, +${balance.clases.bonusCombinacion}% más con todas` : ''}</span></div>`;
@@ -414,7 +456,7 @@ export class Interfaz {
         const va = this.equipo.includes(h.id);
         return `<button class="ficha-heroe ${va ? 'va' : ''}" data-accion="alternar" data-id="${h.id}" aria-pressed="${va}">
           ${this.avatar(h)}
-          <span class="quien"><strong>${esc(h.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${ICONO_CLASE[h.clase] ?? ''} ${h.clase} · poder ${num(h.poder)}</span></span>
+          <span class="quien"><strong>${esc(h.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${ICONO_CLASE[h.clase] ?? ''} ${h.clase} · poder ${num(h.poder)}${huecos(h) > 1 ? ` · ${huecos(h)} huecos` : ''} · ${textoAnimo(h).toLowerCase()}</span></span>
           <span class="marca">${va ? '✓' : '+'}</span>
         </button>`;
       })
@@ -427,11 +469,13 @@ export class Interfaz {
     const motivo = motivoNoLanzar(estado, mision.id, this.equipo);
     return `<div class="cabecera-mision">
         <div><span class="nivel t-${mision.rango}">${r.nombre}</span> <strong>${esc(mision.titulo)}</strong>
-          <div class="tenue">+${num(mision.recompensa)} oro · ${duracion} ${duracion === 1 ? 'día' : 'días'}${duracion < mision.duracion ? ' (el Explorador ahorra uno)' : ''} · elige <strong>${mision.equipo}</strong> ${mision.equipo === 1 ? 'héroe' : 'héroes'}. Ya te proponemos un equipo.</div>
+          <div class="tenue">+${num(mision.recompensa)} oro · ${duracion} ${duracion === 1 ? 'día' : 'días'}${duracion < mision.duracion ? ' (el Explorador ahorra uno)' : ''} · ${mision.equipo} ${mision.equipo === 1 ? 'hueco' : 'huecos'} (ocupados ${ocupa}). Ya te proponemos un equipo.</div>
           ${this.avisoVuelta(estado, mision, duracion)}</div>
         <div class="medidor d-${nivelDificultad(prob)}"><b>${prob === null ? '—' : pct(prob)}</b><span>de éxito</span></div>
       </div>
       ${clases}
+      ${quimica !== 0 ? `<p class="quimica ${quimica > 0 ? 'buena' : 'mala'}">Química del equipo: ${quimica > 0 ? '+' : ''}${quimica}% de poder (${quimica > 0 ? 'se llevan bien' : 'se llevan mal'})</p>` : ''}
+      ${riesgo ? `<p class="riesgo-muerte">☠ Riesgo de muerte: con menos del ${balance.muerte.umbralProbabilidad}% de éxito, si la misión fracasa alguien puede no volver.</p>` : ''}
       <div class="fichas">${fichas || '<p class="tenue">No tienes héroes libres.</p>'}</div>
       ${ocupados ? `<p class="tenue">No disponibles: ${ocupados}. <button data-accion="ir-heroes">Ver héroes</button></p>` : ''}
       <p class="tenue">Si fracasa, cobras menos y alguien puede lesionarse.</p>
@@ -552,8 +596,17 @@ export class Interfaz {
         return `${pestañas}${this.tablaRanking(estado)}
           <p class="tenue">Puntos = Fuerza (poder de tus 5 mejores héroes) + Prestigio (instalaciones, misiones de rango alto y novatos destacados fichados). El ranking oficial se actualiza el día 7; al final de cada temporada (28 días) se reparte un premio según la posición.</p>`;
       default:
-        return `${pestañas}${this.inventario(estado)}`;
+        return `${pestañas}${this.inventario(estado)}${this.muroCaidos(estado)}`;
     }
+  }
+
+  /** Muro de los caídos: los héroes del gremio que han muerto. */
+  private muroCaidos(estado: EstadoJuego): string {
+    const caidos = estado.caidos.filter((c) => c.gremioId === estado.jugadorId);
+    if (caidos.length === 0) return '';
+    return `<details class="muro"><summary>☠ Muro de los caídos (${caidos.length})</summary><ul class="lista">${caidos
+      .map((c) => `<li><b>${esc(c.nombre)}</b> · ${esc(c.clase)}, poder ${c.poder} · ${esc(c.texto)} (${esc(textoCalendario({ ...estado, dia: c.dia }))})</li>`)
+      .join('')}</ul></details>`;
   }
 
   /** Inventario de héroes: quién está libre, de misión o lesionado, con la curación a mano. */
@@ -576,7 +629,7 @@ export class Interfaz {
         detalle = `${h.diasLesion} ${h.diasLesion === 1 ? 'día' : 'días'} de reposo`;
         accion = `<button class="principal" data-accion="curar" data-id="${h.id}" ${c.bloqueo ? `disabled title="${esc(c.bloqueo)}"` : ''}>Curar por ${num(c.precio)}</button>`;
       } else {
-        detalle = 'Listo para una misión';
+        detalle = h.lealtad < balance.animo.lealtadAviso ? 'Piensa en irse: su lealtad está muy baja' : 'Listo para una misión';
         const a = condicionesAscension(estado, h.id);
         if (alLimite(h) && a.rangoNuevo) {
           detalle = 'Ha llegado a su límite';
@@ -596,7 +649,7 @@ export class Interfaz {
         : '';
       return `<div class="fila-heroe e-${h.estado.replace(' ', '-')}">
         ${this.avatar(h)}
-        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} Poder ${h.poder} · sueldo ${num(sueldo(h))} · lealtad ${h.lealtad}</span>${this.techo(estado, h)}${this.barraXp(h)}${aviso}</div>
+        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} Poder ${h.poder} · sueldo ${num(sueldoEn(estado, j.id, h))} · lealtad ${h.lealtad}</span>${this.techo(estado, h)}${this.barraXp(h)}${this.habilidad(h)}${this.sentimientos(estado, h, j.id)}${aviso}</div>
         <div class="situacion"><span class="estado-chip e-${h.estado.replace(' ', '-')}">${h.estado === 'en mision' ? 'de misión' : h.estado}</span><span class="tenue">${detalle}</span></div>
         <div class="accion-fila">${accion}</div>
       </div>`;
@@ -665,7 +718,7 @@ export class Interfaz {
         .join('');
       this.recienRevelados.clear();
       return `<p>Ya has pagado los sueldos: te quedan <strong>${num(jugador(estado).oro)}</strong> de oro. Tu gremio es de <strong>categoría ${categoria(jugador(estado))}</strong>: hoy ${prueba.pendientes.length} jóvenes despiertan sus poderes.</p>
-        <p class="tenue">Los sobres que brillan son los que tus ojeadores creen que pueden llegar lejos: dorado, hasta S; violeta, hasta A; azul, hasta B. Con mejores ojeadores, el brillo engaña menos.</p>
+        <p class="tenue">Los sobres que brillan son los que tus ojeadores creen que pueden llegar lejos: dorado, hasta S; violeta, hasta A o A+; azul, hasta B o B+. Con mejores ojeadores, el brillo engaña menos.</p>
         <div class="sobres">${cartas}</div>
         <div class="botones"><button data-accion="terminar-prueba">No pujar esta semana</button>${
           todos ? '<button class="principal" data-accion="siguiente-candidato">Empezar la subasta</button>' : '<button class="principal" data-accion="revelar-todos">Revelar todos</button>'
@@ -725,8 +778,10 @@ export class Interfaz {
         const heroes = i.partes
           .map((parte) => this.tarjetaRegreso(estado.heroes[parte.heroeId], parte.progreso, parte.diasLesion))
           .join('');
+        const muertes = i.muertes.length ? `<p class="caidos">☠ No vuelven: ${esc(i.muertes.join(', '))}.</p>` : '';
+        const pasa = i.textos.length ? `<ul class="lista vida">${i.textos.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '';
         return `<div class="resultado r-${i.exito ? 'exito' : 'fracaso'}"><b>${i.exito ? '¡Misión cumplida!' : 'La misión ha fracasado'}</b><span>«${esc(i.mision.titulo)}» · +${num(i.oro)} oro</span>
-          <div class="regresos">${heroes}</div></div>`;
+          <div class="regresos">${heroes}</div>${muertes}${pasa}</div>`;
       })
       .join('');
     const nombre = (id: string): string => estado.heroes[id]?.nombre ?? '';
@@ -737,6 +792,9 @@ export class Interfaz {
           ${p.seVan.length ? `<p class="caidos">Se van por no cobrar: ${esc(p.seVan.map((x) => `${x.nombre}${x.destino ? ` (a ${estado.gremios[x.destino]?.nombre ?? ''})` : ''}`).join(', '))}.</p>` : ''}</div>`
       : '';
     const noticias = r.noticias.length ? `<h3>Noticias</h3><ul class="lista">${r.noticias.slice(0, 4).map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : '';
+    const dentro = r.informes.flatMap((i) => i.textos);
+    const vida = r.vida.filter((t) => !dentro.includes(t));
+    const gremio = vida.length ? `<h3>En el gremio</h3><ul class="lista vida">${vida.slice(0, 8).map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : '';
     const boton = r.prueba
       ? '<button class="principal" data-accion="ir-prueba">Ir a la Prueba de los Novatos</button>'
       : '<button class="principal" data-accion="cerrar">Seguir</button>';
@@ -744,14 +802,16 @@ export class Interfaz {
       .map((a) =>
         a.exito
           ? `<div class="resultado r-exito ascension"><b>¡${esc(a.nombre)} supera su Ascensión!</b><span>Asciende a rango ${a.rangoDespues} (poder ${a.poderAntes} → ${a.poderDespues}) y su nuevo techo es ${a.techoNuevo}${a.despertar >= 3 ? ': ¡despertar legendario!' : a.despertar === 2 ? ': ¡despertar extraordinario!' : ''}.</span></div>`
-          : `<div class="resultado r-fracaso ascension"><b>${esc(a.nombre)} no vuelve de su Ascensión</b><span>El gremio guarda luto.</span></div>`,
+          : a.salvado
+            ? `<div class="resultado r-fracaso ascension"><b>${esc(a.nombre)} fracasa en su Ascensión, pero sobrevive</b><span>Una Última oración lo ha traído de vuelta, malherido.</span></div>`
+            : `<div class="resultado r-fracaso ascension"><b>${esc(a.nombre)} no vuelve de su Ascensión</b><span>El gremio guarda luto. Su nombre queda en el muro de los caídos.</span></div>`,
       )
       .join('');
     const ascenso = r.categoriaNueva ? `<div class="resultado ascenso-categoria"><b>¡Categoría ${r.categoriaNueva}!</b><span>La Asociación asciende a tu gremio: desde mañana el tablón ofrece misiones más difíciles y mejor pagadas.</span></div>` : '';
     const entrenos = r.entrenamientos.length
       ? `<div class="resultado entreno"><b>Vuelven de entrenar</b><span>Sin lesiones.</span><div class="regresos">${r.entrenamientos.map((e) => this.tarjetaRegreso(estado.heroes[e.heroeId], e.progreso, 0)).join('')}</div></div>`
       : '';
-    return `${ascenso}${ascensiones}${misiones}${entrenos}${misiones || ascensiones || entrenos ? '' : '<p>Hoy no ha vuelto ninguna misión.</p>'}${sueldos}${noticias}
+    return `${ascenso}${ascensiones}${misiones}${entrenos}${misiones || ascensiones || entrenos ? '' : '<p>Hoy no ha vuelto ninguna misión.</p>'}${sueldos}${gremio}${noticias}
       ${r.prueba ? '' : `<p class="tenue">Empieza el ${esc(textoCalendario(estado).split(' · ')[1] ?? '')}.</p>`}
       <div class="botones">${boton}</div>`;
   }
@@ -800,8 +860,11 @@ export class Interfaz {
   private panelVictoria(estado: EstadoJuego): string {
     const j = jugador(estado);
     const mejor = heroesDe(estado, j.id).sort((a, b) => b.poder - a.poder)[0];
-    return `<p>${esc(j.nombre)} ha cerrado la temporada como <strong>el mejor gremio del reino</strong>. Empezasteis los últimos; ahora todos os miran.</p>
+    const caidos = estado.caidos.filter((c) => c.gremioId === j.id);
+    return `<p><strong>${esc(textoFinal(puesto(estado, j.id)))}</strong></p>
+      <p>${esc(j.nombre)} termina la historia en el puesto ${puesto(estado, j.id)}.º del ranking.</p>
       ${mejor ? `<p class="tenue">Vuestra leyenda: ${esc(mejor.nombre)}, con poder ${mejor.poder} (${letraDe(mejor.poder)}).</p>` : ''}
+      ${caidos.length ? `<p class="tenue">En el muro de los caídos: ${esc(caidos.map((c) => c.nombre).join(', '))}.</p>` : ''}
       <button data-accion="nueva" class="principal">Nueva partida</button>`;
   }
 
@@ -863,8 +926,12 @@ export class Interfaz {
       case 'alternar': {
         const mision = estado.tablon.find((m) => m.id === this.misionId);
         if (this.equipo.includes(id)) this.equipo = this.equipo.filter((x) => x !== id);
-        else if (mision && this.equipo.length < mision.equipo) this.equipo.push(id);
-        else if (mision) this.equipo = [...this.equipo.slice(1), id];
+        else if (mision) {
+          // Se llenan huecos (AllBlack ocupa tres; Pacto, dos): si no cabe, salen los primeros elegidos.
+          this.equipo.push(id);
+          const ocupa = (ids: string[]): number => huecosEquipo(ids.map((x) => obtenerHeroe(estado, x)));
+          while (this.equipo.length > 1 && ocupa(this.equipo) > mision.equipo) this.equipo.shift();
+        }
         return this.repintar();
       }
       case 'lanzar': {
@@ -1037,7 +1104,7 @@ export class Interfaz {
         const extra = r.exito && r.despertar >= 3 ? linea(t.legendario, 'legendaria') : r.exito && r.despertar === 2 ? linea(t.extraordinario, 'extraordinaria') : '';
         const desenlace = (r.exito ? t.exito : t.fracaso).map((x) => linea(x, r.exito ? 'luz' : 'sombra')).join('') + extra;
         const veredicto = r.exito
-          ? `<div class="veredicto exito ${DESPERTAR[r.despertar]?.clase ?? ''}" style="--d:${retraso.toFixed(1)}s"><span class="avatar grande">${retrato({ id: r.heroeId, clase: r.clase })}<span class="rango r${r.rangoDespues}">${r.rangoDespues}</span></span><div>${DESPERTAR[r.despertar]?.titulo ? `<em>${DESPERTAR[r.despertar]!.titulo}</em>` : ''}<b>¡${esc(r.nombre)} asciende a rango ${r.rangoDespues}!</b><span>Poder ${r.poderAntes} → ${r.poderDespues} · ${r.despertar === 0 ? 'ha alcanzado la cima' : `nuevo techo <strong class="r${r.techoNuevo}">${r.techoNuevo}</strong>`}</span></div></div>`
+          ? `<div class="veredicto exito ${DESPERTAR[r.despertar]?.clase ?? ''}" style="--d:${retraso.toFixed(1)}s"><span class="avatar grande">${retrato({ id: r.heroeId, clase: r.clase })}<span class="rango ${this.cr(r.rangoDespues)}">${r.rangoDespues}</span></span><div>${DESPERTAR[r.despertar]?.titulo ? `<em>${DESPERTAR[r.despertar]!.titulo}</em>` : ''}<b>¡${esc(r.nombre)} asciende a rango ${r.rangoDespues}!</b><span>Poder ${r.poderAntes} → ${r.poderDespues} · ${r.despertar === 0 ? 'ha alcanzado la cima' : `nuevo techo <strong class="${this.cr(r.techoNuevo)}">${r.techoNuevo}</strong>`}</span></div></div>`
           : `<div class="veredicto fracaso" style="--d:${retraso.toFixed(1)}s"><span class="avatar grande caido">${retrato({ id: r.heroeId, clase: r.clase })}</span><div><b>${esc(r.nombre)} ha caído en su Ascensión</b><span>El gremio guarda luto.</span></div></div>`;
         retraso += paso;
         return `<div class="bloque-reveal">${preambulo}${desenlace}${veredicto}</div>`;

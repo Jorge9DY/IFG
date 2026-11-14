@@ -1,5 +1,35 @@
 # Informe de balance
 
+## Modo historia con el catálogo de héroes (2026-11-14)
+
+Simulación con `npm run simular -- 300 1`: 300 partidas por estrategia (semillas 1–300), la historia completa (5 temporadas, 140 días). Héroes del catálogo (`src/datos/heroes.json`), escala de diez rangos, relaciones, ánimo, muerte y las 80 habilidades. Cifras provisionales.
+
+Cambios de balance para la nueva escala: dificultad base de las misiones 10/28/60 (antes 24/65/150) con multiplicadores por categoría ×1–×4; el valor de un héroe crece con el cuadrado del poder (comprar a un S cuesta unos 20.000 de oro); los rivales empiezan con 40.000–55.000 de oro y sede de nivel 5, porque pagan sueldos de héroes A y S.
+
+| Métrica | Prudente | Ambiciosa |
+| --- | --: | --: |
+| Puesto medio al cerrar la temporada 1 | 5,0 | 5,0 |
+| Puesto medio al cerrar la temporada 3 | 5,0 | 4,8 |
+| Puesto medio al cerrar la temporada 4 | 5,0 | 3,8 |
+| Puesto medio al cerrar la temporada 5 | 5,0 | 2,9 |
+| Final «Leyenda» / «Respeto» / «Olvido» | 0% / 0% / 100% | 37% / 19% / 44% |
+| Héroes muertos en el gremio (media) | 1,6 | 4,1 |
+| Tasa de éxito de misiones | 88% | 90% |
+| Novatos fichados | 13,4 | 26,0 |
+| Compras / ventas en el mercado | 0 / 0 | 10,2 / 21,5 |
+| Ascensiones intentadas | 0 | 7,7 |
+| Oro final | 113.066 | 44.459 |
+| Fuerza final (top 5) | 307 | 487 |
+
+Lectura:
+
+- **Historia de remontada:** el jugador empieza último y muy lejos (los rivales tienen héroes A y S). Nadie sale del 5.º puesto las dos primeras temporadas; quien invierte (fichajes, mercado, Ascensiones) empieza a escalar en la tercera y llega al 1.º en la última el 37% de las veces.
+- **El prudente no remonta:** no compra en el mercado ni arriesga Ascensiones y acaba con 113.000 de oro sin gastar. Sobra oro si no se invierte; habrá que ajustar recompensas o dar más en qué gastar cuando se prueben los eventos.
+- **Muertes:** el ambicioso pierde unos 4 héroes por partida, casi todos en Ascensiones; el prudente pierde 1–2, casi siempre por el Segador si lo ficha. Chimoku muere en su gremio rival a veces (los rivales lo guardan cuando le quedan 3 vidas).
+- **Pendiente:** jugar a mano la historia completa para ver si el arranque (dos temporadas sin poder salir del último puesto) se hace largo.
+
+## Prototipo anterior (héroes generados)
+
 Simulación con `npm run simular -- 300 1`: 300 partidas por estrategia (semillas 1–300), hasta 4 temporadas (112 días) o la victoria. Cifras provisionales de `src/datos/balance.json` y `src/datos/gremios.json` (ver `preguntas.md`).
 
 ## Estrategias del jugador automático

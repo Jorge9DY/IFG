@@ -1,13 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { alLimite, esDestacado, ganarExperiencia, letraDe, rango, rangoPotencial, sueldo, textoPotencial, valor } from '../src/motor/heroes';
+import { LETRAS } from '../src/motor/tipos';
 import { heroe } from './fabrica';
+
+const i = (l: string): number => (LETRAS as readonly string[]).indexOf(l);
 
 describe('héroes', () => {
   it('convierte poder y potencial en letras', () => {
+    // Escala de diez rangos del modo historia (hoja «Cupos»).
     expect(letraDe(0)).toBe('F');
+    expect(letraDe(10)).toBe('E');
     expect(letraDe(20)).toBe('D');
-    expect(letraDe(49)).toBe('C');
-    expect(letraDe(65)).toBe('A');
+    expect(letraDe(39)).toBe('C');
+    expect(letraDe(49)).toBe('C+');
+    expect(letraDe(65)).toBe('B+');
+    expect(letraDe(85)).toBe('A+');
     expect(letraDe(100)).toBe('S');
   });
 
@@ -16,9 +23,9 @@ describe('héroes', () => {
       const h = heroe({ id: 'a', poder: 22, potencial: 70, sesgoOjeo }); // potencial real A
       const anchos = [0, 1, 2, 3].map((nivel) => {
         const [min, max] = rangoPotencial(h, nivel);
-        expect(['F', 'D', 'C', 'B', 'A', 'S'].indexOf(min)).toBeLessThanOrEqual(4);
-        expect(['F', 'D', 'C', 'B', 'A', 'S'].indexOf(max)).toBeGreaterThanOrEqual(4);
-        return ['F', 'D', 'C', 'B', 'A', 'S'].indexOf(max) - ['F', 'D', 'C', 'B', 'A', 'S'].indexOf(min);
+        expect(i(min)).toBeLessThanOrEqual(i('A'));
+        expect(i(max)).toBeGreaterThanOrEqual(i('A'));
+        return i(max) - i(min);
       });
       expect(anchos[3]).toBe(0);
       for (let i = 1; i < anchos.length; i++) expect(anchos[i]!).toBeLessThanOrEqual(anchos[i - 1]!);
@@ -28,7 +35,7 @@ describe('héroes', () => {
 
   it('el rango nunca baja de la letra del poder actual', () => {
     const h = heroe({ id: 'a', poder: 60, potencial: 62, sesgoOjeo: 0.99 });
-    expect(rangoPotencial(h, 0)[0]).toBe('B');
+    expect(rangoPotencial(h, 0)[0]).toBe('B+');
   });
 
   it('el sueldo crece con el poder y la reputación', () => {
@@ -55,11 +62,11 @@ describe('héroes', () => {
   });
 
   it('cruzar un umbral de letra es un ascenso de rango y sube el sueldo', () => {
-    const h = heroe({ id: 'a', poder: 33, potencial: 60 });
-    expect(rango(h)).toBe('D');
+    const h = heroe({ id: 'a', poder: 38, potencial: 60 });
+    expect(rango(h)).toBe('C');
     const p = ganarExperiencia(h, 21);
-    expect(p.rangoAntes).toBe('D');
-    expect(p.rangoDespues).toBe('C');
+    expect(p.rangoAntes).toBe('C');
+    expect(p.rangoDespues).toBe('C+');
     expect(p.sueldoDespues).toBeGreaterThan(p.sueldoAntes);
   });
 
@@ -68,12 +75,12 @@ describe('héroes', () => {
     const p = ganarExperiencia(h, 100);
     expect(p).toMatchObject({ poderDespues: 32, llegaAlLimite: true, experienciaDespues: 0 });
     expect(alLimite(h)).toBe(true);
-    expect(rangoPotencial(h, 0)).toEqual(['D', 'D']);
+    expect(rangoPotencial(h, 0)).toEqual(['C', 'C']);
     const otra = ganarExperiencia(h, 50);
     expect(otra).toMatchObject({ experienciaGanada: 0, barras: 0, llegaAlLimite: false });
   });
 
-  it('un novato destacado tiene potencial A o S', () => {
+  it('un novato destacado tiene potencial A, A+ o S', () => {
     expect(esDestacado(heroe({ id: 'a', potencial: 70 }))).toBe(true);
     expect(esDestacado(heroe({ id: 'b', potencial: 60 }))).toBe(false);
   });

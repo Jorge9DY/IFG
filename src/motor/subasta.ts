@@ -7,6 +7,7 @@ import { gremio, heroe as obtenerHeroe, registrar, rivales, type EstadoJuego } f
 import { esDestacado, valorPublico } from './heroes';
 import { plazasLibres } from './instalaciones';
 import { limitePuja } from './rivales';
+import { alGastar, martillazo } from './habilidades';
 
 const N = balance.novatos;
 
@@ -127,10 +128,18 @@ export function cerrarSubasta(estado: EstadoJuego, s: Subasta): string | null {
     registrar(estado, 'novatos', `Nadie se queda con ${h.nombre}: vuelve a su aldea.`);
     return null;
   }
+  // Martillo puede anular la puja ganadora una vez por temporada.
+  const golpe = martillazo(estado, h, s.lider, s.precio);
+  if (golpe) {
+    s.lider = golpe.gremioId;
+    s.precio = golpe.precio;
+    registrar(estado, 'novatos', golpe.texto);
+  }
   const g = gremio(estado, s.lider);
   g.oro -= s.precio;
   g.plantilla.push(h.id);
   if (esDestacado(h)) g.novatosDestacados += 1;
   registrar(estado, g.esJugador ? 'fichaje' : 'novatos', `${h.nombre} (poder ${h.poder}) se une a ${g.nombre} por ${s.precio} de oro.`);
+  alGastar(estado, g.id);
   return g.id;
 }

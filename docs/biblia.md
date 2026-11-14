@@ -56,6 +56,9 @@ El juego deja de generar héroes nuevos en cada partida. Pasa a ser un **modo hi
 - **Duración fija:** el modo historia dura un número cerrado de temporadas (\[Abierto\]: cuántas).
 - **Eventos con guion:** los acontecimientos importantes ocurren cuando lo decide el diseño (qué semana, qué temporada, con qué condiciones), no al azar.
 - **Rejugabilidad por inversión:** en cada partida el jugador reparte sus recursos (oro, tiempo, misiones, entrenamientos, Ascensiones, fichajes) entre unos héroes u otros. Esas elecciones **desbloquean eventos y finales distintos**.
+- **\[Aceptado\] Catálogo:** 80 héroes diseñados por el propietario en su hoja de cálculo («Héroes»), copiados en `src/datos/heroes.json`. Clase y género los propuso Claude por encargo del propietario (20 por clase; 40 hombres y 40 mujeres, 5 y 5 en cada rival). El jugador empieza con los 4 «Prota»; cada rival, con sus 10 héroes **en su rango máximo**; los 36 «Libre» llegan por la Prueba de los Novatos y **todos empiezan en rango F**.
+- **\[Propuesta\] Correspondencia de gremios:** Gran rival = Dragón Carmesí, Rival 2 = Sombras Negras, Rival 3 = Corona Dorada, Rival 4 = Última Esperanza.
+- **\[Propuesta\] Duración y finales:** 5 temporadas (provisional). Al cerrar la última, el final depende del puesto: «Leyenda» (1.º), «Respeto» (2.º–3.º) u «Olvido». Los finales y eventos por héroe están por diseñar (pregunta 18).
 
 ### Foco del diseño \[Aceptado\] (2026-11-14)
 
@@ -188,6 +191,16 @@ El diseño original permitía elegir solo una de las tres. Con misiones de hasta
 
 **\[Aceptado de momento\]** La fórmula provisional de éxito y lesiones del prototipo sirve como base; se revisará al equilibrar.
 
+### Muerte \[Propuesta\] (encargo del propietario, 2026-11-14)
+
+Principio: **un héroe solo muere por un riesgo que el jugador ve antes de aceptarlo**.
+
+- **Ascensión** fallida (sección 9).
+- **Misiones imposibles:** una misión de rango alto con menos del 35% de éxito lleva la marca «☠ Riesgo de muerte». Si fracasa, cada héroe del equipo puede morir (*ilustrativo:* 15%) en lugar de lesionarse.
+- **Habilidades que lo dicen:** Chimoku (se le acaba la vida tras 10 misiones), el Segador (sacrifica cada semana al compañero que peor le cae, si esa relación es mala o peor; interpretación provisional) e InsectLover (al ascender lo sustituye GodInsect).
+- **Consecuencias:** el héroe pasa al **muro de los caídos** (pestaña Héroes del gremio); sus compañeros pierden ánimo según lo que los unía (más su pareja y sus mejores amigos); Nox hereda una cuarta parte de su poder; Beato puede evitar una muerte por temporada (el héroe queda malherido 7 días).
+- Cifras en `balance.json` (`muerte`).
+
 **\[Abierto\]**
 
 - Fórmula de éxito (poder del equipo frente a dificultad, rasgos, relaciones, estado de ánimo).
@@ -316,7 +329,7 @@ Los héroes mejoran misión a misión y el jugador lo ve. No se añade ninguna e
 
 - **Experiencia:** cada misión llena la barra del héroe (más cuanto más alto es el rango de la misión; la mitad si fracasa). No hay experiencia extra por otros motivos.
 - **Subidas de poder:** al llenarse la barra, el poder sube de golpe (*ilustrativo:* +3 por barra de 21 puntos).
-- **Rangos F, D, C, B, A, S** según el poder, con las mismas letras que el potencial. Ascender de rango solo sube el sueldo, y se muestra cuánto.
+- **Rangos** según el poder, con las mismas letras que el potencial. **\[Aceptado\] Escala de diez rangos** (hoja «Cupos» del propietario): F 1–9, E 10–19, D 20–29, C 30–39, C+ 40–49, B 50–59, B+ 60–69, A 70–79, A+ 80–89, S 90–100. El techo de cada héroe diseñado es el rango máximo que marca la hoja. Ascender de rango solo sube el sueldo, y se muestra cuánto.
 - **Techo:** al llegar a su potencial, el héroe deja de crecer, se avisa («Ha llegado a su límite») y se revela su potencial real.
 - **Regreso de la misión:** en el resumen del día, cada héroe enseña su barra llenándose, la subida de poder, el ascenso y la lesión. Sin pantallas ni botones nuevos.
 - **Descartado:** un «nivel» aparte del poder (dos números para lo mismo) y árboles de habilidades o reparto de puntos (trabajo administrativo).
@@ -326,11 +339,18 @@ Los héroes mejoran misión a misión y el jugador lo ve. No se añade ninguna e
 Un héroe que ha llegado a su límite puede intentar romperlo. El jugador paga por enviarlo, **solo**, a una misión de Ascensión muy difícil durante unos días.
 
 - **Si la supera:** asciende de rango (su poder sube hasta la letra siguiente) y su techo queda **por encima de ese nuevo rango**: normalmente un rango más; a veces dos (**despertar extraordinario**) y rara vez tres (**despertar legendario**), con S como máximo (*ilustrativo:* 75%, 20% y 5%). El nuevo techo se conoce con exactitud, porque el héroe acaba de mostrar hasta dónde llega.
-- **Si fracasa: muere.** Es la única forma de morir del juego y por eso pesa: ¿lo vendes o lo arriesgas todo para convertirlo en leyenda?
+- **Si fracasa: muere.** Es la forma principal de morir y por eso pesa: ¿lo vendes o lo arriesgas todo para convertirlo en leyenda? (Las demás muertes, siempre avisadas, están en la sección 5, «Muerte».)
+- **Ascensiones de héroe:** algunos héroes del catálogo tienen la suya (InsectLover deja paso a GodInsect; Récord, Tiburón y Su Alteza llegan a S cumpliendo su condición; ver su ficha).
 - La probabilidad y el coste se muestran antes de enviarlo, con un paso de confirmación que avisa de la muerte. Cuanto más alto el rango, más difícil (*ilustrativo:* 60% desde F, 35% desde A). Desde S no se puede ascender.
 - Se puede repetir tras cada ascenso, siempre más difícil.
 - **Se vive en la pantalla principal** (decisión del propietario): mientras dura, una barra bajo «Finalizar día» avanza cada día con una línea de lo que está sufriendo el héroe. Es la única excepción a los cinco elementos de la sección 3, y solo aparece durante una Ascensión.
 - **Gran reveal:** el día que termina, una ventana en el centro de la pantalla cuenta unas líneas de tensión antes de desvelar si ha vuelto y ha ascendido o si ha caído. Se cierra con una ✕.
+
+### Habilidades únicas \[Aceptado\] (diseño del propietario; cifras \[Propuesta\])
+
+Cada héroe del catálogo tiene una habilidad única (hoja «Héroes», columna «Habilidad»). Están todas en el juego (`src/motor/habilidades.ts`, cifras en `balance.json` → `habilidades`) y enganchan en lo que ya existe: el poder en misión, las lesiones, el oro, la experiencia, la semana, el mercado, la Prueba, la Ascensión y la muerte. En la carta del héroe se ven plegadas: el nombre a la vista y el texto al abrirla.
+
+Reglas generales: Tokopi («...») anula las habilidades de su equipo; Echo copia la del compañero más fuerte; AllBlack ocupa tres huecos de misión y Pacto dos (las misiones piden **huecos**, no héroes). Interpretaciones provisionales donde la hoja no lo cerraba: ver la pregunta 19.
 
 ### Clases \[Aceptado\]
 
@@ -421,7 +441,17 @@ Las etiquetas evolucionan: una rivalidad puede convertirse en amistad y una amis
 
 **Ejemplo de vínculo especial:** dos héroes quieren ser el mejor espadachín del gremio. Se provocan, entrenan juntos y acaban reconociendo el talento del otro; la rivalidad sana mejora a ambos.
 
-**\[Abierto\]** Cómo se calculan los cambios de afinidad y el tamaño de cada bonificación.
+### Sistema de relaciones \[Propuesta\] (encargo del propietario: pilar del juego, 2026-11-14)
+
+El juego consiste en gestionar a la vez las relaciones y los estados de muchos héroes. Primera versión (cifras en `balance.json` → `relaciones` y `animo`):
+
+- **Afinidad** de −100 a 100 por pareja. Niveles: enemigos (≤ −60), mala relación (≤ −25), neutral, amigos (≥ 25), mejores amigos (≥ 60).
+- **Compatibilidad oculta** (−2 a +2, fija por pareja): unas parejas mejoran solas y otras se tuercen. Cada semana la afinidad se mueve 4 puntos por punto de compatibilidad.
+- **Misiones juntos:** +6 si sale bien, −2 si sale mal, ±3 por compatibilidad. Rima lo duplica; Teo impide que empeore.
+- **Química del equipo** en misión: amigos +4%, mejores amigos +8%, pareja +12%, mala relación −6%, enemigos −12% de poder, con un tope de ±25%. Se ve al formar el equipo.
+- **Amor:** cada semana, quien no está enamorado puede enamorarse (25%) del compañero con quien mejor se lleva si la afinidad llega a 65 (40 con Aimul). Si es mutuo, son **pareja**. Quien quiere a alguien que quiere a otro sufre **celos** (pierde ánimo y afinidad con el rival).
+- **Perder a alguien** (venta, marcha o muerte) baja el ánimo de sus amigos, mejores amigos y su amor, más si muere.
+- En la carta de cada héroe del gremio se ven su ánimo y sus vínculos fuertes; los cambios aparecen en el resumen del día («En el gremio»).
 
 ## 11. Emociones, necesidades y lealtad
 
@@ -465,6 +495,11 @@ Escalada orientativa (no obligatoria): se frustra → lo comenta a un compañero
 **\[Aceptado\]** Excepción: si las condiciones son extremas y el jugador ignora reiteradamente las oportunidades, el héroe se va por iniciativa propia.
 
 **\[Abierto\]** Valores iniciales de necesidades y lealtad y cómo se calculan sus cambios.
+
+### Ánimo y lealtad en el prototipo \[Propuesta\] (2026-11-14)
+
+- **Ánimo** de 0 a 100 (empieza en 60). Sube al cumplir misiones y baja al fracasar, lesionarse, no cobrar o perder a alguien. Cada semana se acerca a lo que le dan sus relaciones (más amigos, más alto). **Cambia el poder en misión hasta un ±15%**: esto matiza el «no aplica penalizaciones constantes» de arriba y espera confirmación (pregunta 19).
+- **Lealtad:** cada semana sube con el ánimo alto y baja con el ánimo bajo. Por debajo de 20 avisa («piensa en irse»); a 0, se va a otro gremio. Sigue valiendo el impago: dos semanas sin cobrar y se va.
 
 ## 12. Autonomía de los héroes
 
@@ -703,6 +738,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-14 | Encargo del propietario: clases y géneros del catálogo a criterio de Claude (equilibrados); escala de diez rangos de la hoja; los héroes de los rivales empiezan en su rango máximo y los libres llegan por la Prueba en F; crear los sistemas que falten, con las **relaciones** como pilar; resolver la **muerte** a criterio de Claude. Aplicado: catálogo de 80 héroes con sus 80 habilidades, relaciones y ánimo \[Propuesta\], muerte \[Propuesta\] (la Ascensión deja de ser la única forma de morir), misiones por huecos, 5 temporadas y tres finales provisionales. |
 | 2026-11-14 | Decisión del propietario: **modo historia** con héroes diseñados, duración de X temporadas, eventos con guion y rejugabilidad por inversión que desbloquea eventos y finales. Foco en misiones, héroes y fichajes; las mecánicas nuevas solo profundizan las existentes. Se descarta la propuesta de las tres ramas (economía e investigación). El torneo de fin de temporada pasa a la versión principal como \[Propuesta\]. |
 | 2026-11-07 | Decisiones del propietario: cada misión del tablón se puede repetir mientras haya equipos libres (con aviso si el oro llega después de la Prueba); retratos provisionales generados para cada héroe. |
 | 2026-11-07 | Decisión del propietario: tras una Ascensión el techo queda al menos un rango por encima del nuevo rango (+1, +2 extraordinario, +3 legendario) y se conoce. |

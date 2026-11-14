@@ -101,3 +101,31 @@ Para adaptar el prototipo hace falta decidir:
 8. **Torneo de fin de temporada:** ¿qué formato y qué papel tiene en la historia?
 9. **Condición de final:** ¿el modo historia termina siempre tras X temporadas, con un final según lo conseguido?
 
+
+## 19. Catálogo, relaciones y muerte: supuestos que conviene confirmar (2026-11-14)
+
+Aplicado por encargo del propietario («añade las clases…, crea los sistemas que no existan…, soluciona la muerte a tu criterio»). Lo que la hoja no cerraba, Claude lo ha decidido así; todo es provisional:
+
+1. **Clases y géneros:** escritos en la hoja (columna O «Clase» y columna G «Género»). 20 por clase; 40 hombres y 40 mujeres (5 y 5 en cada rival). Se respetaron los géneros que ya estaban puestos.
+2. **Gremios:** Gran rival = Dragón Carmesí, Rival 2 = Sombras Negras, Rival 3 = Corona Dorada, Rival 4 = Última Esperanza.
+3. **Rivales en su rango máximo:** su poder está dentro de la franja de su techo (p. ej. Solus, S, poder 94). La columna «Rango inicial» de la hoja no se usa para ellos.
+4. **Los «Prota»** empiezan con el rango y el poder de la hoja (Entrman E 16, HalfGoblin E 14, InsectLover F 9, AllBlack F 8).
+5. **Duración:** 5 temporadas; finales por puesto («Leyenda», «Respeto», «Olvido»). Los finales por héroe siguen pendientes (pregunta 18).
+6. **Ánimo con efecto en el poder (±15%):** la biblia decía que el ánimo no aplica penalizaciones constantes. Como el propietario pidió que el juego se base en los estados de los héroes, ahora sí las aplica. ¿Se mantiene?
+7. **Amor sin restricciones de género:** cualquier pareja puede enamorarse. ¿Correcto?
+8. **Interpretaciones de habilidades:**
+   - Entrman: «heroínas» = héroes con género Mujer.
+   - Segador: solo sacrifica si su peor relación es «mala» o peor (si no, se contiene). Techo base C (la hoja dice «Por decidir»).
+   - Dado: 50% doblar, 50% perder.
+   - Pirita: guarda el 20%.
+   - Ñam: come de 100 a 400 de oro y rinde un 40% más.
+   - Retorta: la poción es al azar cada día y afecta al compañero más flojo.
+   - Topo: cada semana cuenta el oro y la clase que busca un rival; al final de la temporada, si su lealtad es baja, vuelve a su gremio de origen (aún no se lleva a su mejor amigo).
+   - Su Alteza: el tratado es automático la primera semana de cada temporada, con un gremio al azar (no comparten misión).
+   - Zancadilla: sabotea sola cada semana al gremio de justo delante (−8 de prestigio; si la pillan, −10 al suyo).
+   - Martillo, Usura, Vigilia, Letra y Dep: automáticos, sin botones nuevos.
+   - Heredero: su misión personal es completar 8 misiones.
+   - Cobra: rinde un 30% más mientras cobra y se va a la primera semana sin cobrar.
+   - Echo: copia al compañero más fuerte.
+   - Sin implementar aún: la ascensión de Bastión y la de Roble (dejar poder a un discípulo).
+9. **Ascensión genérica:** sigue abierta a cualquier héroe al límite (decisión anterior). ¿O solo a los que la hoja marca con techo final mayor que el base?

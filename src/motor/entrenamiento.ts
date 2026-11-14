@@ -6,6 +6,7 @@ import balance from '../datos/balance.json';
 import { heroe as obtenerHeroe, jugador, registrar, type EstadoJuego } from './estado';
 import { alLimite, ganarExperiencia, type Progreso } from './heroes';
 import { nivelInstalacion } from './instalaciones';
+import { alGastar, factorEntrenamiento } from './habilidades';
 
 const E = balance.entrenamiento;
 const I = balance.instalaciones.entrenamiento;
@@ -54,6 +55,7 @@ export function entrenar(estado: EstadoJuego, heroeId: string): void {
   h.estado = 'entrenando';
   estado.entrenamientos.push({ heroeId, diaVuelta: estado.dia + c.dias - 1 });
   registrar(estado, 'mision', `${h.nombre} entrena ${c.dias} días (−${c.coste} de oro).`);
+  alGastar(estado, estado.jugadorId);
 }
 
 export interface ResultadoEntrenamiento {
@@ -71,7 +73,9 @@ export function resolverEntrenamientos(estado: EstadoJuego): ResultadoEntrenamie
     const h = estado.heroes[e.heroeId];
     if (!h) continue;
     h.estado = 'libre';
-    const progreso = ganarExperiencia(h, E.dias * experienciaPorDia(estado));
+    // Sparring hace de saco de boxeo: más experiencia, a costa de su ánimo.
+    const extra = factorEntrenamiento(estado, estado.jugadorId, h.id);
+    const progreso = ganarExperiencia(h, Math.round(E.dias * experienciaPorDia(estado) * extra));
     resultados.push({ heroeId: h.id, nombre: h.nombre, progreso });
   }
   return resultados;

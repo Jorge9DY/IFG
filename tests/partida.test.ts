@@ -19,7 +19,8 @@ describe('partida', () => {
     const estado = partida();
     const j = jugador(estado);
     expect(j.oro).toBe(balance.jugador.oro);
-    expect(j.plantilla).toHaveLength(balance.jugador.heroes);
+    expect(j.plantilla).toHaveLength(4);
+    expect(j.plantilla.map((id) => estado.heroes[id]!.nombre)).toContain('AllBlack');
     expect(puesto(estado, j.id)).toBe(5);
     expect(estado.tablon).toHaveLength(3);
   });
@@ -43,7 +44,7 @@ describe('partida', () => {
     expect(estado.tablon).toHaveLength(3);
     expect(lanzadasHoy(estado, bajo)).toBe(3);
     expect(new Set(estado.enCurso.map((c) => c.mision.id)).size).toBe(3);
-    expect(heroesDe(estado, 'jugador').every((h) => h.estado === 'en mision')).toBe(true);
+    expect([h1!, h2!, h3!].every((id) => estado.heroes[id]!.estado === 'en mision')).toBe(true);
     expect(motivoNoLanzar(estado, bajo.id, [h1!])).toMatch(/no está disponible/);
   });
 
@@ -65,7 +66,7 @@ describe('partida', () => {
     const estado = partida();
     const [h1, h2] = jugador(estado).plantilla;
     const [bajo, medio] = estado.tablon;
-    expect(motivoNoLanzar(estado, medio!.id, [h1!])).toMatch(/2 héroes/);
+    expect(motivoNoLanzar(estado, medio!.id, [h1!])).toMatch(/2 huecos/);
     lanzarMision(estado, bajo!.id, [h1!]);
     expect(motivoNoLanzar(estado, medio!.id, [h1!, h2!])).toMatch(/no está disponible/);
   });

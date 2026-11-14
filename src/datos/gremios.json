@@ -1,5 +1,5 @@
 {
-  "_nota": "Sección 14 de la biblia. Nombres, número y cifras provisionales (pendiente de decisión).",
+  "_nota": "Sección 14 de la biblia. Nombres y cifras provisionales. Modo historia: los héroes de cada rival vienen del catálogo (src/datos/heroes.json). Correspondencia provisional con la hoja: Gran rival = Dragón Carmesí, Rival 2 = Sombras Negras, Rival 3 = Corona Dorada, Rival 4 = Última Esperanza.",
   "rivales": [
     {
       "id": "dragon",
@@ -7,16 +7,17 @@
       "nombre": "Dragón Carmesí",
       "personalidad": "Arrogante",
       "estrategia": "Héroes muy poderosos, instalaciones mediocres.",
-      "oro": 15000,
-      "heroes": 6,
-      "poder": [45, 64],
-      "potencial": ["B", "A", "A", "S"],
-      "reputacion": [20, 50],
+      "oro": 50000,
       "nivelSede": 2,
       "nivelOjeadores": 0,
       "misionesAltas": 4,
       "novatosDestacados": 1,
-      "perfil": { "prioridad": "poder", "agresividad": 1.2, "mejora": 0.3, "vende": true }
+      "perfil": {
+        "prioridad": "poder",
+        "agresividad": 1.2,
+        "mejora": 0.3,
+        "vende": true
+      }
     },
     {
       "id": "corona",
@@ -24,16 +25,17 @@
       "nombre": "Corona Dorada",
       "personalidad": "Ambiciosa",
       "estrategia": "Invierte en prestigio e instalaciones.",
-      "oro": 18000,
-      "heroes": 5,
-      "poder": [36, 54],
-      "potencial": ["B", "A", "A"],
-      "reputacion": [30, 60],
+      "oro": 55000,
       "nivelSede": 3,
       "nivelOjeadores": 1,
       "misionesAltas": 3,
       "novatosDestacados": 3,
-      "perfil": { "prioridad": "destacado", "agresividad": 1.1, "mejora": 1.0, "vende": true }
+      "perfil": {
+        "prioridad": "destacado",
+        "agresividad": 1.1,
+        "mejora": 1.0,
+        "vende": true
+      }
     },
     {
       "id": "sombras",
@@ -41,16 +43,17 @@
       "nombre": "Sombras Negras",
       "personalidad": "Calculadora",
       "estrategia": "Compra talento barato antes que nadie.",
-      "oro": 12000,
-      "heroes": 6,
-      "poder": [28, 48],
-      "potencial": ["A", "A", "S"],
-      "reputacion": [10, 35],
+      "oro": 45000,
       "nivelSede": 2,
       "nivelOjeadores": 2,
       "misionesAltas": 2,
       "novatosDestacados": 2,
-      "perfil": { "prioridad": "potencial", "agresividad": 1.0, "mejora": 0.5, "vende": true }
+      "perfil": {
+        "prioridad": "potencial",
+        "agresividad": 1.0,
+        "mejora": 0.5,
+        "vende": true
+      }
     },
     {
       "id": "esperanza",
@@ -58,37 +61,162 @@
       "nombre": "Última Esperanza",
       "personalidad": "Tradicional",
       "estrategia": "Conserva a sus veteranos.",
-      "oro": 10000,
-      "heroes": 5,
-      "poder": [42, 58],
-      "potencial": ["B", "B", "A"],
-      "reputacion": [45, 75],
+      "oro": 40000,
       "nivelSede": 2,
       "nivelOjeadores": 1,
       "misionesAltas": 6,
       "novatosDestacados": 0,
-      "perfil": { "prioridad": "barato", "agresividad": 0.7, "mejora": 0.4, "vende": false }
+      "perfil": {
+        "prioridad": "barato",
+        "agresividad": 0.7,
+        "mejora": 0.4,
+        "vende": false
+      }
     }
   ],
   "tiposMision": {
     "_nota": "Decisión del propietario: cada tipo de misión favorece a una clase (misiones de un héroe) o a una combinación de clases (misiones de grupo).",
     "bajo": [
-      { "tipo": "Caza", "clases": ["Guerrero"], "titulos": ["Limpiar ratas gigantes del granero", "Ahuyentar a unos goblins del camino", "Abatir al jabalí que asusta al pueblo"] },
-      { "tipo": "Encantamiento", "clases": ["Mago"], "titulos": ["Romper la maldición de un pozo", "Descifrar una runa en la muralla", "Apagar un fuego fatuo en el cementerio"] },
-      { "tipo": "Rastreo", "clases": ["Explorador"], "titulos": ["Recuperar un collar en el pantano", "Encontrar a un niño perdido en el bosque", "Seguir las huellas de un ladrón"] },
-      { "tipo": "Socorro", "clases": ["Sanador"], "titulos": ["Atender a los enfermos de la aldea", "Purificar el agua del molino", "Cuidar a los heridos de una caravana"] }
+      {
+        "tipo": "Caza",
+        "clases": [
+          "Guerrero"
+        ],
+        "titulos": [
+          "Limpiar ratas gigantes del granero",
+          "Ahuyentar a unos goblins del camino",
+          "Abatir al jabalí que asusta al pueblo"
+        ]
+      },
+      {
+        "tipo": "Encantamiento",
+        "clases": [
+          "Mago"
+        ],
+        "titulos": [
+          "Romper la maldición de un pozo",
+          "Descifrar una runa en la muralla",
+          "Apagar un fuego fatuo en el cementerio"
+        ]
+      },
+      {
+        "tipo": "Rastreo",
+        "clases": [
+          "Explorador"
+        ],
+        "titulos": [
+          "Recuperar un collar en el pantano",
+          "Encontrar a un niño perdido en el bosque",
+          "Seguir las huellas de un ladrón"
+        ]
+      },
+      {
+        "tipo": "Socorro",
+        "clases": [
+          "Sanador"
+        ],
+        "titulos": [
+          "Atender a los enfermos de la aldea",
+          "Purificar el agua del molino",
+          "Cuidar a los heridos de una caravana"
+        ]
+      }
     ],
     "medio": [
-      { "tipo": "Escolta", "clases": ["Guerrero", "Sanador"], "titulos": ["Proteger una caravana de especias", "Escoltar a un peregrino hasta el santuario"] },
-      { "tipo": "Exploración", "clases": ["Explorador", "Mago"], "titulos": ["Explorar la cripta del molino", "Cartografiar las cuevas de cristal"] },
-      { "tipo": "Rescate", "clases": ["Explorador", "Sanador"], "titulos": ["Rescatar a un mercader secuestrado", "Sacar a unos mineros atrapados"] },
-      { "tipo": "Cacería mayor", "clases": ["Guerrero", "Mago"], "titulos": ["Cazar al lobo de dos cabezas", "Abatir al grifo del desfiladero"] }
+      {
+        "tipo": "Escolta",
+        "clases": [
+          "Guerrero",
+          "Sanador"
+        ],
+        "titulos": [
+          "Proteger una caravana de especias",
+          "Escoltar a un peregrino hasta el santuario"
+        ]
+      },
+      {
+        "tipo": "Exploración",
+        "clases": [
+          "Explorador",
+          "Mago"
+        ],
+        "titulos": [
+          "Explorar la cripta del molino",
+          "Cartografiar las cuevas de cristal"
+        ]
+      },
+      {
+        "tipo": "Rescate",
+        "clases": [
+          "Explorador",
+          "Sanador"
+        ],
+        "titulos": [
+          "Rescatar a un mercader secuestrado",
+          "Sacar a unos mineros atrapados"
+        ]
+      },
+      {
+        "tipo": "Cacería mayor",
+        "clases": [
+          "Guerrero",
+          "Mago"
+        ],
+        "titulos": [
+          "Cazar al lobo de dos cabezas",
+          "Abatir al grifo del desfiladero"
+        ]
+      }
     ],
     "alto": [
-      { "tipo": "Mazmorra", "clases": ["Guerrero", "Mago", "Sanador"], "titulos": ["Recuperar la reliquia del templo hundido", "Limpiar la mazmorra del rey loco"] },
-      { "tipo": "Expedición", "clases": ["Explorador", "Mago", "Sanador"], "titulos": ["Sellar la grieta del bosque maldito", "Cruzar el desierto de ceniza"] },
-      { "tipo": "Asedio", "clases": ["Guerrero", "Guerrero", "Mago"], "titulos": ["Expulsar a la banda del barón sin tierra", "Romper el asedio de la torre del norte"] },
-      { "tipo": "Cacería legendaria", "clases": ["Guerrero", "Explorador", "Mago"], "titulos": ["Derrotar al ogro de la colina negra", "Seguir al wyvern hasta su nido"] }
+      {
+        "tipo": "Mazmorra",
+        "clases": [
+          "Guerrero",
+          "Mago",
+          "Sanador"
+        ],
+        "titulos": [
+          "Recuperar la reliquia del templo hundido",
+          "Limpiar la mazmorra del rey loco"
+        ]
+      },
+      {
+        "tipo": "Expedición",
+        "clases": [
+          "Explorador",
+          "Mago",
+          "Sanador"
+        ],
+        "titulos": [
+          "Sellar la grieta del bosque maldito",
+          "Cruzar el desierto de ceniza"
+        ]
+      },
+      {
+        "tipo": "Asedio",
+        "clases": [
+          "Guerrero",
+          "Guerrero",
+          "Mago"
+        ],
+        "titulos": [
+          "Expulsar a la banda del barón sin tierra",
+          "Romper el asedio de la torre del norte"
+        ]
+      },
+      {
+        "tipo": "Cacería legendaria",
+        "clases": [
+          "Guerrero",
+          "Explorador",
+          "Mago"
+        ],
+        "titulos": [
+          "Derrotar al ogro de la colina negra",
+          "Seguir al wyvern hasta su nido"
+        ]
+      }
     ]
   },
   "frasesReto": {

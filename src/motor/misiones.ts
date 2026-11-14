@@ -3,8 +3,27 @@
 import balance from '../datos/balance.json';
 import datosGremios from '../datos/gremios.json';
 import type { Azar } from './azar';
+import type { EstadoJuego } from './estado';
+import { activa, huecos as huecosDe, ajustarOro, alSalir, alVolver, bonusExito, diasMenos, factorExperiencia, factorLesion, lesionForzada, poderEquipoEnMision, type Contexto } from './habilidades';
 import { ganarExperiencia, type Progreso } from './heroes';
+import { morir, riesgoDeMuerte } from './muerte';
+import { cambiarAnimo, quimica, relacionesTrasMision } from './relaciones';
 import { RANGOS_MISION, type Clase, type Heroe, type Mision, type RangoMision } from './tipos';
+
+/**
+ * Dónde se juega la misión: con él cuentan las habilidades, el ánimo y las relaciones. Sin entorno, solo
+ * el poder y las clases (lo usan las pruebas de reglas básicas).
+ */
+export interface Entorno {
+  estado: EstadoJuego;
+  gremioId: string;
+  /** Día de salida (por defecto, hoy). */
+  dia?: number;
+}
+
+function contexto(mision: Mision, equipo: readonly Heroe[], e: Entorno): Contexto {
+  return { estado: e.estado, gremioId: e.gremioId, mision, equipo, dia: e.dia ?? e.estado.dia };
+}
 
 /** Multiplicadores de la categoría del gremio (1 y 1 en la categoría inicial). */
 export interface Escala {
@@ -88,22 +107,63 @@ export function bonusClases(mision: Mision, equipo: readonly Heroe[]): number {
   return K.bonusPorClase * cubiertas.length + (faltan.length === 0 ? K.bonusCombinacion : 0);
 }
 
-/** Poder del equipo en esta misión: el Mago pega más fuerte en las de rango alto. */
-export function poderEnMision(mision: Mision, equipo: readonly Heroe[]): number {
+/**
+ * Poder del equipo en esta misión. Sin entorno: el Mago pega más fuerte en las de rango alto. Con entorno,
+ * además, habilidades, ánimo y química del equipo.
+ */
+export function poderEnMision(mision: Mision, equipo: readonly Heroe[], entorno?: Entorno): number {
+  if (entorno) return poderEquipoEnMision(contexto(mision, equipo, entorno));
   return Math.round(equipo.reduce((t, h) => t + h.poder * (h.clase === 'Mago' && mision.rango === 'alto' ? K.poderMagoEnAlto : 1), 0));
 }
 
-/** Probabilidad de éxito de este equipo en esta misión: poder, efecto del Mago y clases favorecidas. */
-export function probabilidadMision(mision: Mision, equipo: readonly Heroe[]): number {
+/** Probabilidad de éxito de este equipo en esta misión: poder, clases favorecidas y, con entorno, todo lo demás. */
+export function probabilidadMision(mision: Mision, equipo: readonly Heroe[], entorno?: Entorno): number {
   if (equipo.length === 0) return 0;
-  const porPoder = M.exito.base + M.exito.pendiente * (poderEnMision(mision, equipo) / mision.dificultad - 1);
-  return limitar(porPoder + bonusClases(mision, equipo));
+  const porPoder = M.exito.base + M.exito.pendiente * (poderEnMision(mision, equipo, entorno) / mision.dificultad - 1);
+  const extra = entorno ? bonusExito(contexto(mision, equipo, entorno)) : 0;
+  return limitar(porPoder + bonusClases(mision, equipo) + extra);
 }
 
-/** Días que dura la misión con este equipo: un Explorador acorta en un día las más largas (rango alto). */
+/** Química del equipo en % de poder (relaciones). */
+export function quimicaEquipo(estado: EstadoJuego, equipo: readonly Heroe[]): number {
+  return quimica(estado, equipo);
+}
+
+/** Días que dura la misión con este equipo: un Explorador acorta en un día las más largas (rango alto); Brújula, uno más. */
 export function duracionMision(mision: Mision, equipo: readonly Heroe[]): number {
   const explorador = equipo.some((h) => h.clase === 'Explorador');
-  return explorador && mision.duracion >= K.duracionMinimaExplorador ? mision.duracion - K.diasMenosExplorador : mision.duracion;
+  const base = explorador && mision.duracion >= K.duracionMinimaExplorador ? mision.duracion - K.diasMenosExplorador : mision.duracion;
+  return Math.max(1, base - diasMenos(equipo));
+}
+
+/**
+ * Equipos posibles que llenan exactamente los huecos de una misión (AllBlack ocupa tres; Pacto, dos).
+ * Para no disparar el cálculo, mira solo a los 12 primeros de la lista.
+ */
+export function equiposPosibles(lista: readonly Heroe[], huecos: number): Heroe[][] {
+  const candidatos = lista.slice(0, 12);
+  const resultado: Heroe[][] = [];
+  const recorrer = (desde: number, quedan: number, actual: Heroe[]): void => {
+    if (quedan === 0) {
+      resultado.push([...actual]);
+      return;
+    }
+    for (let i = desde; i < candidatos.length; i++) {
+      const h = candidatos[i]!;
+      const n = huecosDe(h);
+      if (n > quedan) continue;
+      actual.push(h);
+      recorrer(i + 1, quedan - n, actual);
+      actual.pop();
+    }
+  };
+  recorrer(0, huecos, []);
+  return resultado;
+}
+
+/** Efectos de salir de misión (habilidades que actúan al partir). */
+export function salirDeMision(azar: Azar, mision: Mision, equipo: readonly Heroe[], entorno: Entorno): string[] {
+  return alSalir(contexto(mision, equipo, entorno), azar);
 }
 
 /** Probabilidad de lesión de un héroe: el Guerrero aguanta más, el Mago menos y un Sanador protege a los demás. */
@@ -129,11 +189,16 @@ export interface InformeMision {
   exito: boolean;
   oro: number;
   partes: ParteHeroe[];
+  /** Héroes que han muerto en la misión (nombres). */
+  muertes: string[];
+  /** Lo que ha pasado por habilidades y relaciones. */
+  textos: string[];
 }
 
 /**
- * Resuelve una misión: una tirada contra la probabilidad. Fracasar reduce la recompensa y la experiencia
- * y aumenta la probabilidad de lesión (sección 5). No hay muertes.
+ * Resuelve una misión: una tirada contra la probabilidad (la fijada al salir, si la hay). Fracasar reduce la
+ * recompensa y la experiencia y aumenta la probabilidad de lesión (sección 5). Con entorno, además:
+ * habilidades, ánimo, relaciones y, si la misión llevaba «Riesgo de muerte» y fracasa, muertes.
  * Aplica experiencia, reputación y lesiones a los héroes; el oro lo suma quien llama.
  */
 export function resolverMision(
@@ -141,26 +206,52 @@ export function resolverMision(
   mision: Mision,
   equipo: readonly Heroe[],
   gremioId: string,
+  entorno?: Entorno,
+  probabilidadFijada?: number,
 ): InformeMision {
   const d = M[mision.rango];
-  const probabilidad = probabilidadMision(mision, equipo);
+  const probabilidad = probabilidadFijada ?? probabilidadMision(mision, equipo, entorno);
   const exito = azar.d100() <= probabilidad;
   const xp = exito ? d.experiencia : Math.round(d.experiencia * M.fraccionExperienciaFracaso);
+  const mortal = !!entorno && !exito && riesgoDeMuerte(mision, probabilidad);
+  const muertos: string[] = [];
   const partes = equipo.map((h) => {
-    const lesion = azar.probabilidad(probLesion(h, equipo, exito ? d.lesionExito : d.lesionFracaso));
-    const diasLesion = lesion ? azar.entero(d.diasLesion[0] ?? 1, d.diasLesion[1] ?? 1) : 0;
-    const progreso = ganarExperiencia(h, xp);
+    const forzada = entorno ? lesionForzada(equipo, h) : null;
+    const base = probLesion(h, equipo, exito ? d.lesionExito : d.lesionFracaso) * (entorno ? factorLesion(equipo, h) : 1);
+    const lesion = forzada === 'nunca' ? false : forzada ? true : azar.probabilidad(base);
+    const [min, max] = [d.diasLesion[0] ?? 1, d.diasLesion[1] ?? 1];
+    const diasLesion = lesion ? (forzada === 'grave' ? max : azar.entero(min, max)) : 0;
+    if (mortal && forzada !== 'nunca' && azar.probabilidad(balance.muerte.probPorHeroe)) muertos.push(h.id);
+    const progreso = ganarExperiencia(h, Math.round(xp * (entorno ? factorExperiencia(equipo, h) : 1)));
     if (exito) h.reputacion = Math.min(100, h.reputacion + d.reputacion);
     h.estado = lesion ? 'lesionado' : 'libre';
     h.diasLesion = diasLesion;
+    if (entorno) {
+      h.ultimoRegreso = entorno.estado.dia;
+      cambiarAnimo(h, (exito ? balance.animo.exito : balance.animo.fracaso) + (lesion ? balance.animo.lesion : 0));
+      if (lesion && h.habilidad === 'vendetta') h.memoria = { ...(h.memoria ?? {}), vendetta: diasLesion };
+    }
     return { heroeId: h.id, diasLesion, progreso };
   });
-  return {
-    mision,
-    gremioId,
-    probabilidad,
-    exito,
-    oro: exito ? mision.recompensa : Math.round(mision.recompensa * M.fraccionRecompensaFracaso),
-    partes,
-  };
+  let oro = exito ? mision.recompensa : Math.round(mision.recompensa * M.fraccionRecompensaFracaso);
+  const textos: string[] = [];
+  const muertes: string[] = [];
+  if (entorno) {
+    const ctx = contexto(mision, equipo, entorno);
+    const ajuste = ajustarOro(ctx, azar, oro, exito);
+    oro = ajuste.oro;
+    textos.push(...ajuste.textos);
+    textos.push(...relacionesTrasMision(entorno.estado, equipo, exito, (h) => activa(h, equipo)));
+    const lesionados = partes.filter((p) => p.diasLesion > 0).map((p) => p.heroeId);
+    textos.push(...alVolver(ctx, azar, exito, lesionados));
+    for (const id of muertos) {
+      const h = entorno.estado.heroes[id];
+      if (!h) continue;
+      const r = morir(entorno.estado, id, 'mision');
+      if (r.murio) muertes.push(h.nombre);
+      textos.push(...r.textos);
+    }
+    for (const h of equipo) if (h.habilidad === 'porLasUltimas' && !entorno.estado.heroes[h.id]) muertes.push(h.nombre);
+  }
+  return { mision, gremioId, probabilidad, exito, oro, partes, muertes, textos };
 }

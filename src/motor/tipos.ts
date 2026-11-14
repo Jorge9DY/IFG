@@ -1,9 +1,12 @@
 // Modelo de datos del juego (biblia: secciones 4–9 y 14). Todo es serializable con JSON.
 
-export const LETRAS = ['F', 'D', 'C', 'B', 'A', 'S'] as const;
+/** Escala de rangos del modo historia (hoja «Cupos»): de F (poder 1–9) a S (90–100). */
+export const LETRAS = ['F', 'E', 'D', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S'] as const;
 export type Letra = (typeof LETRAS)[number];
 
 export type EstadoHeroe = 'libre' | 'en mision' | 'lesionado' | 'entrenando';
+
+export type Genero = 'Hombre' | 'Mujer';
 
 /** Decisión del propietario: cuatro clases, con un solo efecto pasivo cada una. */
 export const CLASES = ['Guerrero', 'Mago', 'Explorador', 'Sanador'] as const;
@@ -33,6 +36,21 @@ export interface Heroe {
   techoConocido?: boolean;
   /** Semanas seguidas sin cobrar el sueldo. */
   semanasSinCobrar: number;
+  /** Ánimo (0–100): cambia con las misiones, las relaciones y lo que le pasa a sus compañeros. Por defecto 60. */
+  animo?: number;
+  genero?: Genero;
+  /** Héroe diseñado del catálogo (src/datos/heroes.json). Los genéricos no tienen. */
+  catalogo?: string;
+  /** Habilidad única (id del catálogo). */
+  habilidad?: string;
+  /** Héroe del que está enamorado (puede no ser correspondido). */
+  amor?: string | null;
+  /** Contadores de su habilidad (rachas, cargas, vida…). Plano y serializable. */
+  memoria?: Record<string, number | string | number[] | string[]>;
+  /** Último día en que volvió de una misión (para el descanso). */
+  ultimoRegreso?: number;
+  /** Convertido por el Segador. */
+  zombie?: boolean;
 }
 
 export type RangoMision = 'bajo' | 'medio' | 'alto';
@@ -88,4 +106,18 @@ export interface Gremio {
   personalidad?: string;
   estrategia?: string;
   perfil?: PerfilRival;
+  /** Prestigio ganado o perdido por habilidades (Mascota, sabotajes…). */
+  prestigioExtra?: number;
+  /** Fichajes y ventas de la semana (Dep). */
+  movimientosSemana?: number;
+  /** Habilidades de «una vez por temporada» ya usadas: id de habilidad → temporada. */
+  usos?: Record<string, number>;
+  /** Penalización de éxito pendiente para la próxima misión (Trébol). */
+  karma?: number;
+  /** Deuda con Usura y semanas que lleva sin pagarse. */
+  deuda?: { oro: number; semanas: number };
+  /** Alianza de Su Alteza: gremio aliado y temporada. */
+  alianza?: { gremioId: string; temporada: number };
+  /** Factor del coste de las instalaciones esta semana (Chapuzas). */
+  factorObras?: number;
 }

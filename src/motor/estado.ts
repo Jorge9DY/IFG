@@ -15,11 +15,27 @@ export interface MisionEnCurso {
   cartaId?: string;
   /** Misión de Ascensión (un héroe solo; si fracasa, muere). */
   ascension?: boolean;
+  /** Probabilidad de éxito calculada al salir (la que vio el jugador). */
+  probabilidad?: number;
+  /** Día en que salió. */
+  diaSalida?: number;
+}
+
+/** Héroe caído: el muro de los caídos guarda su memoria. */
+export interface Caido {
+  id: string;
+  nombre: string;
+  clase: string;
+  gremioId: string;
+  dia: number;
+  poder: number;
+  causa: 'ascension' | 'mision' | 'vida' | 'segador' | 'metamorfosis';
+  texto: string;
 }
 
 export interface Evento {
   dia: number;
-  tipo: 'mision' | 'fichaje' | 'venta' | 'sueldos' | 'novatos' | 'instalacion' | 'rival' | 'ranking' | 'temporada' | 'reto';
+  tipo: 'mision' | 'fichaje' | 'venta' | 'sueldos' | 'novatos' | 'instalacion' | 'rival' | 'ranking' | 'temporada' | 'reto' | 'relacion' | 'muerte' | 'habilidad';
   texto: string;
 }
 
@@ -47,7 +63,7 @@ export interface PruebaNovatos {
 export type Fase = 'gestion' | 'prueba' | 'victoria';
 
 export interface EstadoJuego {
-  version: 8;
+  version: 9;
   semilla: number;
   /** Estado del generador aleatorio, para continuar la misma secuencia. */
   azar: number;
@@ -69,6 +85,12 @@ export interface EstadoJuego {
   ranking: FilaRanking[];
   registro: Evento[];
   contadorIds: number;
+  /** Afinidad de cada pareja de héroes (clave «a|b»). Las que faltan valen 0. */
+  relaciones: Record<string, number>;
+  /** Héroes libres del catálogo que aún pueden llegar a la Prueba de los Novatos. */
+  bolsaNovatos: string[];
+  /** Muro de los caídos. */
+  caidos: Caido[];
 }
 
 const C = balance.calendario;

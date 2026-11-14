@@ -6,7 +6,7 @@ import { nivelOjeo, potencialEstimado, valorEstimado } from '../../src/motor/her
 import type { Heroe } from '../../src/motor/tipos';
 import { infoInstalacion, mejorar, plazasLibres } from '../../src/motor/instalaciones';
 import { comprar, condicionesCompra, ofertaVenta, vender } from '../../src/motor/mercado';
-import { probabilidadMision } from '../../src/motor/misiones';
+import { probabilidadJugador } from '../../src/motor/partida';
 import { aceptarReto, heroesParaReto, motivoNoAceptar } from '../../src/motor/retos';
 import { Azar } from '../../src/motor/azar';
 import { diaDeVuelta, lanzarMision, pujarNovato, siguienteCandidato, vuelveTrasPrueba } from '../../src/motor/partida';
@@ -89,7 +89,7 @@ export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): vo
   for (const mision of [...estado.tablon].sort((a, b) => b.recompensa - a.recompensa)) {
     for (;;) {
       const equipo = equipoRecomendado(estado, mision);
-      if (equipo.length === 0 || probabilidadMision(mision, equipo) < e.probMinima) break;
+      if (equipo.length === 0 || probabilidadJugador(estado, mision, equipo) < e.probMinima) break;
       const ids = equipo.map((h) => h.id);
       if (vuelveTrasPrueba(estado, diaDeVuelta(estado, mision, ids)) && diasParaPrueba(estado.dia) <= 1) break;
       lanzarMision(estado, mision.id, ids);

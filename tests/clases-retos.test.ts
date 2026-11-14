@@ -117,7 +117,7 @@ describe('retos de los maestros', () => {
   });
 
   it('solo responden héroes de la clase y el rango pedidos, y hay que cubrir la apuesta', () => {
-    const { estado, mio } = conReto(40, 38);
+    const { estado, mio } = conReto(35, 33);
     expect(heroesParaReto(estado).map((h) => h.id)).toEqual(['mio']);
     const otro = jugador(estado).plantilla.find((id) => id !== 'mio')!;
     expect(motivoNoAceptar(estado, otro)).toMatch(/mago de rango C/);
@@ -126,30 +126,30 @@ describe('retos de los maestros', () => {
   });
 
   it('gana el más fuerte: si ganas, oro y prestigio', () => {
-    const { estado, mio } = conReto(45, 38);
+    const { estado, mio } = conReto(38, 33);
     const antes = prestigio(jugador(estado));
     const r = aceptarReto(estado, new Azar(1), mio.id);
     expect(r.desenlace).toBe('victoria');
-    expect(r.poderRival).toBe(38);
+    expect(r.poderRival).toBe(33);
     expect(jugador(estado).oro).toBe(5800);
     expect(prestigio(jugador(estado))).toBe(antes + balance.ranking.prestigioPorReto);
   });
 
   it('si pierdes, pagas la apuesta; con empate nadie paga', () => {
-    const derrota = conReto(36, 44);
+    const derrota = conReto(31, 37);
     expect(aceptarReto(derrota.estado, new Azar(1), derrota.mio.id).desenlace).toBe('derrota');
     expect(jugador(derrota.estado).oro).toBe(4200);
-    const empate = conReto(40, 40);
+    const empate = conReto(35, 35);
     expect(aceptarReto(empate.estado, new Azar(1), empate.mio.id).desenlace).toBe('empate');
     expect(jugador(empate.estado).oro).toBe(5000);
   });
 
   it('rechazar no cuesta nada y el reto caduca al terminar el día límite', () => {
-    const a = conReto(40, 40);
+    const a = conReto(35, 35);
     rechazarReto(a.estado);
     expect(a.estado.reto).toBeNull();
     expect(jugador(a.estado).oro).toBe(5000);
-    const b = conReto(40, 40);
+    const b = conReto(35, 35);
     b.estado.dia = 7;
     caducarReto(b.estado);
     expect(b.estado.reto).toBeNull();

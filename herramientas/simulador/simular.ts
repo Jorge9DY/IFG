@@ -1,4 +1,4 @@
-// Simulador de balance: juega N partidas (hasta 4 temporadas o la victoria) con el jugador automático.
+// Simulador de balance: juega N partidas del modo historia completo con el jugador automático.
 // Uso: npm run simular -- [partidas] [semillaInicial]
 
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -10,7 +10,7 @@ import { crearPartida, finalizarDia, terminarPrueba } from '../../src/motor/part
 import { fuerza } from '../../src/motor/ranking';
 import { AMBICIOSA, PRUDENTE, jugarDia, jugarPrueba, metricasVacias, type Estrategia, type MetricasBot } from './bot';
 
-const TEMPORADAS = 4;
+const TEMPORADAS = balance.historia.temporadas;
 
 export interface ResultadoPartida {
   semilla: number;
@@ -25,13 +25,15 @@ export interface ResultadoPartida {
   oroFinal: number;
   fuerzaFinal: number;
   plantillaFinal: number;
+  /** Héroes del jugador muertos. */
+  muertes: number;
   metricas: MetricasBot;
 }
 
 export function simularPartida(semilla: number, e: Estrategia): ResultadoPartida {
   const estado: EstadoJuego = crearPartida({ semilla });
   const m = metricasVacias();
-  const r: ResultadoPartida = { semilla, puestos: [], victoria: null, impagos: 0, semanasApuradas: 0, oroFinal: 0, fuerzaFinal: 0, plantillaFinal: 0, metricas: m };
+  const r: ResultadoPartida = { semilla, puestos: [], victoria: null, impagos: 0, semanasApuradas: 0, oroFinal: 0, fuerzaFinal: 0, plantillaFinal: 0, muertes: 0, metricas: m };
   const ultimoDia = TEMPORADAS * balance.calendario.diasPorTemporada;
   while (estado.fase !== 'victoria' && estado.dia <= ultimoDia) {
     jugarDia(estado, e, m);
@@ -52,6 +54,7 @@ export function simularPartida(semilla: number, e: Estrategia): ResultadoPartida
   r.oroFinal = j.oro;
   r.fuerzaFinal = fuerza(estado, j.id);
   r.plantillaFinal = j.plantilla.length;
+  r.muertes = estado.caidos.filter((c) => c.gremioId === j.id).length;
   return r;
 }
 
@@ -64,14 +67,15 @@ export function informe(resultados: ResultadoPartida[], e: Estrategia): string {
   const filas: [string, string][] = [];
   for (let t = 1; t <= TEMPORADAS; t++) {
     const llegan = resultados.filter((r) => r.puestos.length >= t);
-    const ganadas = resultados.filter((r) => r.victoria === t).length;
+    const primeros = resultados.filter((r) => r.puestos[t - 1] === 1).length;
     filas.push([`Temporada ${t}: puesto medio al cerrar`, llegan.length ? f1(media(llegan.map((r) => r.puestos[t - 1] ?? 5))) : '—']);
-    filas.push([`Temporada ${t}: partidas ganadas`, pct(ganadas, n)]);
+    filas.push([`Temporada ${t}: cierra 1.º`, pct(primeros, n)]);
   }
-  const ganadas = resultados.filter((r) => r.victoria !== null).length;
+  const final = (f: (p: number) => boolean): number => resultados.filter((r) => r.puestos.length === TEMPORADAS && f(r.puestos[TEMPORADAS - 1]!)).length;
   const m = (f: (x: MetricasBot) => number): string => f1(media(resultados.map((r) => f(r.metricas))));
   filas.push(
-    [`Victoria en ${TEMPORADAS} temporadas o menos`, pct(ganadas, n)],
+    ['Final «Leyenda» (1.º) / «Respeto» (2.º–3.º) / «Olvido»', `${pct(final((p) => p === 1), n)} / ${pct(final((p) => p === 2 || p === 3), n)} / ${pct(final((p) => p > 3), n)}`],
+    ['Héroes muertos (media)', f1(media(resultados.map((r) => r.muertes)))],
     ['Semanas con sueldos impagados (media)', f1(media(resultados.map((r) => r.impagos)))],
     ['Semanas con menos de 1.000 de oro tras sueldos', f1(media(resultados.map((r) => r.semanasApuradas)))],
     ['Misiones lanzadas', m((x) => x.misiones)],
