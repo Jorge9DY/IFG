@@ -2,6 +2,19 @@
 
 Entradas más recientes primero.
 
+## 2026-11-15 — Revisión de diseño
+
+- Petición del propietario: revisar el juego con herramientas de diseñador profesional. Informe en `docs/revision-de-diseno.md` (playtest guiado de 15 días con capturas, simulación, MDA, curva de progreso, economía, decisiones, carga cognitiva y feedback).
+- Corregido o mejorado:
+  - Objetivo del momento en el HUD.
+  - Progreso semanal en el ranking (puntos ganados y lo que falta para el de delante).
+  - La sede 3D muestra a los héroes del gremio.
+  - Noticias de rivales agrupadas.
+  - Retos a los que puedes responder.
+  - Cartas más ligeras.
+- Pendiente de decisión (pregunta 21): la brecha del ranking, la economía con oro sobrante, el desbloqueo progresivo de sistemas y la pista de relaciones.
+- 124 tests; probado en navegador sin errores.
+
 ## 2026-11-15 — Sistema social de los héroes
 
 - Documento del propietario «Sistema social de héroes» v1.0, integrado con lo que ya había y con las habilidades.

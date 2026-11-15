@@ -61,7 +61,7 @@ import type { Heroe, Mision, RangoMision } from '../motor/tipos';
 import balance from '../datos/balance.json';
 import textosAscension from '../narrativa/ascension.json';
 import type { ResultadoAscension } from '../motor/ascension';
-import { equipoRecomendado, heroesLibres, nivelDificultad, probabilidadRecomendada } from './ayudas';
+import { equipoRecomendado, heroesLibres, nivelDificultad, probabilidadRecomendada, objetivoDelMomento } from './ayudas';
 import { borrar, cargar, guardar } from './guardado';
 import { esc, num, pct } from './html';
 import type { CombateTorneo } from '../motor/torneo';
@@ -181,6 +181,12 @@ export class Interfaz {
     return this.abierto !== null;
   }
 
+  /** Héroes del gremio para la sede 3D (solo lectura). */
+  heroesEnSede(): { id: string; clase: string; estado: string }[] {
+    if (!this.estado) return [];
+    return heroesDe(this.estado, this.estado.jugadorId).map((h) => ({ id: h.id, clase: h.clase, estado: h.estado }));
+  }
+
   abrir(panel: Panel): void {
     this.abierto = panel;
     this.mensaje = '';
@@ -238,7 +244,11 @@ export class Interfaz {
         const pista = esDia7(estado.dia)
           ? `Hoy se pagan los sueldos (${num(sueldosDe(estado, estado.jugadorId))}) y después llega la Prueba de los Novatos`
           : `Prueba de los Novatos en ${faltan} ${faltan === 1 ? 'día' : 'días'}`;
-        this.el.objetivo.innerHTML = `<button class="boton-dia" data-accion="finalizar">Finalizar día<small>${pista}</small></button>`;
+        const meta = objetivoDelMomento(estado);
+        const objetivo = meta.abrir
+          ? `<button class="meta-objetivo" data-abrir="${meta.abrir}"${meta.abrir === 'gremio' && estado.social.pendientes.length ? ' data-pestana="relaciones"' : ''}>▸ ${esc(meta.texto)}</button>`
+          : `<p class="meta-objetivo">▸ ${esc(meta.texto)}</p>`;
+        this.el.objetivo.innerHTML = `<button class="boton-dia" data-accion="finalizar">Finalizar día<small>${pista}</small></button>${objetivo}`;
       }
       const libres = heroesLibres(estado).length;
       const bloqueo = estado.fase !== 'gestion' ? 'disabled' : '';
@@ -393,7 +403,12 @@ export class Interfaz {
       })
       .join('');
     const asunto = estado.social.pendientes.some((p) => p.a === h.id || p.b === h.id) ? '<span class="asunto-chip">Asunto pendiente</span>' : '';
-    return `<div class="sentimientos">${this.rasgosChips(h)}${asunto}</div>${this.mental(h)}${chips ? `<div class="sentimientos">${chips}</div>` : ''}`;
+    // Solo se despliegan las barras si algo va mal; si no, una palabra basta (menos carga a la vista).
+    const mal = felicidad(h) < 50 || estres(h) > social.mision.estresAlto;
+    const estadoMental = mal
+      ? this.mental(h)
+      : `<span class="mental-corto" title="Felicidad ${felicidad(h)}/100 · Estrés ${estres(h)}/100">${textoFelicidad(h)} · ${textoEstres(h).toLowerCase()}</span>`;
+    return `<div class="sentimientos">${mal ? '' : estadoMental}${this.rasgosChips(h)}${asunto}${chips}</div>${mal ? estadoMental : ''}`;
   }
 
   /** Icono de una relación: pareja, amor, rivalidad o nivel de afinidad. */
@@ -929,7 +944,11 @@ export class Interfaz {
           ${p.impagados.length ? `<p class="caidos">Sin cobrar: ${esc(p.impagados.map(nombre).join(', '))}. Pierden lealtad y, si la semana que viene tampoco cobran, se irán.</p>` : ''}
           ${p.seVan.length ? `<p class="caidos">Se van por no cobrar: ${esc(p.seVan.map((x) => `${x.nombre}${x.destino ? ` (a ${estado.gremios[x.destino]?.nombre ?? ''})` : ''}`).join(', '))}.</p>` : ''}</div>`
       : '';
-    const noticias = r.noticias.length ? `<h3>Noticias</h3><ul class="lista">${r.noticias.slice(0, 4).map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : '';
+    // Las misiones altas de los rivales, en una sola línea: si no, tapan lo importante.
+    const altas = r.noticias.filter((n) => n.endsWith('completa una misión de rango alto.')).length;
+    const resto = r.noticias.filter((n) => !n.endsWith('completa una misión de rango alto.'));
+    const lineas = [...resto.slice(0, 3), ...(altas ? [`Los rivales completan ${altas} ${altas === 1 ? 'misión' : 'misiones'} de rango alto.`] : [])];
+    const noticias = lineas.length ? `<h3>Noticias</h3><ul class="lista">${lineas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : '';
     const dentro = r.informes.flatMap((i) => i.textos);
     const vida = r.vida.filter((t) => !dentro.includes(t));
     const gremio = vida.length ? `<h3>En el gremio</h3><ul class="lista vida">${vida.slice(0, 8).map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : '';
@@ -988,13 +1007,26 @@ export class Interfaz {
     if (!r) return '';
     const actual = puesto(estado, estado.jugadorId);
     const cambio = r.puestoAnterior - actual;
-    const titular = cambio > 0 ? `¡Subes ${cambio} ${cambio === 1 ? 'puesto' : 'puestos'}!` : cambio < 0 ? `Bajas ${-cambio} ${cambio === -1 ? 'puesto' : 'puestos'}.` : 'Te mantienes en el mismo puesto.';
+    const mia = r.ranking.find((f) => f.gremioId === estado.jugadorId);
+    const ganados = (mia?.puntos ?? 0) - r.puntosAnteriores;
+    const delante = mia ? r.ranking.find((f) => f.puesto === mia.puesto - 1) : undefined;
+    const titular =
+      cambio > 0
+        ? `¡Subes ${cambio} ${cambio === 1 ? 'puesto' : 'puestos'}!`
+        : cambio < 0
+          ? `Bajas ${-cambio} ${cambio === -1 ? 'puesto' : 'puestos'}.`
+          : ganados > 0
+            ? `+${num(ganados)} puntos esta semana.`
+            : 'Esta semana no has sumado puntos.';
+    const progreso = delante && mia
+      ? `<p class="progreso-ranking">${cambio > 0 && ganados > 0 ? `+${num(ganados)} puntos esta semana. ` : ''}Para alcanzar a <b>${esc(estado.gremios[delante.gremioId]?.nombre ?? '')}</b> te faltan <b>${num(delante.puntos - mia.puntos)}</b> puntos${ganados > 0 ? ` (a este ritmo, unas ${Math.ceil((delante.puntos - mia.puntos) / ganados)} semanas)` : ''}. Suben con el poder de tus 5 mejores héroes y con el prestigio.</p>`
+      : '';
     const temporada = r.temporada
       ? `<div class="resultado"><b>Fin de la temporada ${r.temporada.numero}</b><span>Terminas ${r.temporada.puesto}.º · premio +${num(r.temporada.premio)} oro</span></div>`
       : '';
     const ascenso = r.categoriaNueva ? `<div class="resultado ascenso-categoria"><b>¡Categoría ${r.categoriaNueva}!</b><span>La Asociación asciende a tu gremio: desde mañana el tablón ofrece misiones más difíciles y mejor pagadas.</span></div>` : '';
     const reto = estado.reto && !estado.reto.resultado ? `<div class="resultado reto-aviso"><b>Nuevo reto</b><span>El maestro de ${esc(estado.gremios[estado.reto.gremioId]?.nombre ?? '')} te reta con un ${estado.reto.clase.toLowerCase()} de rango ${estado.reto.rango}. Respóndele en el Mercado de héroes.</span></div>` : '';
-    return `<p><strong>${titular}</strong> Eres ${actual}.º.</p>${ascenso}${reto}${temporada}${r.torneo ? this.tablaTorneo(estado, r.torneo) : ''}${this.tablaRanking(estado, r.ranking)}
+    return `<p><strong>${titular}</strong> Eres ${actual}.º.</p>${progreso}${ascenso}${reto}${temporada}${r.torneo ? this.tablaTorneo(estado, r.torneo) : ''}${this.tablaRanking(estado, r.ranking)}
       <div class="botones"><button class="principal" data-accion="${r.victoria ? 'ver-victoria' : 'cerrar'}">Seguir</button></div>`;
   }
 

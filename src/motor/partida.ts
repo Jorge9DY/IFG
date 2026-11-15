@@ -427,6 +427,8 @@ export function pujarNovato(estado: EstadoJuego, accion: 'pujar' | 'retirarse'):
 export interface ResumenSemana {
   ranking: FilaRanking[];
   puestoAnterior: number;
+  /** Puntos del jugador en el ranking oficial anterior (para enseñar el progreso aunque no cambie de puesto). */
+  puntosAnteriores: number;
   /** Cierre de temporada (cada 4 semanas). */
   temporada: { numero: number; puesto: number; premio: number } | null;
   victoria: boolean;
@@ -467,6 +469,7 @@ export function terminarPrueba(estado: EstadoJuego): ResumenSemana {
     const torneo = esFinDeTemporada(estado.dia) ? celebrarTorneo(estado, azar) : null;
     const categoriaNueva = actualizarCategorias(estado);
     const puestoAnterior = puesto(estado, estado.jugadorId);
+    const puntosAnteriores = estado.ranking.find((f) => f.gremioId === estado.jugadorId)?.puntos ?? 0;
     estado.ranking = calcularRanking(estado);
     const j = jugador(estado);
     const actual = puesto(estado, j.id);
@@ -488,7 +491,7 @@ export function terminarPrueba(estado: EstadoJuego): ResumenSemana {
     } else {
       avanzarDia(estado, azar);
     }
-    return { ranking: estado.ranking, puestoAnterior, temporada, victoria, torneo, categoriaNueva };
+    return { ranking: estado.ranking, puestoAnterior, puntosAnteriores, temporada, victoria, torneo, categoriaNueva };
   });
 }
 

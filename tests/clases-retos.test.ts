@@ -154,4 +154,13 @@ describe('retos de los maestros', () => {
     caducarReto(b.estado);
     expect(b.estado.reto).toBeNull();
   });
+
+  it('si puede, el reto es de una clase y un rango que el jugador ya tiene', () => {
+    for (let semilla = 1; semilla <= 10; semilla++) {
+      const estado = partida(semilla);
+      const r = generarReto(estado, new Azar(semilla));
+      if (!r) continue;
+      expect(heroesParaReto(estado).length).toBeGreaterThan(0);
+    }
+  });
 });

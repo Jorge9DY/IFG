@@ -15,7 +15,24 @@ export interface EventosSede {
   alInteractuar(punto: PuntoInteraccion): void;
   /** true mientras un panel está abierto: el personaje no se mueve ni interactúa. */
   estaBloqueada?(): boolean;
+  /** Héroes del gremio para dibujarlos en la sede (los de misión no están). Solo lectura. */
+  heroes?(): HeroeEnSede[];
 }
+
+export interface HeroeEnSede {
+  id: string;
+  clase: string;
+  estado: string;
+}
+
+const COLOR_CLASE: Record<string, string> = { Guerrero: '#c0603a', Mago: '#8a6fd1', Explorador: '#6aa84f', Sanador: '#5fc2d6' };
+/** Sitios de la sede donde se quedan los héroes libres (lejos de los puntos de interacción). */
+const SITIOS: [number, number][] = [
+  [-5.5, -3.6], [-4.6, -0.2], [-2.6, 1.2], [-5.6, 3.2], [-2.2, -2.6], [1.6, -3.2], [2.2, -1.4], [5.6, -1.6],
+  [5.4, 2.6], [2.6, 1.8], [-1.0, -1.0], [-6.2, 0.8], [6.2, 4.2], [-3.4, 4.4], [3.0, 4.4], [1.0, -4.6], [-0.6, 0.6], [4.6, 1.2],
+];
+/** Camas junto a la puerta de los dormitorios, para los lesionados. */
+const CAMAS: [number, number][] = [[-6.6, -4.6], [-6.6, -3.6], [-6.6, 0.4], [-6.6, 1.4], [-6.6, 2.4], [-6.6, 3.4]];
 
 const ANCHO = 16;
 const FONDO = 12;
@@ -229,6 +246,45 @@ export function iniciarSede(canvas: HTMLCanvasElement, eventos: EventosSede): ()
     );
   };
 
+  // Los héroes del gremio: libres de pie por la sede, lesionados tumbados junto a los dormitorios.
+  const figuras = new Map<string, THREE.Mesh>();
+  let ultimaLectura = -1;
+  const sincronizarHeroes = (t: number): void => {
+    if (!eventos.heroes || t - ultimaLectura < 0.5) return;
+    ultimaLectura = t;
+    const lista = eventos.heroes().filter((h) => h.estado === 'libre' || h.estado === 'lesionado' || h.estado === 'descansando');
+    const vivos = new Set(lista.map((h) => h.id));
+    for (const [id, f] of figuras) {
+      if (!vivos.has(id)) {
+        escena.remove(f);
+        figuras.delete(id);
+      }
+    }
+    let sitio = 0;
+    let cama = 0;
+    for (const h of lista) {
+      let f = figuras.get(h.id);
+      if (!f) {
+        f = new THREE.Mesh(new THREE.CapsuleGeometry(0.28, 0.8, 4, 12), toon(COLOR_CLASE[h.clase] ?? '#9aa0a6'));
+        f.castShadow = true;
+        contorno(f, 0.07);
+        escena.add(f);
+        figuras.set(h.id, f);
+      }
+      if (h.estado === 'lesionado' && cama < CAMAS.length) {
+        const [x, z] = CAMAS[cama++]!;
+        f.position.set(x, 0.32, z);
+        f.rotation.set(0, 0, Math.PI / 2);
+      } else {
+        const [x, z] = SITIOS[sitio++ % SITIOS.length]!;
+        f.position.set(x, 0.7, z);
+        f.rotation.set(0, 0, 0);
+      }
+      f.userData.base = f.position.y;
+      f.userData.de_pie = f.rotation.z === 0;
+    }
+  };
+
   const reloj = new THREE.Clock();
   const direccion = new THREE.Vector3();
   let activo = true;
@@ -267,6 +323,8 @@ export function iniciarSede(canvas: HTMLCanvasElement, eventos: EventosSede): ()
       eventos.alAcercarse(cercano);
     }
 
+    sincronizarHeroes(reloj.elapsedTime);
+    for (const f of figuras.values()) if (f.userData.de_pie) f.position.y = (f.userData.base as number) + Math.abs(Math.sin(reloj.elapsedTime * 2 + f.position.x)) * 0.04;
     fuego.intensity = 16 + Math.sin(reloj.elapsedTime * 9) * 2 + Math.sin(reloj.elapsedTime * 23);
     renderer.render(escena, camara);
     requestAnimationFrame(fotograma);

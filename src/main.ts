@@ -20,4 +20,5 @@ iniciarSede(document.querySelector<HTMLCanvasElement>('#escena')!, {
     interfaz.abrirDesdeSede(punto.id);
   },
   estaBloqueada: () => interfaz.bloqueada,
+  heroes: () => interfaz.heroesEnSede(),
 });

@@ -39,7 +39,8 @@ function candidatosRival(estado: EstadoJuego, gremioId: string, clase: Clase, ra
 
 /**
  * Al empezar la semana, un maestro rival lanza un reto. El rango es el de uno de tus héroes (al azar)
- * y la clase, la de un héroe del rival de ese rango. Si no hay emparejamiento posible, no hay reto.
+ * y la clase, la de un héroe del rival de ese rango; si puede, una clase que tú también tienes en ese rango.
+ * Si no hay emparejamiento posible, no hay reto.
  */
 export function generarReto(estado: EstadoJuego, azar: Azar): Reto | null {
   const mios = heroesDe(estado, estado.jugadorId);
@@ -52,7 +53,10 @@ export function generarReto(estado: EstadoJuego, azar: Azar): Reto | null {
     }
   }
   if (opciones.length === 0) return null;
-  const elegido = azar.elegir(opciones);
+  // Revisión de diseño: un reto al que no puedes responder solo frustra. Si hay alguno con una clase y un
+  // rango que ya tienes, el maestro elige entre esos.
+  const respondibles = opciones.filter((o) => mios.some((h) => h.clase === o.clase && letraDe(h.poder) === o.rango));
+  const elegido = azar.elegir(respondibles.length > 0 ? respondibles : opciones);
   const diasSemana = balance.calendario.diasPorSemana;
   const reto: Reto = {
     ...elegido,

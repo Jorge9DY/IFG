@@ -143,3 +143,12 @@ El documento del propietario pide documentar lo que no especifica. Elegido lo m�
 7. **Lealtad:** se queda solo para los impagos; ya no cambia cada semana. El abandono por problemas sociales llega siempre como petición.
 8. **Partidas guardadas antiguas:** se convierten solas (afinidad → relación completa, ánimo → felicidad, amor mutuo → pareja).
 9. Con el bot del simulador surgen pocas parejas (menos de una por partida) porque rota mucho los equipos; un jugador que mantenga parejas fijas verá más. Pendiente de jugarlo a mano.
+
+## 21. Revisión de diseño: decisiones pendientes (2026-11-15)
+
+Detalle y razones en `docs/revision-de-diseno.md`. Recomendación de Claude entre paréntesis.
+
+1. **Brecha del ranking:** empiezas con 90 puntos y el 4.º tiene 547, así que pasas unas 10 semanas sin moverte del 5.º. ¿Ranking por puntos de temporada, que vuelven a 0 cada temporada (recomendado)? ¿O una meta de «alcanza al de delante» con premio?
+2. **Economía:** sobra oro (18.000–25.000 el día 16). ¿Bajar un 25–30% las recompensas o subir los sueldos con el rango? (Probar junto con la 1.)
+3. **Desbloqueo progresivo** de sistemas para el jugador nuevo: semana 1 misiones y Prueba; semana 2 mercado y relaciones; temporada 2 Ascensión y retos. (Recomendado.)
+4. **Pista de relaciones** al formar equipo («si van juntos a menudo, se acercarán»). (Recomendado.)

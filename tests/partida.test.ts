@@ -157,4 +157,13 @@ describe('partida', () => {
     }
     expect(estado.dia).toBe(29);
   });
+
+  it('el resumen de la semana trae los puntos anteriores para enseñar el progreso', () => {
+    const estado = partida();
+    const antes = estado.ranking.find((f) => f.gremioId === 'jugador')!.puntos;
+    while (!estado.prueba) finalizarDia(estado);
+    const r = terminarPrueba(estado);
+    expect(r.puntosAnteriores).toBe(antes);
+    expect(r.ranking.find((f) => f.gremioId === 'jugador')!.puntos).toBeGreaterThanOrEqual(0);
+  });
 });
