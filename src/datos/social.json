@@ -93,15 +93,22 @@
     }
   },
   "chispa": {
-    "_nota": "Química romántica oculta y fija de cada héroe hacia otro (0–3): atracción que gana por cada misión juntos. El romance surge de interacciones y compatibilidad, no al azar. La atracción sube chispa × porMision en cada misión juntos.",
+    "_nota": "Decisión del propietario (2026-11-16): que enamorarse sea mucho más común, aunque no sea recíproco. Cada misión juntos, la atracción de A hacia B sube chispa (oculta, 0–3) × porMision × factor del índice «enamoradizo» de A × factor del índice «atractivo» de B (índices 1–5).",
     "probabilidades": {
-      "0": 40,
-      "1": 25,
-      "2": 22,
-      "3": 13
+      "0": 15,
+      "1": 30,
+      "2": 35,
+      "3": 20
     },
-    "afinidadMinima": 10,
-    "porMision": 3
+    "porMision": 4,
+    "afinidadMinima": 0,
+    "factorIndice": [
+      0.4,
+      0.7,
+      1,
+      1.5,
+      2.2
+    ]
   },
   "mental": {
     "_nota": "Cambios de felicidad y estrés por acontecimiento (tabla 7.1).",
@@ -275,5 +282,23 @@
     ],
     "probabilidad": 35,
     "afinidad": -6
+  },
+  "indices": {
+    "_nota": "Índices de romance por defecto (héroes genéricos: al azar entre 2 y 4).",
+    "porDefecto": 3,
+    "nombreEnamoradizo": [
+      "Muy difícil",
+      "Difícil",
+      "Normal",
+      "Fácil",
+      "Muy fácil"
+    ],
+    "nombreAtractivo": [
+      "Casi nadie",
+      "Poca gente",
+      "Normal",
+      "Mucha gente",
+      "Todo el mundo"
+    ]
   }
 }

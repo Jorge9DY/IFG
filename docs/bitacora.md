@@ -2,6 +2,19 @@
 
 Entradas más recientes primero.
 
+## 2026-11-16 — Romance con índices por personaje
+
+- Respuestas del propietario a la pregunta 22:
+  - **Romance mucho más frecuente**, sobre todo el no correspondido, con dos índices por personaje: «enamoradizo» y «atractivo» (1–5, en `src/datos/heroes.json`). Multiplican la atracción que se gana en cada misión juntos. La química oculta es más alta y ya no exige afinidad previa.
+  - **Mascota y Chibi con puntos de temporada:** la Mascota da 2 puntos por semana y Chibi cuenta prestigio más puntos de temporada.
+  - **Choques de carácter aprobados.**
+- Medido con `herramientas/auditoria/social.ts` (10 partidas del bot ambicioso):
+  - Unos 2 de cada 3 héroes del gremio acaban enamorados de alguien (66 de 102).
+  - 1,5 parejas por partida (antes 0,1).
+  - Unos 9 rechazos por partida.
+- Los índices se ven en la ficha del héroe y en el detalle de cada pareja.
+- Simulación: la estrategia ambiciosa gana el 55% y la prudente el 34%. 138 tests; probado en navegador sin errores.
+
 ## 2026-11-15 — Auditoría de habilidades
 
 - Petición del propietario: comprobar las 80 habilidades (si funcionan, si el diseño es bueno, si se sienten con impacto) y que la descripción solo se vea tras fichar al héroe o con los ojeadores al máximo.

@@ -43,6 +43,10 @@ export interface Heroe {
   estres?: number;
   /** Rasgos de personalidad (2–3, fijos). */
   rasgos?: string[];
+  /** Índice de romance (1–5): lo fácil que se enamora. */
+  enamoradizo?: number;
+  /** Índice de romance (1–5): lo fácil que es que alguien se enamore de él. */
+  atractivo?: number;
   genero?: Genero;
   /** Héroe diseñado del catálogo (src/datos/heroes.json). Los genéricos no tienen. */
   catalogo?: string;

@@ -177,7 +177,7 @@ function factorPropio(ctx: Contexto, h: Heroe, hab: string | null): number {
     case 'casaLlena':
       return 1 + (g?.plantilla.length ?? 0) * H.casaLlena.porPlaza;
     case 'sombraDeGigantes':
-      return g ? 1 + Math.min(H.sombraDeGigantes.maximo, prestigio(g) * H.sombraDeGigantes.porPrestigio) : 1;
+      return g ? 1 + Math.min(H.sombraDeGigantes.maximo, (prestigio(g) + (g.puntosTemporada ?? 0)) * H.sombraDeGigantes.porPrestigio) : 1;
     case 'vendetta':
       return 1 + num(h, 'vendetta') * H.vendetta.porDia;
     case 'mejorAmigo':
@@ -547,6 +547,8 @@ export function cadaSemana(estado: EstadoJuego, azar: Azar): ResultadoSemanaHabi
       switch (h.habilidad) {
         case 'mimo':
           g.prestigioExtra = (g.prestigioExtra ?? 0) + H.mimo.prestigio;
+          // Decisión del propietario: la mascota también da puntos de temporada.
+          g.puntosTemporada = (g.puntosTemporada ?? 0) + H.mimo.puntos;
           break;
         case 'brilloFugaz':
           if (alLimite(h)) {

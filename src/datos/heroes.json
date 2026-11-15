@@ -1,5 +1,5 @@
 {
- "_nota": "Catálogo del modo historia: los 80 héroes diseñados por el propietario (hoja de cálculo «Héroes»). Clase y género propuestos por Claude con criterio de equilibrio (20 por clase, 40/40). Los héroes de los gremios rivales empiezan en su rango máximo (techo); los libres llegan por la Prueba de los Novatos en rango F. Textos de habilidad resumidos para la interfaz. Rasgos de personalidad (2–3 por héroe) propuestos por Claude a partir de su arquetipo.",
+ "_nota": "Catálogo del modo historia: los 80 héroes diseñados por el propietario (hoja de cálculo «Héroes»). Clase y género propuestos por Claude con criterio de equilibrio (20 por clase, 40/40). Los héroes de los gremios rivales empiezan en su rango máximo (techo); los libres llegan por la Prueba de los Novatos en rango F. Textos de habilidad resumidos para la interfaz. Rasgos de personalidad (2–3 por héroe) propuestos por Claude a partir de su arquetipo. Índices de romance (1–5, propuestos por Claude por encargo del propietario): «enamoradizo» (lo fácil que se enamora) y «atractivo» (lo fácil que es que se enamoren de él).",
  "gremios": {
   "jugador": "Prota",
   "dragon": "Gran rival",
@@ -26,7 +26,9 @@
    "rasgos": [
     "ambicioso",
     "sociable"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H02",
@@ -44,7 +46,9 @@
    "rasgos": [
     "reservado",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H03",
@@ -62,7 +66,9 @@
    "rasgos": [
     "orgulloso",
     "competitivo"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 4
   },
   {
    "id": "H04",
@@ -81,7 +87,9 @@
    "rasgos": [
     "timido",
     "amable"
-   ]
+   ],
+   "enamoradizo": 1,
+   "atractivo": 1
   },
   {
    "id": "H05",
@@ -99,7 +107,9 @@
    "rasgos": [
     "orgulloso",
     "competitivo"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 1
   },
   {
    "id": "H06",
@@ -118,7 +128,9 @@
     "sociable",
     "orgulloso",
     "celoso"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 5
   },
   {
    "id": "H07",
@@ -136,7 +148,9 @@
    "rasgos": [
     "sociable",
     "leal"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H08",
@@ -155,7 +169,9 @@
     "orgulloso",
     "reservado",
     "competitivo"
-   ]
+   ],
+   "enamoradizo": 1,
+   "atractivo": 5
   },
   {
    "id": "H09",
@@ -173,7 +189,9 @@
    "rasgos": [
     "reservado",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 4
   },
   {
    "id": "H10",
@@ -191,7 +209,9 @@
    "rasgos": [
     "reservado",
     "leal"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H11",
@@ -211,7 +231,9 @@
     "leal",
     "paciente",
     "amable"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H12",
@@ -229,7 +251,9 @@
    "rasgos": [
     "competitivo",
     "orgulloso"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 3
   },
   {
    "id": "H13",
@@ -248,7 +272,9 @@
    "rasgos": [
     "competitivo",
     "ambicioso"
-   ]
+   ],
+   "enamoradizo": 3,
+   "atractivo": 3
   },
   {
    "id": "H14",
@@ -268,7 +294,9 @@
     "ambicioso",
     "competitivo",
     "orgulloso"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 4
   },
   {
    "id": "H15",
@@ -287,7 +315,9 @@
    "rasgos": [
     "orgulloso",
     "amable"
-   ]
+   ],
+   "enamoradizo": 3,
+   "atractivo": 4
   },
   {
    "id": "H16",
@@ -306,7 +336,9 @@
    "rasgos": [
     "reservado",
     "celoso"
-   ]
+   ],
+   "enamoradizo": 1,
+   "atractivo": 2
   },
   {
    "id": "H17",
@@ -324,7 +356,9 @@
    "rasgos": [
     "ambicioso",
     "sociable"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H18",
@@ -342,7 +376,9 @@
    "rasgos": [
     "amable",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H19",
@@ -361,7 +397,9 @@
    "rasgos": [
     "paciente",
     "leal"
-   ]
+   ],
+   "enamoradizo": 3,
+   "atractivo": 3
   },
   {
    "id": "H20",
@@ -379,7 +417,9 @@
    "rasgos": [
     "sociable",
     "amable"
-   ]
+   ],
+   "enamoradizo": 5,
+   "atractivo": 4
   },
   {
    "id": "H21",
@@ -397,7 +437,9 @@
    "rasgos": [
     "sociable",
     "amable"
-   ]
+   ],
+   "enamoradizo": 5,
+   "atractivo": 5
   },
   {
    "id": "H22",
@@ -415,7 +457,9 @@
    "rasgos": [
     "ambicioso",
     "celoso"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H23",
@@ -433,7 +477,9 @@
    "rasgos": [
     "timido",
     "sociable"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 1
   },
   {
    "id": "H24",
@@ -451,7 +497,9 @@
    "rasgos": [
     "competitivo",
     "leal"
-   ]
+   ],
+   "enamoradizo": 3,
+   "atractivo": 3
   },
   {
    "id": "H25",
@@ -469,7 +517,9 @@
    "rasgos": [
     "paciente",
     "amable"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H26",
@@ -487,7 +537,9 @@
    "rasgos": [
     "orgulloso",
     "sociable"
-   ]
+   ],
+   "enamoradizo": 3,
+   "atractivo": 4
   },
   {
    "id": "H27",
@@ -505,7 +557,9 @@
    "rasgos": [
     "celoso",
     "leal"
-   ]
+   ],
+   "enamoradizo": 5,
+   "atractivo": 2
   },
   {
    "id": "H28",
@@ -523,7 +577,9 @@
    "rasgos": [
     "paciente",
     "reservado"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H29",
@@ -541,7 +597,9 @@
    "rasgos": [
     "orgulloso",
     "leal"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 3
   },
   {
    "id": "H30",
@@ -559,7 +617,9 @@
    "rasgos": [
     "reservado",
     "timido"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H31",
@@ -578,7 +638,9 @@
     "amable",
     "paciente",
     "leal"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H32",
@@ -596,7 +658,9 @@
    "rasgos": [
     "reservado",
     "orgulloso"
-   ]
+   ],
+   "enamoradizo": 1,
+   "atractivo": 2
   },
   {
    "id": "H33",
@@ -614,7 +678,9 @@
    "rasgos": [
     "sociable",
     "ambicioso"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H34",
@@ -632,7 +698,9 @@
    "rasgos": [
     "timido",
     "orgulloso"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 3
   },
   {
    "id": "H35",
@@ -650,7 +718,9 @@
    "rasgos": [
     "reservado",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H36",
@@ -668,7 +738,9 @@
    "rasgos": [
     "sociable",
     "reservado"
-   ]
+   ],
+   "enamoradizo": 3,
+   "atractivo": 3
   },
   {
    "id": "H37",
@@ -686,7 +758,9 @@
    "rasgos": [
     "sociable",
     "competitivo"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H38",
@@ -704,7 +778,9 @@
    "rasgos": [
     "reservado",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H39",
@@ -722,7 +798,9 @@
    "rasgos": [
     "reservado",
     "ambicioso"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H40",
@@ -740,7 +818,9 @@
    "rasgos": [
     "timido",
     "leal"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H41",
@@ -758,7 +838,9 @@
    "rasgos": [
     "reservado",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 1,
+   "atractivo": 2
   },
   {
    "id": "H42",
@@ -776,7 +858,9 @@
    "rasgos": [
     "ambicioso",
     "orgulloso"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 3
   },
   {
    "id": "H43",
@@ -794,7 +878,9 @@
    "rasgos": [
     "sociable",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H44",
@@ -812,7 +898,9 @@
    "rasgos": [
     "amable",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H45",
@@ -830,7 +918,9 @@
    "rasgos": [
     "sociable",
     "ambicioso"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H46",
@@ -848,7 +938,9 @@
    "rasgos": [
     "competitivo",
     "celoso"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 2
   },
   {
    "id": "H47",
@@ -866,7 +958,9 @@
    "rasgos": [
     "sociable",
     "amable"
-   ]
+   ],
+   "enamoradizo": 5,
+   "atractivo": 5
   },
   {
    "id": "H48",
@@ -884,7 +978,9 @@
    "rasgos": [
     "ambicioso",
     "reservado"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H49",
@@ -902,7 +998,9 @@
    "rasgos": [
     "orgulloso",
     "timido"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 3
   },
   {
    "id": "H50",
@@ -920,7 +1018,9 @@
    "rasgos": [
     "amable",
     "timido"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H51",
@@ -938,7 +1038,9 @@
    "rasgos": [
     "leal",
     "orgulloso"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 4
   },
   {
    "id": "H52",
@@ -956,7 +1058,9 @@
    "rasgos": [
     "reservado",
     "timido"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H53",
@@ -974,7 +1078,9 @@
    "rasgos": [
     "sociable",
     "amable"
-   ]
+   ],
+   "enamoradizo": 5,
+   "atractivo": 5
   },
   {
    "id": "H54",
@@ -992,7 +1098,9 @@
    "rasgos": [
     "ambicioso",
     "sociable"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H55",
@@ -1010,7 +1118,9 @@
    "rasgos": [
     "ambicioso",
     "orgulloso"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 3
   },
   {
    "id": "H56",
@@ -1028,7 +1138,9 @@
    "rasgos": [
     "paciente",
     "competitivo"
-   ]
+   ],
+   "enamoradizo": 3,
+   "atractivo": 3
   },
   {
    "id": "H57",
@@ -1046,7 +1158,9 @@
    "rasgos": [
     "paciente",
     "amable"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H58",
@@ -1064,7 +1178,9 @@
    "rasgos": [
     "sociable",
     "amable"
-   ]
+   ],
+   "enamoradizo": 5,
+   "atractivo": 5
   },
   {
    "id": "H59",
@@ -1082,7 +1198,9 @@
    "rasgos": [
     "reservado",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H60",
@@ -1100,7 +1218,9 @@
    "rasgos": [
     "timido",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 3,
+   "atractivo": 3
   },
   {
    "id": "H61",
@@ -1118,7 +1238,9 @@
    "rasgos": [
     "sociable",
     "ambicioso"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 5
   },
   {
    "id": "H62",
@@ -1136,7 +1258,9 @@
    "rasgos": [
     "timido",
     "celoso"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 2
   },
   {
    "id": "H63",
@@ -1154,7 +1278,9 @@
    "rasgos": [
     "timido",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 3
   },
   {
    "id": "H64",
@@ -1172,7 +1298,9 @@
    "rasgos": [
     "competitivo",
     "celoso"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 2
   },
   {
    "id": "H65",
@@ -1190,7 +1318,9 @@
    "rasgos": [
     "sociable",
     "amable"
-   ]
+   ],
+   "enamoradizo": 5,
+   "atractivo": 5
   },
   {
    "id": "H66",
@@ -1208,7 +1338,9 @@
    "rasgos": [
     "paciente",
     "amable"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H67",
@@ -1226,7 +1358,9 @@
    "rasgos": [
     "reservado",
     "ambicioso"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H68",
@@ -1244,7 +1378,9 @@
    "rasgos": [
     "ambicioso",
     "sociable"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H69",
@@ -1262,7 +1398,9 @@
    "rasgos": [
     "orgulloso",
     "reservado"
-   ]
+   ],
+   "enamoradizo": 1,
+   "atractivo": 4
   },
   {
    "id": "H70",
@@ -1280,7 +1418,9 @@
    "rasgos": [
     "amable",
     "sociable"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 1
   },
   {
    "id": "H71",
@@ -1298,7 +1438,9 @@
    "rasgos": [
     "ambicioso",
     "sociable"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H72",
@@ -1316,7 +1458,9 @@
    "rasgos": [
     "leal",
     "amable"
-   ]
+   ],
+   "enamoradizo": 5,
+   "atractivo": 4
   },
   {
    "id": "H73",
@@ -1334,7 +1478,9 @@
    "rasgos": [
     "timido",
     "leal"
-   ]
+   ],
+   "enamoradizo": 3,
+   "atractivo": 3
   },
   {
    "id": "H74",
@@ -1352,7 +1498,9 @@
    "rasgos": [
     "amable",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 4,
+   "atractivo": 4
   },
   {
    "id": "H75",
@@ -1370,7 +1518,9 @@
    "rasgos": [
     "reservado",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H76",
@@ -1388,7 +1538,9 @@
    "rasgos": [
     "leal",
     "paciente"
-   ]
+   ],
+   "enamoradizo": 3,
+   "atractivo": 3
   },
   {
    "id": "H77",
@@ -1406,7 +1558,9 @@
    "rasgos": [
     "ambicioso",
     "reservado"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H78",
@@ -1424,7 +1578,9 @@
    "rasgos": [
     "sociable",
     "orgulloso"
-   ]
+   ],
+   "enamoradizo": 3,
+   "atractivo": 4
   },
   {
    "id": "H79",
@@ -1442,7 +1598,9 @@
    "rasgos": [
     "leal",
     "reservado"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   },
   {
    "id": "H80",
@@ -1460,7 +1618,9 @@
    "rasgos": [
     "sociable",
     "amable"
-   ]
+   ],
+   "enamoradizo": 2,
+   "atractivo": 2
   }
  ]
 }

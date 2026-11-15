@@ -520,7 +520,8 @@
     },
     "sombraDeGigantes": {
       "porPrestigio": 0.004,
-      "maximo": 0.6
+      "maximo": 0.6,
+      "_nota": "Decisión del propietario (2026-11-16): cuenta el prestigio y también los puntos de temporada del gremio."
     },
     "cajaSorpresa": {
       "minimo": 30,
@@ -684,7 +685,8 @@
     },
     "mimo": {
       "prestigio": 3,
-      "felicidad": -10
+      "felicidad": -10,
+      "puntos": 2
     },
     "prestamo": {
       "interes": 0.2,

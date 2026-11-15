@@ -29,6 +29,7 @@ import {
   sonPareja,
   textoEstres,
   textoFelicidad,
+  textoIndices,
   vetosDelEquipo,
   type Romance,
   type Vinculo,
@@ -432,7 +433,9 @@ export class Interfaz {
     const estadoMental = mal
       ? this.mental(h)
       : `<span class="mental-corto" title="Felicidad ${felicidad(h)}/100 · Estrés ${estres(h)}/100">${textoFelicidad(h)} · ${textoEstres(h).toLowerCase()}</span>`;
-    return `<div class="sentimientos">${mal ? '' : estadoMental}${this.rasgosChips(h)}${asunto}${chips}</div>${mal ? estadoMental : ''}`;
+    const ind = textoIndices(h);
+    const corazon = `<span class="indices" title="Índices de romance: lo fácil que se enamora y lo fácil que es enamorarse de él.">♡ Se enamora: ${esc(ind.enamoradizo.toLowerCase())} · enamora a: ${esc(ind.atractivo.toLowerCase())}</span>`;
+    return `<div class="sentimientos">${mal ? '' : estadoMental}${this.rasgosChips(h)}${asunto}${chips}</div>${mal ? estadoMental : ''}<div class="sentimientos">${corazon}</div>`;
   }
 
   /** Icono de una relación: pareja, amor, rivalidad o nivel de afinidad. */
@@ -777,6 +780,7 @@ export class Interfaz {
     return `<section class="detalle-pareja">
       <header>${this.avatar(a)}<b>${esc(a.nombre)}</b><span class="vinculo v-${v.replace(' ', '-')}">${this.icono(v, 'ninguno', r.rivales)} ${esc(this.textoVinculo(v, 'ninguno', r.rivales))}</span><b>${esc(b.nombre)}</b>${this.avatar(b)}</header>
       <p>Afinidad <b>${afinidad(estado, a.id, b.id)}</b> (de −100 a 100). ${esc(a.nombre)} ${sentir(a, b)}; ${esc(b.nombre)} ${sentir(b, a)}.</p>
+      <p class="tenue">${[a, b].map((x) => `${esc(x.nombre)}: se enamora ${esc(textoIndices(x).enamoradizo.toLowerCase())}, enamora a ${esc(textoIndices(x).atractivo.toLowerCase())}`).join(' · ')}.</p>
       ${veto}
       ${historia ? `<h4>Por qué</h4><ul class="lista vida">${historia}</ul>` : '<p class="tenue">Todavía no han vivido nada importante juntos.</p>'}
     </section>`;

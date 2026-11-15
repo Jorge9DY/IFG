@@ -155,7 +155,14 @@ Detalle y razones en `docs/revision-de-diseno.md`. Recomendación de Claude entr
 3. **Desbloqueo progresivo** de sistemas para el jugador nuevo: semana 1 misiones y Prueba; semana 2 mercado y relaciones; temporada 2 Ascensión y retos. (Recomendado.)
 4. **Pista de relaciones** al formar equipo («si van juntos a menudo, se acercarán»). (Recomendado.)
 
-## 22. Auditoría de habilidades: decisiones pendientes (2026-11-15)
+## 22. Auditoría de habilidades — RESUELTA (2026-11-16)
+
+Respuestas del propietario:
+1. Acelerar mucho el romance, sobre todo que alguien se enamore aunque no sea recíproco, con un índice por personaje de lo difícil que es que se enamore y de lo probable que es que se enamoren de él. **Aplicado:** índices «enamoradizo» y «atractivo» (1–5) en el catálogo, que multiplican la atracción (×0,4 a ×2,2). Química oculta más alta y sin exigir afinidad previa. Resultado: unos 2 de cada 3 héroes del gremio acaban enamorados de alguien y hay 1,5 parejas por partida (antes 0,1).
+2. Que Mascota y Chibi den puntos de temporada. **Aplicado:** la Mascota da 2 puntos por semana y Chibi cuenta el prestigio más los puntos de temporada.
+3. Choques de carácter: **aprobados**.
+
+Texto original:
 
 Detalle en `docs/auditoria-habilidades.md`.
 

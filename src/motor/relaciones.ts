@@ -391,7 +391,8 @@ export function trasMision(
       // La atracción crece con la química romántica de cada uno (Aimul enamora con más facilidad).
       if (afinidad(estado, a.id, b.id) >= S.chispa.afinidadMinima) {
         // Aimul enamora el doble; Yandere se obsesiona el doble de rápido.
-        const extra = (de: Heroe, hacia: Heroe): number => (hacia.habilidad === 'lookAtMe' ? 2 : 1) * (de.habilidad === 'obsesion' ? balance.habilidades.obsesion.atraccion : 1);
+        const extra = (de: Heroe, hacia: Heroe): number =>
+          factorEnamoradizo(de) * factorAtractivo(hacia) * (hacia.habilidad === 'lookAtMe' ? 2 : 1) * (de.habilidad === 'obsesion' ? balance.habilidades.obsesion.atraccion : 1);
         const ab = chispa(estado, a.id, b.id) * S.chispa.porMision * extra(a, b);
         const ba = chispa(estado, b.id, a.id) * S.chispa.porMision * extra(b, a);
         decir(cambiar(estado, a.id, b.id, { atraccionAB: ab * balada, atraccionBA: ba * balada }));
@@ -445,6 +446,31 @@ export function trasMision(
     if (lesionado(h) && !salvados.includes(h.id)) cambiarMental(h, S.mental.lesion);
   }
   return { textos, salvados };
+}
+
+/** Índices de romance de cada héroe (1–5) y su multiplicador sobre la atracción. */
+export function indiceEnamoradizo(h: Heroe): number {
+  return h.enamoradizo ?? S.indices.porDefecto;
+}
+
+export function indiceAtractivo(h: Heroe): number {
+  return h.atractivo ?? S.indices.porDefecto;
+}
+
+const factorDe = (n: number): number => S.chispa.factorIndice[Math.max(1, Math.min(5, Math.round(n))) - 1] ?? 1;
+
+/** Cuánto más (o menos) se enamora este héroe. */
+export function factorEnamoradizo(h: Heroe): number {
+  return factorDe(indiceEnamoradizo(h));
+}
+
+/** Cuánto más (o menos) se enamoran de este héroe. */
+export function factorAtractivo(h: Heroe): number {
+  return factorDe(indiceAtractivo(h));
+}
+
+export function textoIndices(h: Heroe): { enamoradizo: string; atractivo: string } {
+  return { enamoradizo: S.indices.nombreEnamoradizo[indiceEnamoradizo(h) - 1] ?? '', atractivo: S.indices.nombreAtractivo[indiceAtractivo(h) - 1] ?? '' };
 }
 
 /** Si dos caracteres chocan, cuál es el motivo (para el texto); si no, null. */

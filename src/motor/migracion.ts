@@ -41,6 +41,8 @@ export function migrar(datos: unknown): EstadoJuego | null {
     h.felicidad ??= viejo.animo ?? S.mentalInicial.felicidad;
     h.estres ??= S.mentalInicial.estres;
     h.rasgos ??= [...(ficha(h.catalogo)?.rasgos ?? [])];
+    h.enamoradizo ??= ficha(h.catalogo)?.enamoradizo ?? S.indices.porDefecto;
+    h.atractivo ??= ficha(h.catalogo)?.atractivo ?? S.indices.porDefecto;
     delete viejo.animo;
     delete viejo.amor;
   }

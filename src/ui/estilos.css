@@ -705,3 +705,4 @@ button.meta-objetivo:hover { border-color: var(--cian); }
 .efectos-habilidad li.malo { color: var(--naranja); }
 .efectos-habilidad li.neutro { color: var(--texto); }
 .habilidad.oculta summary { color: var(--tenue); }
+.indices { font-size: 12px; color: #e98aa8; }

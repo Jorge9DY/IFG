@@ -46,6 +46,8 @@ export interface FichaHeroe {
   habilidad: string;
   nombreHabilidad: string;
   rasgos?: string[];
+  enamoradizo?: number;
+  atractivo?: number;
   texto: string;
   ascension?: string;
 }
@@ -83,6 +85,8 @@ export function heroeDeCatalogo(azar: Azar, f: FichaHeroe, modo: 'rival' | 'nova
     felicidad: social.mentalInicial.felicidad,
     estres: social.mentalInicial.estres,
     rasgos: [...(f.rasgos ?? [])],
+    enamoradizo: f.enamoradizo ?? social.indices.porDefecto,
+    atractivo: f.atractivo ?? social.indices.porDefecto,
     genero: f.genero as Genero,
     catalogo: f.id,
     habilidad: f.habilidad,
@@ -132,6 +136,8 @@ export function generarHeroe(azar: Azar, id: string, o: OpcionesHeroe): Heroe {
   // Dos rasgos al azar para los genéricos (los del catálogo vienen de diseño).
   const r1 = azar.elegir(social.rasgos);
   heroe.rasgos = [r1, azar.elegir(social.rasgos.filter((r) => r !== r1))];
+  heroe.enamoradizo = azar.entero(2, 4);
+  heroe.atractivo = azar.entero(2, 4);
   return heroe;
 }
 

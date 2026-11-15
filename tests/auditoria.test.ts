@@ -7,7 +7,7 @@ import { jugador } from '../src/motor/estado';
 import { apuntarConocidas, cadaSemana, conoceHabilidad, efectosEnMision, type Contexto } from '../src/motor/habilidades';
 import { OJEO_MAXIMO } from '../src/motor/heroes';
 import { comprar } from '../src/motor/mercado';
-import { afinidad, cambiar, choque, trasMision } from '../src/motor/relaciones';
+import { afinidad, atraccion, cambiar, chispa, choque, trasMision } from '../src/motor/relaciones';
 import type { Heroe, Mision } from '../src/motor/tipos';
 import { fichar, heroe, partida } from './fabrica';
 
@@ -91,5 +91,32 @@ describe('arreglos de impacto', () => {
     estado.gremios[delante]!.plantilla = estado.gremios[delante]!.plantilla.filter((id) => estado.heroes[id]!.habilidad !== 'guardia');
     cadaSemana(estado, new Azar(2));
     expect(estado.gremios[delante]!.puntosTemporada).toBe(20 - balance.habilidades.malaJugada.puntos);
+  });
+
+  it('los índices de romance aceleran o frenan el enamoramiento, aunque no sea recíproco', () => {
+    const gana = (enamoradizo: number, atractivo: number): number => {
+      const estado = partida();
+      let n = 0;
+      while (chispa(estado, `a${n}`, `b${n}`) === 0) n++;
+      const a = fichar(estado, 'jugador', heroe({ id: `a${n}`, enamoradizo }));
+      const b = fichar(estado, 'jugador', heroe({ id: `b${n}`, atractivo }));
+      trasMision(estado, { probabilidad: () => false, elegir: <T,>(l: readonly T[]): T => l[0]! }, [a, b], true, [], () => null);
+      return atraccion(estado, a.id, b.id);
+    };
+    expect(gana(5, 5)).toBeGreaterThan(gana(3, 3));
+    expect(gana(3, 3)).toBeGreaterThan(gana(1, 1));
+  });
+
+  it('la Mascota da puntos de temporada cada semana y Chibi cuenta esos puntos', () => {
+    const estado = partida();
+    fichar(estado, 'jugador', heroe({ id: 'm', habilidad: 'mimo' }));
+    const antes = jugador(estado).puntosTemporada ?? 0;
+    cadaSemana(estado, new Azar(1));
+    expect(jugador(estado).puntosTemporada).toBe(antes + balance.habilidades.mimo.puntos);
+    const chibi = fichar(estado, 'jugador', heroe({ id: 'c', habilidad: 'sombraDeGigantes', poder: 30, estres: 0 }));
+    const c = ctx(estado, [chibi]);
+    const sin = efectosEnMision(c).find((e) => e.heroeId === 'c')?.texto;
+    jugador(estado).puntosTemporada = 50;
+    expect(efectosEnMision(c).find((e) => e.heroeId === 'c')?.texto).not.toBe(sin);
   });
 });
