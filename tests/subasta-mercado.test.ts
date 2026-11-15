@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { jugador } from '../src/motor/estado';
 import { infoInstalacion, mejorar, plazas } from '../src/motor/instalaciones';
 import { comprar, condicionesCompra, ofertaVenta, vender } from '../src/motor/mercado';
-import { calcularRanking, fuerza, prestigio } from '../src/motor/ranking';
+import { calcularRanking, fuerza, prestigio, puntosDe, sumarPuntos } from '../src/motor/ranking';
 import { accionJugador, cerrarSubasta, type Subasta } from '../src/motor/subasta';
 import { fichar, heroe, partida } from './fabrica';
 
@@ -122,10 +122,21 @@ describe('instalaciones y ranking', () => {
     expect(fuerza(estado, j.id)).toBe(200);
   });
 
-  it('puntos = fuerza + prestigio y el ranking ordena de mayor a menor', () => {
+  it('el ranking va por puntos de temporada y la fuerza desempata', () => {
     const estado = partida();
     const r = calcularRanking(estado);
-    for (const f of r) expect(f.puntos).toBe(f.fuerza + f.prestigio);
-    for (let i = 1; i < r.length; i++) expect(r[i - 1]!.puntos).toBeGreaterThanOrEqual(r[i]!.puntos);
+    // Al empezar nadie tiene puntos: manda la fuerza y el jugador es el último.
+    for (const f of r) expect(f.puntos).toBe(0);
+    for (let i = 1; i < r.length; i++) expect(r[i - 1]!.fuerza).toBeGreaterThanOrEqual(r[i]!.fuerza);
+    expect(r.at(-1)!.gremioId).toBe('jugador');
+    jugador(estado).puntosTemporada = 1;
+    expect(calcularRanking(estado)[0]!.gremioId).toBe('jugador');
+  });
+
+  it('los logros dan puntos de temporada', () => {
+    const j = jugador(partida());
+    sumarPuntos(j, 'alto');
+    sumarPuntos(j, 'reto');
+    expect(j.puntosTemporada).toBe(puntosDe('alto') + puntosDe('reto'));
   });
 });

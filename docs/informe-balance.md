@@ -1,5 +1,23 @@
 # Informe de balance
 
+## Decisiones de la revisión de diseño (2026-11-15)
+
+`npm run simular -- 150 1`, historia completa. Ranking por puntos de temporada (vuelven a 0), recompensas −28%, desbloqueo progresivo y rivales con un tope de unas 1,3 misiones al día.
+
+| Métrica | Prudente | Ambiciosa |
+| --- | --: | --: |
+| Puesto medio al cerrar las temporadas 1 / 2 / 3 / 4 / 5 | 5,0 / 4,6 / 4,0 / 3,1 / 2,8 | 5,0 / 4,5 / 3,3 / 2,2 / 2,0 |
+| Final «Leyenda» / «Respeto» / «Olvido» | 33% / 33% / 35% | 51% / 33% / 16% |
+| Semanas con sueldos impagados (media) | 0,5 | 0,5 |
+| Oro final | 35.920 | 18.854 |
+
+Lectura:
+
+- **El arco de remontada funciona:** último en la temporada 1 (a unos 50 puntos del 4.º, no a 450), escalada en la 2 y la 3, y lucha por el título en la 4 y la 5.
+- **El oro vuelve a apretar:** al final quedan 19.000–36.000 (antes 40.000–100.000), y algún impago ocasional.
+- **Invertir se paga:** la estrategia ambiciosa gana la historia el 51% de las veces; la prudente, el 33%.
+- **Tope de misiones de los rivales:** sin él, un rival con 10 héroes ganaba siempre por volumen (con 2 al día, el ambicioso seguía 5.º en la temporada 1 y ganaba poco). Es provisional.
+
 ## Sistema social (2026-11-15)
 
 `npm run simular -- 150 1`, historia completa. El ánimo (±15% de poder) desaparece; ahora cuentan las relaciones del equipo (±15% con tope) y el estrés alto (−5%).

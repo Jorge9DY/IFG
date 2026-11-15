@@ -53,7 +53,11 @@ No hubo errores de consola en todo el playtest.
 - **Noticias agrupadas** y **retos a los que puedes responder**.
 - **Cartas más ligeras:** «Contento · tranquilo» en una línea; las barras de felicidad y estrés solo cuando hace falta.
 
-## Decisiones que necesita el propietario (pregunta 21)
+## Decisiones del propietario (pregunta 21) — aprobadas las cuatro el 2026-11-15
+
+Aplicadas: puntos de temporada (más un tope de misiones diarias para los rivales, sin el que ganaban por volumen), recompensas −28%, desbloqueo progresivo y pista de relaciones. Resultados en `docs/informe-balance.md`.
+
+Propuesta original:
 
 1. **La brecha del ranking.** Es el problema de fondo: ningún texto lo arregla si la meta está a 15 semanas.
    - **Recomendación:** que el ranking de cada temporada cuente **puntos de temporada** (misiones, retos, torneo, novatos destacados), que vuelven a 0 al empezar cada temporada. La fuerza se mantiene para el torneo y como desempate. Así cada temporada es una carrera que se puede ganar, y la remontada sigue siendo la historia de fondo.

@@ -4,6 +4,7 @@
 import balance from '../datos/balance.json';
 import { dueño, gremio, heroe as obtenerHeroe, jugador, registrar, type EstadoJuego } from './estado';
 import { valorPublico } from './heroes';
+import { desbloqueado, diaDesbloqueo } from './desbloqueos';
 import { alComprar, alGastar, alVender, bloqueoCompra, factorCompra, valorVenta } from './habilidades';
 import { plazasLibres } from './instalaciones';
 import { perderCompanero } from './relaciones';
@@ -34,6 +35,7 @@ export function condicionesCompra(estado: EstadoJuego, heroeId: string): Condici
   const g = dueño(estado, heroeId);
   const h = obtenerHeroe(estado, heroeId);
   if (!g || g.esJugador) return { precio, bloqueo: 'No es de otro gremio' };
+  if (!desbloqueado(estado, 'mercado')) return { precio, bloqueo: `El mercado abre el día ${diaDesbloqueo('mercado')}` };
   if (g.perfil && !g.perfil.vende) return { precio, bloqueo: `${g.nombre} no vende a los suyos` };
   const porHabilidad = bloqueoCompra(h);
   if (porHabilidad) return { precio, bloqueo: porHabilidad };
@@ -67,7 +69,7 @@ export interface Oferta {
 /** Mejor oferta inmediata de los rivales por un héroe del jugador, o null si nadie lo quiere ahora. */
 export function ofertaVenta(estado: EstadoJuego, heroeId: string): Oferta | null {
   const h = obtenerHeroe(estado, heroeId);
-  if (!jugador(estado).plantilla.includes(heroeId) || h.estado === 'en mision' || h.estado === 'entrenando') return null;
+  if (!desbloqueado(estado, 'mercado') || !jugador(estado).plantilla.includes(heroeId) || h.estado === 'en mision' || h.estado === 'entrenando') return null;
   const precio = redondear(valorVenta(h) * V.factorVenta);
   const g = comprador(estado, h, precio);
   return g ? { compradorId: g.id, precio } : null;

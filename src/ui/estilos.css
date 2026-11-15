@@ -696,3 +696,6 @@ button.meta-objetivo { cursor: pointer; }
 button.meta-objetivo:hover { border-color: var(--cian); }
 .progreso-ranking { font-size: 14px; border-left: 3px solid var(--cian); padding: 2px 10px; }
 .mental-corto { font-size: 12px; color: #8fd98a; }
+.nuevo { display: block; font-style: normal; color: var(--cian); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+.boton-grande.cerrado { opacity: 0.55; }
+.resultado.desbloqueo { border-left: 3px solid var(--cian); }

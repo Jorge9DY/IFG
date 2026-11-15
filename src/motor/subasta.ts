@@ -4,6 +4,7 @@
 import balance from '../datos/balance.json';
 import type { Azar } from './azar';
 import { gremio, heroe as obtenerHeroe, registrar, rivales, type EstadoJuego } from './estado';
+import { sumarPuntos } from './ranking';
 import { esDestacado, valorPublico } from './heroes';
 import { plazasLibres } from './instalaciones';
 import { limitePuja } from './rivales';
@@ -138,7 +139,10 @@ export function cerrarSubasta(estado: EstadoJuego, s: Subasta): string | null {
   const g = gremio(estado, s.lider);
   g.oro -= s.precio;
   g.plantilla.push(h.id);
-  if (esDestacado(h)) g.novatosDestacados += 1;
+  if (esDestacado(h)) {
+    g.novatosDestacados += 1;
+    sumarPuntos(g, 'novatoDestacado');
+  }
   registrar(estado, g.esJugador ? 'fichaje' : 'novatos', `${h.nombre} (poder ${h.poder}) se une a ${g.nombre} por ${s.precio} de oro.`);
   alGastar(estado, g.id);
   return g.id;

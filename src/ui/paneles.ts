@@ -33,6 +33,7 @@ import {
   type Vinculo,
 } from '../motor/relaciones';
 import { pendientes, resolverEvento } from '../motor/eventosSociales';
+import { desbloqueado, diaDesbloqueo, esNuevo } from '../motor/desbloqueos';
 import social from '../datos/social.json';
 import { sueldoEn } from '../motor/economia';
 import { fraseReto, heroesParaReto, motivoNoAceptar, aceptarReto, rechazarReto } from '../motor/retos';
@@ -96,6 +97,9 @@ const DESPERTAR: Record<number, { titulo: string; clase: string }> = {
 };
 
 /** Brillo del sobre de un novato según el mejor techo que ven tus ojeadores. */
+const P = balance.puntosTemporada;
+const TEXTO_PUNTOS = `Los puntos de temporada se ganan con misiones cumplidas (alta ${P.mision.alto}, media ${P.mision.medio}, baja ${P.mision.bajo}), retos (${P.reto}), novatos destacados (${P.novatoDestacado}), Ascensiones (${P.ascension}) y el torneo (${P.torneo} por categoría). Vuelven a 0 cada temporada.`;
+
 const BRILLO: Record<string, string> = { S: 'oro', 'A+': 'violeta', A: 'violeta', 'B+': 'azul', B: 'azul' };
 
 const RANGO: Record<RangoMision, { nombre: string; riesgo: string }> = {
@@ -260,10 +264,14 @@ export class Interfaz {
       const sinCobrar = todos.some((h) => h.semanasSinCobrar > 0) ? '<em class="alerta-texto">Hay héroes sin cobrar</em>' : '';
       const asuntos = estado.social.pendientes.length;
       const avisoAsuntos = asuntos ? `<em class="alerta-texto">${asuntos} ${asuntos === 1 ? 'asunto pendiente' : 'asuntos pendientes'}</em>` : '';
-      this.el.menu.innerHTML = `<button class="boton-grande gastar" data-abrir="gremio" data-pestana="${asuntos ? 'relaciones' : 'heroes'}" ${bloqueo}><span class="signo">−</span>Gestionar gremio<small>Héroes: ${resumen}</small><small>Relaciones · Mejorar instalaciones</small>${sinCobrar}${avisoAsuntos}</button>`;
+      this.el.menu.innerHTML = `<button class="boton-grande gastar" data-abrir="gremio" data-pestana="${asuntos ? 'relaciones' : 'heroes'}" ${bloqueo}><span class="signo">−</span>Gestionar gremio<small>Héroes: ${resumen}</small><small>${desbloqueado(estado, 'relaciones') ? 'Relaciones · ' : ''}Mejorar instalaciones</small>${sinCobrar}${avisoAsuntos}</button>`;
       this.el.equipo.innerHTML = `<button class="boton-grande ganar" data-abrir="misiones" ${bloqueo}><span class="signo">+</span>Lanzar misiones<small>${estado.tablon.length} en el tablón · ${libres} ${libres === 1 ? 'héroe libre' : 'héroes libres'}</small></button>`;
       const retoPendiente = estado.reto && !estado.reto.resultado ? '<em class="alerta-texto">¡Un maestro rival te reta!</em>' : '';
-      this.el.accion.innerHTML = `<button class="boton-grande mercado" data-abrir="mercado" ${bloqueo}>Mercado de héroes<small>Compra a otros gremios o vende a los tuyos</small>${retoPendiente}</button>`;
+      const mercadoAbierto = desbloqueado(estado, 'mercado');
+      const nuevoMercado = esNuevo(estado, 'mercado') ? '<em class="nuevo">¡Nuevo!</em>' : '';
+      this.el.accion.innerHTML = mercadoAbierto
+        ? `<button class="boton-grande mercado" data-abrir="mercado" ${bloqueo}>Mercado de héroes<small>Compra a otros gremios o vende a los tuyos</small>${nuevoMercado}${retoPendiente}</button>`
+        : `<button class="boton-grande mercado cerrado" disabled>Mercado de héroes<small>🔒 Abre el día ${diaDesbloqueo('mercado')}</small></button>`;
     }
 
     if (!this.abierto) {
@@ -554,6 +562,7 @@ export class Interfaz {
           : ''
       }
       ${vetos.map((v) => `<p class="riesgo-muerte">⚠ Prometiste a ${esc(obtenerHeroe(estado, v.solicitante).nombre)} que no iría con ${esc(obtenerHeroe(estado, v.otro).nombre)}. Puedes mandarlos igual, pero lo llevará mal.</p>`).join('')}
+      ${equipo.length > 1 && soc.detalles.length === 0 && desbloqueado(estado, 'relaciones') ? '<p class="tenue">Si van juntos a menudo, se acercarán… y rendirán más juntos.</p>' : ''}
       ${conAsunto.length ? `<p class="tenue">⚑ ${esc(conAsunto.map((h) => h.nombre).join(', '))} ${conAsunto.length === 1 ? 'tiene' : 'tienen'} un asunto pendiente en el gremio. <button data-accion="ir-relaciones">Verlo</button></p>` : ''}
       ${riesgo ? `<p class="riesgo-muerte">☠ Riesgo de muerte: con menos del ${balance.muerte.umbralProbabilidad}% de éxito, si la misión fracasa alguien puede no volver.</p>` : ''}
       <div class="fichas">${fichas || '<p class="tenue">No tienes héroes libres.</p>'}</div>
@@ -644,8 +653,11 @@ export class Interfaz {
 
   private panelGremio(estado: EstadoJuego): string {
     const asuntos = estado.social.pendientes.length;
-    const nombres: Record<PestanaGremio, string> = { heroes: 'Héroes', relaciones: asuntos ? `Relaciones (${asuntos})` : 'Relaciones', instalaciones: 'Instalaciones', ranking: 'Ranking' };
+    const nombres: Record<PestanaGremio, string> = { heroes: 'Héroes', relaciones: asuntos ? `Relaciones (${asuntos})` : esNuevo(estado, 'relaciones') ? 'Relaciones ¡Nuevo!' : 'Relaciones', instalaciones: 'Instalaciones', ranking: 'Ranking' };
+    // Desbloqueo progresivo: la pestaña de relaciones aparece la semana 2.
+    if (this.pestanaGremio === 'relaciones' && !desbloqueado(estado, 'relaciones')) this.pestanaGremio = 'heroes';
     const pestañas = `<div class="pestanas">${(Object.keys(nombres) as PestanaGremio[])
+      .filter((p) => p !== 'relaciones' || desbloqueado(estado, 'relaciones'))
       .map((p) => `<button data-accion="pestana-gremio" data-id="${p}" class="${this.pestanaGremio === p ? 'activo' : ''}">${nombres[p]}</button>`)
       .join('')}</div>`;
     const j = jugador(estado);
@@ -677,7 +689,7 @@ export class Interfaz {
         return `${pestañas}${this.panelRelaciones(estado)}`;
       case 'ranking':
         return `${pestañas}${this.tablaRanking(estado)}
-          <p class="tenue">Puntos = Fuerza (poder de tus 5 mejores héroes) + Prestigio (instalaciones, misiones de rango alto y novatos destacados fichados). El ranking oficial se actualiza el día 7; al final de cada temporada (28 días) se reparte un premio según la posición.</p>`;
+          <p class="tenue">${esc(TEXTO_PUNTOS)} El ranking oficial se actualiza el día 7; al final de cada temporada (28 días) se reparte un premio según la posición. La fuerza (poder de tus 5 mejores héroes) desempata y decide el torneo; el prestigio sube la categoría de tu tablón.</p>`;
       default:
         return `${pestañas}${this.inventario(estado)}${this.muroCaidos(estado)}`;
     }
@@ -784,7 +796,9 @@ export class Interfaz {
       } else {
         detalle = felicidad(h) < social.efectos.descontento ? 'Está descontento: mira sus relaciones' : 'Listo para una misión';
         const a = condicionesAscension(estado, h.id);
-        if (alLimite(h) && a.rangoNuevo) {
+        if (alLimite(h) && a.rangoNuevo && !desbloqueado(estado, 'ascension')) {
+          detalle = 'Ha llegado a su límite (la Ascensión llega en la temporada 2)';
+        } else if (alLimite(h) && a.rangoNuevo) {
           detalle = 'Ha llegado a su límite';
           accion = this.confirmarAscension === h.id
             ? `<div class="confirmar-ascension">
@@ -836,10 +850,10 @@ export class Interfaz {
 
   private tablaRanking(estado: EstadoJuego, filas = estado.ranking): string {
     const ahora = new Map(calcularRanking(estado).map((f) => [f.gremioId, f]));
-    return `<table><thead><tr><th></th><th>Gremio</th><th class="num">Fuerza</th><th class="num">Prestigio</th><th class="num">Puntos</th><th class="num">Ahora</th></tr></thead><tbody>${filas
+    return `<table><thead><tr><th></th><th>Gremio</th><th class="num">Puntos</th><th class="num">Ahora</th><th class="num">Fuerza</th></tr></thead><tbody>${filas
       .map((f) => {
         const g = estado.gremios[f.gremioId]!;
-        return `<tr class="${g.esJugador ? 'propio' : ''}"><td>${f.puesto}.º</td><td>${esc(g.nombre)}</td><td class="num">${num(f.fuerza)}</td><td class="num">${num(f.prestigio)}</td><td class="num"><b>${num(f.puntos)}</b></td><td class="num tenue">${num(ahora.get(f.gremioId)?.puntos ?? f.puntos)}</td></tr>`;
+        return `<tr class="${g.esJugador ? 'propio' : ''}"><td>${f.puesto}.º</td><td>${esc(g.nombre)}</td><td class="num"><b>${num(f.puntos)}</b></td><td class="num tenue">${num(ahora.get(f.gremioId)?.puntos ?? f.puntos)}</td><td class="num tenue">${num(f.fuerza)}</td></tr>`;
       })
       .join('')}</tbody></table>`;
   }
@@ -971,7 +985,7 @@ export class Interfaz {
     const entrenos = r.entrenamientos.length
       ? `<div class="resultado entreno"><b>Vuelven de entrenar</b><span>Sin lesiones.</span><div class="regresos">${r.entrenamientos.map((e) => this.tarjetaRegreso(estado.heroes[e.heroeId], e.progreso, 0)).join('')}</div></div>`
       : '';
-    return `${ascenso}${ascensiones}${misiones}${entrenos}${misiones || ascensiones || entrenos ? '' : '<p>Hoy no ha vuelto ninguna misión.</p>'}${asuntos}${sueldos}${gremio}${noticias}
+    return `${ascenso}${ascensiones}${misiones}${entrenos}${misiones || ascensiones || entrenos ? '' : '<p>Hoy no ha vuelto ninguna misión.</p>'}${r.desbloqueos.map((t) => `<div class="resultado desbloqueo"><b>${esc(t)}</b></div>`).join('')}${asuntos}${sueldos}${gremio}${noticias}
       ${r.prueba ? '' : `<p class="tenue">Empieza el ${esc(textoCalendario(estado).split(' · ')[1] ?? '')}.</p>`}
       <div class="botones">${boton}</div>`;
   }
@@ -1019,14 +1033,15 @@ export class Interfaz {
             ? `+${num(ganados)} puntos esta semana.`
             : 'Esta semana no has sumado puntos.';
     const progreso = delante && mia
-      ? `<p class="progreso-ranking">${cambio > 0 && ganados > 0 ? `+${num(ganados)} puntos esta semana. ` : ''}Para alcanzar a <b>${esc(estado.gremios[delante.gremioId]?.nombre ?? '')}</b> te faltan <b>${num(delante.puntos - mia.puntos)}</b> puntos${ganados > 0 ? ` (a este ritmo, unas ${Math.ceil((delante.puntos - mia.puntos) / ganados)} semanas)` : ''}. Suben con el poder de tus 5 mejores héroes y con el prestigio.</p>`
+      ? `<p class="progreso-ranking">${cambio > 0 && ganados > 0 ? `+${num(ganados)} puntos esta semana. ` : ''}Para alcanzar a <b>${esc(estado.gremios[delante.gremioId]?.nombre ?? '')}</b> te faltan <b>${num(delante.puntos - mia.puntos)}</b> puntos. ${esc(TEXTO_PUNTOS)}</p>`
       : '';
     const temporada = r.temporada
       ? `<div class="resultado"><b>Fin de la temporada ${r.temporada.numero}</b><span>Terminas ${r.temporada.puesto}.º · premio +${num(r.temporada.premio)} oro</span></div>`
       : '';
     const ascenso = r.categoriaNueva ? `<div class="resultado ascenso-categoria"><b>¡Categoría ${r.categoriaNueva}!</b><span>La Asociación asciende a tu gremio: desde mañana el tablón ofrece misiones más difíciles y mejor pagadas.</span></div>` : '';
     const reto = estado.reto && !estado.reto.resultado ? `<div class="resultado reto-aviso"><b>Nuevo reto</b><span>El maestro de ${esc(estado.gremios[estado.reto.gremioId]?.nombre ?? '')} te reta con un ${estado.reto.clase.toLowerCase()} de rango ${estado.reto.rango}. Respóndele en el Mercado de héroes.</span></div>` : '';
-    return `<p><strong>${titular}</strong> Eres ${actual}.º.</p>${progreso}${ascenso}${reto}${temporada}${r.torneo ? this.tablaTorneo(estado, r.torneo) : ''}${this.tablaRanking(estado, r.ranking)}
+    const nuevos = r.desbloqueos.map((t) => `<div class="resultado desbloqueo"><b>${esc(t)}</b></div>`).join('');
+    return `<p><strong>${titular}</strong> Eres ${actual}.º.</p>${nuevos}${progreso}${ascenso}${reto}${temporada}${r.torneo ? this.tablaTorneo(estado, r.torneo) : ''}${this.tablaRanking(estado, r.ranking)}
       <div class="botones"><button class="principal" data-accion="${r.victoria ? 'ver-victoria' : 'cerrar'}">Seguir</button></div>`;
   }
 

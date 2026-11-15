@@ -2,6 +2,16 @@
 
 Entradas más recientes primero.
 
+## 2026-11-15 — Decisiones de la revisión de diseño aplicadas
+
+- El propietario aprueba las cuatro propuestas de la pregunta 21.
+- **Ranking por puntos de temporada** (`ranking.ts`: `sumarPuntos`, `puntosDe`). Puntos por misiones cumplidas, retos, novatos destacados, Ascensiones y torneo; vuelven a 0 al cerrar la temporada; la fuerza desempata.
+- **Tope de misiones de los rivales** (unas 1,3 al día), para que no ganen solo por tener más héroes.
+- **Recompensas −28%** (350 / 1.100 / 2.900).
+- **Desbloqueo progresivo** (`desbloqueos.ts`): el mercado y las relaciones el día 8; la Ascensión y los retos el día 29. Se anuncian con «¡Nuevo!» y, mientras tanto, el mercado sale con candado. Las partidas guardadas lo tienen todo abierto.
+- **Pista de relaciones** al formar equipo.
+- 129 tests; probado en navegador sin errores. Simulación en `docs/informe-balance.md`.
+
 ## 2026-11-15 — Revisión de diseño
 
 - Petición del propietario: revisar el juego con herramientas de diseñador profesional. Informe en `docs/revision-de-diseno.md` (playtest guiado de 15 días con capturas, simulación, MDA, curva de progreso, economía, decisiones, carga cognitiva y feedback).

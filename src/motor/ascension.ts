@@ -5,9 +5,11 @@
 import balance from '../datos/balance.json';
 import type { Azar } from './azar';
 import { heroe as obtenerHeroe, jugador, nuevoId, registrar, type EstadoJuego, type MisionEnCurso } from './estado';
+import { sumarPuntos } from './ranking';
 import { alLimite, indiceLetra, letraDe, valor } from './heroes';
 import { alGastar, bonusAscension, trasAscension } from './habilidades';
 import { morir } from './muerte';
+import { desbloqueado } from './desbloqueos';
 import { LETRAS, type Clase, type Letra } from './tipos';
 
 const A = balance.ascension;
@@ -30,6 +32,7 @@ export function condicionesAscension(estado: EstadoJuego, heroeId: string): Cond
   const probabilidad = Math.min(95, ((A.probExito as Record<string, number>)[actual] ?? 0) + bonusAscension(estado, estado.jugadorId, heroeId));
   const base = { coste, probabilidad, rangoNuevo };
   if (!jugador(estado).plantilla.includes(heroeId)) return { ...base, bloqueo: 'No es de tu gremio' };
+  if (!desbloqueado(estado, 'ascension')) return { ...base, bloqueo: 'La Ascensión llega en la temporada 2' };
   if (!rangoNuevo) return { ...base, bloqueo: 'Ya tiene el rango máximo' };
   if (!alLimite(h)) return { ...base, bloqueo: 'Solo puede intentarlo quien ha llegado a su límite' };
   if (h.estado !== 'libre') return { ...base, bloqueo: 'No está libre' };
@@ -131,6 +134,7 @@ export function resolverAscension(estado: EstadoJuego, azar: Azar, c: MisionEnCu
     h.poder = Math.max(h.poder, U[i] ?? h.poder);
     h.potencial = Math.max(h.poder, (U[techo + 1] ?? 101) - 1);
     h.techoConocido = true;
+    if (g) sumarPuntos(g, 'ascension');
     h.experiencia = 0;
     h.estado = 'libre';
     h.reputacion = Math.min(100, h.reputacion + 10);

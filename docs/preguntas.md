@@ -144,7 +144,9 @@ El documento del propietario pide documentar lo que no especifica. Elegido lo m�
 8. **Partidas guardadas antiguas:** se convierten solas (afinidad → relación completa, ánimo → felicidad, amor mutuo → pareja).
 9. Con el bot del simulador surgen pocas parejas (menos de una por partida) porque rota mucho los equipos; un jugador que mantenga parejas fijas verá más. Pendiente de jugarlo a mano.
 
-## 21. Revisión de diseño: decisiones pendientes (2026-11-15)
+## 21. Revisión de diseño — RESUELTA (2026-11-15)
+
+El propietario aprueba las cuatro propuestas. Aplicado: ranking por puntos de temporada (con un tope de misiones diarias para los rivales, provisional), recompensas un 28% más bajas, desbloqueo progresivo (días 8 y 29) y pista de relaciones. Texto original:
 
 Detalle y razones en `docs/revision-de-diseno.md`. Recomendación de Claude entre paréntesis.
 

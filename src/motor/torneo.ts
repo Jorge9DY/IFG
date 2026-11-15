@@ -5,6 +5,7 @@
 import balance from '../datos/balance.json';
 import type { Azar } from './azar';
 import { gremio, heroesDe, registrar, type EstadoJuego } from './estado';
+import { sumarPuntos } from './ranking';
 import type { Heroe } from './tipos';
 
 const T = balance.torneo;
@@ -36,6 +37,7 @@ export function celebrarTorneo(estado: EstadoJuego, azar: Azar): CombateTorneo[]
       const g = gremio(estado, ganador);
       g.oro += T.oroPorCategoria;
       g.torneosGanados = (g.torneosGanados ?? 0) + 1;
+      sumarPuntos(g, 'torneo');
       if (g.esJugador) registrar(estado, 'temporada', `¡Tu gremio gana la categoría ${categoria} del torneo!`);
     }
     combates.push({ categoria, campeones, ganador });

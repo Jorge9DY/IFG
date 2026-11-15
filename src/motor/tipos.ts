@@ -114,6 +114,8 @@ export interface Gremio {
   novatosDestacados: number;
   /** Retos de maestros ganados (prestigio). */
   retosGanados?: number;
+  /** Puntos de la temporada en curso (ranking). Vuelven a 0 al empezar cada temporada. */
+  puntosTemporada?: number;
   /** Categorías del torneo de fin de temporada ganadas (prestigio). */
   torneosGanados?: number;
   /** Clase en la que se especializa un rival: puja más por ella. */

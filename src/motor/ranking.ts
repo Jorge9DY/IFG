@@ -1,4 +1,4 @@
-// Ranking y puntos de gremio (biblia, sección 6): Puntos = Fuerza + Prestigio.
+// Ranking (biblia, sección 6): puntos de temporada; la fuerza desempata y el prestigio marca la categoría.
 
 import balance from '../datos/balance.json';
 import { heroesDe, type EstadoJuego, type FilaRanking } from './estado';
@@ -26,13 +26,30 @@ export function prestigio(g: Gremio): number {
   );
 }
 
-/** Clasificación con los valores de ahora (el ranking oficial solo se guarda el día 7). */
+/** Tipos de logro que dan puntos de temporada. */
+export type Logro = 'bajo' | 'medio' | 'alto' | 'reto' | 'torneo' | 'novatoDestacado' | 'ascension';
+
+/** Puntos de temporada que da un logro. */
+export function puntosDe(logro: Logro): number {
+  const P = balance.puntosTemporada;
+  return logro === 'bajo' || logro === 'medio' || logro === 'alto' ? P.mision[logro] : P[logro];
+}
+
+/** Suma a un gremio los puntos de temporada de un logro. */
+export function sumarPuntos(g: Gremio, logro: Logro): void {
+  g.puntosTemporada = (g.puntosTemporada ?? 0) + puntosDe(logro);
+}
+
+/**
+ * Clasificación con los valores de ahora (el ranking oficial solo se guarda el día 7).
+ * Decisión del propietario (revisión de diseño): se ordena por puntos de temporada; la fuerza desempata.
+ */
 export function calcularRanking(estado: EstadoJuego): FilaRanking[] {
   return Object.values(estado.gremios)
     .map((g) => {
       const f = fuerza(estado, g.id);
       const p = prestigio(g);
-      return { gremioId: g.id, fuerza: f, prestigio: p, puntos: f + p, puesto: 0 };
+      return { gremioId: g.id, fuerza: f, prestigio: p, puntos: g.puntosTemporada ?? 0, puesto: 0 };
     })
     .sort((a, b) => b.puntos - a.puntos || b.fuerza - a.fuerza)
     .map((fila, i) => ({ ...fila, puesto: i + 1 }));

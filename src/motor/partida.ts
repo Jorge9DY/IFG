@@ -26,6 +26,7 @@ import { CATALOGO, generarHeroe, heroeDeCatalogo, indiceLetra, letraPotencialNov
 import { duracionMision, generarTablon, probabilidadMision, resolverMision, salirDeMision, type InformeMision } from './misiones';
 import { alFicharNovato, cadaDia, cadaSemana, huecosEquipo, motivoNoIr } from './habilidades';
 import { riesgoDeMuerte } from './muerte';
+import { actualizarDesbloqueos } from './desbloqueos';
 import { descansoDelDia, romperVetos } from './relaciones';
 import { caducarEventos, evaluarEventos } from './eventosSociales';
 import { marcharse } from './economia';
@@ -35,7 +36,7 @@ import { resolverEntrenamientos, type ResultadoEntrenamiento } from './entrenami
 import { resolverAscension, type ResultadoAscension } from './ascension';
 import { actualizarCategoria, categoria, categoriaPorPrestigio, multiplicadores } from './categorias';
 import { prestigio } from './ranking';
-import { calcularRanking, premioTemporada } from './ranking';
+import { calcularRanking, premioTemporada, sumarPuntos } from './ranking';
 import { ajustarPlantilla, eligeMisiones, invertir } from './rivales';
 import { accionJugador, cerrarSubasta, crearSubasta } from './subasta';
 import type { Clase, Gremio, Heroe, Letra, Mision, PerfilRival } from './tipos';
@@ -79,6 +80,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
     social: { pendientes: [], cooldowns: {}, unicos: [], memorias: [], vetos: [], contador: 0 },
     bolsaNovatos: CATALOGO.filter((f) => f.gremio === 'libre').map((f) => f.id),
     caidos: [],
+    desbloqueos: [],
   };
   const nuevoGremio = (g: Omit<Gremio, 'plantilla' | 'misionesAltas' | 'novatosDestacados'> & Partial<Gremio>): Gremio => {
     const completo: Gremio = { plantilla: [], misionesAltas: 0, novatosDestacados: 0, ...g };
@@ -233,6 +235,8 @@ export interface ResumenDia {
   vida: string[];
   /** Asuntos sociales nuevos que esperan tu decisión. */
   asuntos: number;
+  /** Sistemas que se abren hoy (desbloqueo progresivo). */
+  desbloqueos: string[];
 }
 
 export function finalizarDia(estado: EstadoJuego): ResumenDia {
@@ -286,7 +290,7 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
     const noticias = nuevos.filter((e) => e.tipo === 'rival' || e.tipo === 'reto').map((e) => e.texto);
     const vida = nuevos.filter((e) => e.tipo === 'relacion' || e.tipo === 'habilidad' || e.tipo === 'muerte' || e.tipo === 'social').map((e) => e.texto);
     const muertes = estado.caidos.filter((c) => c.dia === dia && c.gremioId === estado.jugadorId).map((c) => c.nombre);
-    return { dia, informes: informes.filter((i) => i.gremioId === estado.jugadorId), sueldos, noticias, prueba: estado.fase === 'prueba', ascensiones, entrenamientos, categoriaNueva, muertes, vida, asuntos };
+    return { dia, informes: informes.filter((i) => i.gremioId === estado.jugadorId), sueldos, noticias, prueba: estado.fase === 'prueba', ascensiones, entrenamientos, categoriaNueva, muertes, vida, asuntos, desbloqueos: nuevos.filter((e) => e.texto.startsWith('¡Nuevo!')).map((e) => e.texto) };
   });
 }
 
@@ -317,6 +321,7 @@ function resolverRegresos(estado: EstadoJuego, azar: Azar, ascensiones: Resultad
     informes.push(informe);
     if (!g) continue;
     g.oro += informe.oro;
+    if (informe.exito) sumarPuntos(g, c.mision.rango);
     if (informe.exito && c.mision.rango === 'alto') {
       g.misionesAltas += 1;
       if (!g.esJugador) registrar(estado, 'rival', `${g.nombre} completa una misión de rango alto.`);
@@ -344,6 +349,7 @@ function semanaDeVida(estado: EstadoJuego, azar: Azar): void {
 function avanzarDia(estado: EstadoJuego, azar: Azar): void {
   estado.dia += 1;
   estado.fase = 'gestion';
+  actualizarDesbloqueos(estado);
   cadaDia(estado, azar);
   estado.tablon = generarTablon(azar, () => nuevoId(estado, 'm'), multiplicadores(categoria(jugador(estado))));
   // Cada semana, un maestro rival puede lanzar un reto.
@@ -429,6 +435,8 @@ export interface ResumenSemana {
   puestoAnterior: number;
   /** Puntos del jugador en el ranking oficial anterior (para enseñar el progreso aunque no cambie de puesto). */
   puntosAnteriores: number;
+  /** Sistemas que se abren al empezar la semana nueva. */
+  desbloqueos: string[];
   /** Cierre de temporada (cada 4 semanas). */
   temporada: { numero: number; puesto: number; premio: number } | null;
   victoria: boolean;
@@ -444,6 +452,7 @@ export interface ResumenSemana {
  */
 export function terminarPrueba(estado: EstadoJuego): ResumenSemana {
   const prueba = pruebaEnCurso(estado);
+  const desde = estado.registro.length;
   return conAzar(estado, (azar) => {
     const restantes = [...(prueba.subasta && !prueba.subasta.terminada ? [prueba.subasta.heroeId] : []), ...prueba.pendientes];
     for (const id of restantes) {
@@ -481,6 +490,8 @@ export function terminarPrueba(estado: EstadoJuego): ResumenSemana {
       const numero = temporadaDe(estado.dia);
       for (const fila of estado.ranking) gremio(estado, fila.gremioId).oro += premioTemporada(fila.puesto);
       temporada = { numero, puesto: actual, premio: premioTemporada(actual) };
+      // Decisión del propietario: cada temporada es una carrera nueva. Los puntos vuelven a 0.
+      for (const g of Object.values(estado.gremios)) g.puntosTemporada = 0;
       registrar(estado, 'temporada', `Fin de la temporada ${numero}: ${j.nombre} termina ${actual}.º y cobra ${temporada.premio} de oro.`);
       // Modo historia (provisional, pregunta 18): la historia termina al cerrar la última temporada.
       victoria = numero >= balance.historia.temporadas;
@@ -491,7 +502,8 @@ export function terminarPrueba(estado: EstadoJuego): ResumenSemana {
     } else {
       avanzarDia(estado, azar);
     }
-    return { ranking: estado.ranking, puestoAnterior, puntosAnteriores, temporada, victoria, torneo, categoriaNueva };
+    const desbloqueos = estado.registro.slice(desde).filter((e) => e.texto.startsWith('¡Nuevo!')).map((e) => e.texto);
+    return { ranking: estado.ranking, puestoAnterior, puntosAnteriores, desbloqueos, temporada, victoria, torneo, categoriaNueva };
   });
 }
 

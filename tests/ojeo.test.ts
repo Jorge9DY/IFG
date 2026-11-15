@@ -71,8 +71,11 @@ describe('Prueba de los Novatos que crece con la categoría', () => {
     expect(candidatos.every((h) => h.catalogo && h.poder <= 9)).toBe(true);
     expect(estado.bolsaNovatos.length).toBe(bolsa - candidatos.length);
     terminarPrueba(estado);
-    const fichados = candidatos.filter((h) => estado.heroes[h.id]).length;
-    expect(estado.bolsaNovatos.length).toBe(bolsa - fichados);
+    for (const h of candidatos) {
+      // Los fichados están en un gremio; los demás vuelven a la bolsa.
+      if (estado.heroes[h.id]) expect(estado.bolsaNovatos).not.toContain(h.catalogo);
+      else expect(estado.bolsaNovatos).toContain(h.catalogo);
+    }
   });
 
   it('el día 7 llegan tantos novatos como marca la categoría', () => {

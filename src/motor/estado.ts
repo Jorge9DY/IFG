@@ -123,6 +123,8 @@ export interface EstadoJuego {
   bolsaNovatos: string[];
   /** Muro de los caídos. */
   caidos: Caido[];
+  /** Sistemas ya abiertos (desbloqueo progresivo). */
+  desbloqueos: string[];
 }
 
 const C = balance.calendario;

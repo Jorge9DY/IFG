@@ -21,8 +21,11 @@ export function heroe(datos: Partial<Heroe> & Pick<Heroe, 'id'>): Heroe {
 }
 
 /** Partida nueva con semilla fija. */
+/** Partida nueva con semilla fija y todos los sistemas abiertos (las pruebas del desbloqueo usan crearPartida). */
 export function partida(semilla = 7): EstadoJuego {
-  return crearPartida({ semilla });
+  const estado = crearPartida({ semilla });
+  estado.desbloqueos = ['mercado', 'relaciones', 'ascension', 'retos'];
+  return estado;
 }
 
 /** Mete un héroe en el gremio indicado y lo devuelve. */

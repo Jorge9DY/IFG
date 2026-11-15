@@ -81,6 +81,10 @@ export function eligeMisiones(estado: EstadoJuego, azar: Azar, gremioId: string,
   const entorno = { estado, gremioId };
   const tablon = generarTablon(azar, nuevoId, multiplicadores(categoria(gremio(estado, gremioId))));
   const elegidas: { mision: Mision; equipo: Heroe[]; probabilidad: number }[] = [];
+  // Tope de misiones al día. Con decimales, la misión extra llega cada pocos días (1,34: una de cada tres).
+  const base = Math.floor(R.misionesPorDia);
+  const resto = R.misionesPorDia - base;
+  const tope = base + (resto > 0 && estado.dia % Math.round(1 / resto) === 0 ? 1 : 0);
   // Igual que el jugador: cada misión se puede repetir mientras queden equipos libres. De la más alta a la más baja.
   for (const carta of [...tablon].reverse()) {
     for (;;) {
@@ -90,7 +94,7 @@ export function eligeMisiones(estado: EstadoJuego, azar: Azar, gremioId: string,
         .map((e) => ({ equipo: e, probabilidad: probabilidadMision(carta, e, entorno) }))
         .sort((a, b) => b.probabilidad - a.probabilidad);
       const mejor = opciones[0];
-      if (!mejor || mejor.probabilidad < R.probExitoMinima) break;
+      if (!mejor || mejor.probabilidad < R.probExitoMinima || elegidas.length >= tope) break;
       elegidas.push({ mision: { ...carta, id: nuevoId() }, ...mejor });
     }
   }

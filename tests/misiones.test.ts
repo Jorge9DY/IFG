@@ -9,9 +9,9 @@ describe('misiones', () => {
     let n = 0;
     const tablon = generarTablon(new Azar(1), () => `m${++n}`);
     expect(tablon.map((m) => [m.rango, m.duracion, m.recompensa, m.equipo])).toEqual([
-      ['bajo', 1, 500, 1],
-      ['medio', 2, 1500, 2],
-      ['alto', 3, 4000, 3],
+      ['bajo', 1, 350, 1],
+      ['medio', 2, 1100, 2],
+      ['alto', 3, 2900, 3],
     ]);
   });
 
@@ -31,10 +31,10 @@ describe('misiones', () => {
       const informe = resolverMision(new Azar(s * 13), mision!, [heroe({ id: 'a', poder: 20 })], 'j');
       if (informe.exito) {
         exitos++;
-        expect(informe.oro).toBe(500);
+        expect(informe.oro).toBe(balance.misiones.bajo.recompensa);
       } else {
         fracasos++;
-        expect(informe.oro).toBe(Math.round(500 * balance.misiones.fraccionRecompensaFracaso));
+        expect(informe.oro).toBe(Math.round(balance.misiones.bajo.recompensa * balance.misiones.fraccionRecompensaFracaso));
       }
     }
     expect(exitos).toBeGreaterThan(0);

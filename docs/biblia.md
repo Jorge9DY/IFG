@@ -215,18 +215,21 @@ Principio: **un héroe solo muere por un riesgo que el jugador ve antes de acept
 
 Usar la media del poder castiga la fantasía central: vender a los héroes débiles sube la puntuación, así que no compensa conservar a una Aria mediocre con talento oculto.
 
-### Fórmula \[Aceptado\]
+### Fórmula \[Aceptado\] (decisión del propietario, 2026-11-15; sustituye a «Puntos = Fuerza + Prestigio»)
 
-```latex
-\text{Puntos} = \text{Fuerza} + \text{Prestigio}
-```
+El ranking de cada temporada se juega por **puntos de temporada**, que vuelven a 0 al empezar la siguiente: cada temporada es una carrera que se puede ganar, y la remontada sigue siendo la historia de fondo.
 
-| Componente | Cómo se calcula | Por qué |
-| --- | --- | --- |
-| Fuerza | Suma del poder de los 5 mejores héroes. | El banquillo no resta; tener cantera no penaliza. |
-| Prestigio | Nivel de instalaciones + misiones de rango alto completadas + novatos destacados fichados. | Premia construir el gremio, no solo comprar poder. |
+| Logro | Puntos (provisional) |
+| --- | --: |
+| Misión cumplida | baja 1 · media 2 · alta 4 |
+| Reto ganado | 5 |
+| Novato destacado fichado | 3 |
+| Ascensión superada | 5 |
+| Categoría del torneo ganada | 8 |
 
-Peso de cada componente: aproximadamente igual al principio; se ajustará al equilibrar \[Abierto\].
+- **Fuerza** (poder de los 5 mejores héroes): desempata y decide el torneo.
+- **Prestigio** (instalaciones, misiones altas, novatos destacados, retos y torneos): sube la categoría del gremio y del tablón.
+- Para que un rival con 10 héroes no gane solo por volumen, cada rival lanza como mucho unas 1,3 misiones al día (provisional).
 
 ### Actualización \[Aceptado\]
 
@@ -746,6 +749,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-15 | Decisiones del propietario tras la revisión de diseño (`docs/revision-de-diseno.md`): ranking por **puntos de temporada** que vuelven a 0 (la fuerza desempata); recompensas de las misiones un 28% más bajas; **desbloqueo progresivo** (semana 1: misiones y Prueba; semana 2: mercado y relaciones; temporada 2: Ascensión y retos); pista de relaciones al formar equipo. Además: objetivo del momento, progreso semanal visible, héroes en la sede 3D, noticias agrupadas y retos a los que se puede responder. |
 | 2026-11-15 | Documento del propietario «Sistema social de héroes» v1.0: relaciones por pareja con afinidad y atracción direccional, rasgos, felicidad y estrés, romance por eventos, eventos sociales con decisiones y cooldowns, consecuencias de muertes, peticiones y pestaña «Relaciones». Sustituye a la propuesta de relaciones y ánimo del 2026-11-14 (el ánimo ya no cambia el poder; solo el estrés alto). |
 | 2026-11-14 | Encargo del propietario: clases y géneros del catálogo a criterio de Claude (equilibrados); escala de diez rangos de la hoja; los héroes de los rivales empiezan en su rango máximo y los libres llegan por la Prueba en F; crear los sistemas que falten, con las **relaciones** como pilar; resolver la **muerte** a criterio de Claude. Aplicado: catálogo de 80 héroes con sus 80 habilidades, relaciones y ánimo \[Propuesta\], muerte \[Propuesta\] (la Ascensión deja de ser la única forma de morir), misiones por huecos, 5 temporadas y tres finales provisionales. |
 | 2026-11-14 | Decisión del propietario: **modo historia** con héroes diseñados, duración de X temporadas, eventos con guion y rejugabilidad por inversión que desbloquea eventos y finales. Foco en misiones, héroes y fichajes; las mecánicas nuevas solo profundizan las existentes. Se descarta la propuesta de las tres ramas (economía e investigación). El torneo de fin de temporada pasa a la versión principal como \[Propuesta\]. |

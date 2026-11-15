@@ -32,10 +32,10 @@
     ]
   },
   "misiones": {
-    "_nota": "Sección 5 de la biblia. Duración, recompensa y equipo según la tabla (ilustrativas). Dificultad, experiencia, lesiones y recompensa al fracasar: provisionales.",
+    "_nota": "Sección 5 de la biblia. Duración, recompensa y equipo según la tabla (ilustrativas). Dificultad, experiencia, lesiones y recompensa al fracasar: provisionales. Decisión del propietario (2026-11-15): recompensas un 28% más bajas para que el oro vuelva a apretar.",
     "bajo": {
       "duracion": 1,
-      "recompensa": 500,
+      "recompensa": 350,
       "equipo": 1,
       "dificultad": 10,
       "experiencia": 10,
@@ -49,7 +49,7 @@
     },
     "medio": {
       "duracion": 2,
-      "recompensa": 1500,
+      "recompensa": 1100,
       "equipo": 2,
       "dificultad": 28,
       "experiencia": 20,
@@ -63,7 +63,7 @@
     },
     "alto": {
       "duracion": 3,
-      "recompensa": 4000,
+      "recompensa": 2900,
       "equipo": 3,
       "dificultad": 60,
       "experiencia": 35,
@@ -373,7 +373,7 @@
     "prestigioPorCategoria": 12
   },
   "ranking": {
-    "_nota": "Sección 6: Puntos = Fuerza + Prestigio. Pesos provisionales, aproximadamente iguales al principio.",
+    "_nota": "Decisión del propietario (2026-11-15, revisión de diseño): el ranking de cada temporada se juega por puntos de temporada, que vuelven a 0 al empezar la siguiente. La fuerza (poder de los 5 mejores) desempata y decide el torneo. El prestigio sigue marcando la categoría del gremio.",
     "heroesFuerza": 5,
     "prestigioPorNivelInstalacion": 20,
     "prestigioPorMisionAlta": 2,
@@ -401,7 +401,9 @@
     "reservaSueldos": 1,
     "probMejora": 30,
     "ruidoValor": 0.2,
-    "nivelSedeMinimo": 5
+    "nivelSedeMinimo": 5,
+    "misionesPorDia": 1.34,
+    "_notaMisiones": "Revisión de diseño (2026-11-15): con puntos de temporada, un rival con 10 héroes ganaría siempre por volumen. Cada rival lanza como mucho estas misiones al día (provisional)."
   },
   "muerte": {
     "_nota": "Propuesta de Claude (provisional). Solo se muere por riesgos que el jugador ve antes: la Ascensión, las habilidades que lo dicen (Chimoku, Segador) y las misiones de rango alto con menos del 35% de éxito, marcadas con «Riesgo de muerte».",
@@ -699,5 +701,24 @@
     "ultimaOracion": {},
     "herencia": {},
     "guardia": {}
+  },
+  "puntosTemporada": {
+    "_nota": "Puntos de temporada por logro (provisional).",
+    "mision": {
+      "bajo": 1,
+      "medio": 2,
+      "alto": 4
+    },
+    "reto": 5,
+    "torneo": 8,
+    "novatoDestacado": 3,
+    "ascension": 5
+  },
+  "desbloqueo": {
+    "_nota": "Decisión del propietario (2026-11-15): los sistemas se presentan poco a poco. Día (global) en que se abre cada uno: semana 2 el mercado y las relaciones; temporada 2 la Ascensión y los retos.",
+    "mercado": 8,
+    "relaciones": 8,
+    "ascension": 29,
+    "retos": 29
   }
 }

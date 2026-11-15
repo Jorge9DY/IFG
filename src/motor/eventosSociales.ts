@@ -7,6 +7,7 @@
 import defs from '../datos/eventos-sociales.json';
 import S from '../datos/social.json';
 import { marcharse } from './economia';
+import { desbloqueado } from './desbloqueos';
 import { heroesDe, jugador, registrar, type EstadoJuego, type EventoPendiente } from './estado';
 import {
   afinidad,
@@ -154,6 +155,8 @@ function disponible(estado: EstadoJuego, def: DefEvento, a: string, b?: string):
  * sin pasar del límite de nuevos por día ni de pendientes a la vez. Devuelve los nuevos.
  */
 export function evaluarEventos(estado: EstadoJuego): EventoPendiente[] {
+  // Desbloqueo progresivo: los asuntos sociales llegan cuando se abren las relaciones.
+  if (!desbloqueado(estado, 'relaciones')) return [];
   const hueco = Math.min(E.maxNuevosPorDia, E.maxPendientes - estado.social.pendientes.length);
   if (hueco <= 0) return [];
   const opciones: { def: DefEvento; c: Candidato }[] = [];

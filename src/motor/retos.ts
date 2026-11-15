@@ -7,6 +7,8 @@ import balance from '../datos/balance.json';
 import datosGremios from '../datos/gremios.json';
 import type { Azar } from './azar';
 import { gremio, heroe as obtenerHeroe, heroesDe, jugador, registrar, rivales, type EstadoJuego } from './estado';
+import { sumarPuntos } from './ranking';
+import { desbloqueado } from './desbloqueos';
 import { indiceLetra, letraDe } from './heroes';
 import type { Clase, Heroe, Letra } from './tipos';
 
@@ -43,6 +45,7 @@ function candidatosRival(estado: EstadoJuego, gremioId: string, clase: Clase, ra
  * Si no hay emparejamiento posible, no hay reto.
  */
 export function generarReto(estado: EstadoJuego, azar: Azar): Reto | null {
+  if (!desbloqueado(estado, 'retos')) return null;
   const mios = heroesDe(estado, estado.jugadorId);
   const opciones: { gremioId: string; clase: Clase; rango: Letra }[] = [];
   const rangos = [...new Set(mios.map((h) => letraDe(h.poder)))];
@@ -113,6 +116,7 @@ export function aceptarReto(estado: EstadoJuego, azar: Azar, heroeId: string): R
     j.oro += r.apuesta;
     rival.oro -= r.apuesta;
     j.retosGanados = (j.retosGanados ?? 0) + 1;
+    sumarPuntos(j, 'reto');
   } else if (desenlace === 'derrota') {
     j.oro -= r.apuesta;
     rival.oro += r.apuesta;
