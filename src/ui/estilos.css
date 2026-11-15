@@ -706,3 +706,17 @@ button.meta-objetivo:hover { border-color: var(--cian); }
 .efectos-habilidad li.neutro { color: var(--texto); }
 .habilidad.oculta summary { color: var(--tenue); }
 .indices { font-size: 12px; color: #e98aa8; }
+/* Momentos de la historia */
+.caja-momento { max-width: 520px; text-align: left; }
+.cabecera-momento { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.cabecera-momento em { display: block; font-style: normal; color: var(--cian); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+.cabecera-momento b { font-family: var(--titulo); font-size: 24px; letter-spacing: 0.04em; }
+.opciones-momento { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.opciones-momento button { text-align: left; padding: 8px 12px; border: 1px solid var(--linea-suave); background: rgba(255, 255, 255, 0.03); color: var(--texto); cursor: pointer; }
+.opciones-momento button:hover, .opciones-momento button:focus { border-color: var(--cian); }
+.epilogos li { margin: 4px 0; }
+.dilema { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.dilema button { font-size: 13px; }
+.mas { font-size: 12px; margin: 2px 0; }
+.mas summary { cursor: pointer; color: var(--tenue); }
+.mas[open] summary { margin-bottom: 2px; }

@@ -402,8 +402,16 @@
     "probMejora": 30,
     "ruidoValor": 0.2,
     "nivelSedeMinimo": 5,
-    "misionesPorDia": 1.34,
-    "_notaMisiones": "Revisión de diseño (2026-11-15): con puntos de temporada, un rival con 10 héroes ganaría siempre por volumen. Cada rival lanza como mucho estas misiones al día (provisional)."
+    "misionesPorDia": [
+      1.34,
+      1.4,
+      1.5,
+      1.75,
+      2
+    ],
+    "_notaMisiones": "Revisión de diseño: tope de misiones al día de cada rival, por temporada. Sube cada temporada: los rivales se toman en serio al gremio que remonta (antes la historia se volvía fácil a partir de la temporada 3). Provisional.",
+    "entrenamientoSemanal": 30,
+    "_notaEntrenamiento": "Los rivales entrenan cada semana a sus héroes que aún pueden crecer (los novatos que fichan): experiencia por semana."
   },
   "muerte": {
     "_nota": "Propuesta de Claude (provisional). Solo se muere por riesgos que el jugador ve antes: la Ascensión, las habilidades que lo dicen (Chimoku, Segador) y las misiones de rango alto con menos del 35% de éxito, marcadas con «Riesgo de muerte».",
@@ -417,7 +425,8 @@
   },
   "historia": {
     "_nota": "Duración provisional del modo historia (pregunta 18). Al terminar la última temporada llega el final según el puesto.",
-    "temporadas": 5
+    "temporadas": 5,
+    "ofertaDragon": 1.5
   },
   "habilidades": {
     "_nota": "Cifras provisionales de las 80 habilidades del catálogo. Cada clave es el id de la habilidad.",

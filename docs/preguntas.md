@@ -169,3 +169,12 @@ Detalle en `docs/auditoria-habilidades.md`.
 1. **Romance raro:** menos de una pareja por partida con el bot (hacen falta muchas misiones con la misma pareja). ¿Se acepta así o se acelera? Afecta a Aimul y Yandere.
 2. **Prestigio:** con el ranking por puntos de temporada, Mascota y Chibi solo ayudan a la categoría. ¿Deben dar también puntos de temporada?
 3. **Choques de carácter** (propuesta de Claude para que existan malas relaciones): ¿parece bien la lista de incompatibilidades (orgulloso con orgulloso, competitivo con competitivo, orgulloso con competitivo, reservado con sociable, celoso con sociable, ambicioso con ambicioso)?
+
+## 23. Contenido de la historia: revisar (2026-11-16)
+
+Los arcos de héroe y los epílogos (`src/datos/historia.json`) los ha escrito Claude como borrador para tener la mecánica funcionando. Necesitan la mirada del propietario:
+
+1. ¿Te encajan los tonos y los conflictos de cada arco (AllBlack y sus tres voces, la tribu de HalfGoblin, el insecto de InsectLover, Entrman fichador, Chimoku, Heredero, Topo y Solus como némesis)?
+2. ¿Qué otros héroes deben tener arco? La columna «Historia» de la hoja sigue vacía: si la rellenas, la convierto en momentos.
+3. ¿Los finales deben cambiar algo más que el texto (por ejemplo, desbloquear un héroe o un modo en la siguiente partida)?
+4. El importador (`npx tsx herramientas/importar-hoja.ts Heroes.csv --escribir`) actualiza el catálogo desde la hoja exportada en CSV. ¿Lo usamos como flujo normal a partir de ahora?

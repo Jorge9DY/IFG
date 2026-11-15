@@ -127,6 +127,8 @@ export interface EstadoJuego {
   desbloqueos: string[];
   /** Héroes del catálogo cuya habilidad conoces (los has fichado alguna vez). */
   habilidadesConocidas: string[];
+  /** Modo historia: marcas de lo decidido, momentos vistos y el que espera decisión. */
+  historia: { marcas: string[]; vistos: string[]; pendiente: string | null };
 }
 
 const C = balance.calendario;

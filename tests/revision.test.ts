@@ -58,7 +58,7 @@ describe('ranking por puntos de temporada', () => {
 
   it('un rival no lanza más misiones al día que su tope', () => {
     const estado = crearPartida({ semilla: 5 });
-    const tope = Math.ceil(balance.rivales.misionesPorDia);
+    const tope = Math.ceil(balance.rivales.misionesPorDia[0]!);
     for (let dia = 1; dia <= 6; dia++) {
       estado.dia = dia;
       for (const h of Object.values(estado.heroes)) h.estado = 'libre';

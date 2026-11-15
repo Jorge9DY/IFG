@@ -1,5 +1,6 @@
 // Utilidades para crear héroes y partidas de prueba.
 import type { EstadoJuego } from '../src/motor/estado';
+import { MOMENTOS } from '../src/motor/historia';
 import { crearPartida } from '../src/motor/partida';
 import type { Heroe } from '../src/motor/tipos';
 
@@ -25,6 +26,8 @@ export function heroe(datos: Partial<Heroe> & Pick<Heroe, 'id'>): Heroe {
 export function partida(semilla = 7): EstadoJuego {
   const estado = crearPartida({ semilla });
   estado.desbloqueos = ['mercado', 'relaciones', 'ascension', 'retos'];
+  // Sin momentos de la historia: las pruebas de reglas no deben depender del guion (tests/historia.test.ts usa crearPartida).
+  estado.historia.vistos = MOMENTOS.map((m) => m.id);
   return estado;
 }
 

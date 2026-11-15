@@ -59,6 +59,7 @@ export function migrar(datos: unknown): EstadoJuego | null {
   estado.caidos ??= [];
   // Las partidas empezadas antes del desbloqueo progresivo lo tienen todo abierto.
   estado.habilidadesConocidas ??= [];
+  estado.historia ??= { marcas: [], vistos: [], pendiente: null };
   estado.desbloqueos ??= ['mercado', 'relaciones', 'ascension', 'retos'];
   estado.bolsaNovatos ??= [];
   estado.version = 10;

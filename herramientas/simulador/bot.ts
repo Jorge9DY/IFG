@@ -12,6 +12,7 @@ import { Azar } from '../../src/motor/azar';
 import { diaDeVuelta, lanzarMision, pujarNovato, siguienteCandidato, vuelveTrasPrueba } from '../../src/motor/partida';
 import { motivoNoPujar, siguientePrecio } from '../../src/motor/subasta';
 import { equipoRecomendado } from '../../src/ui/ayudas';
+import { decidirMomento, momentoPendiente } from '../../src/motor/historia';
 import { condicionesEntrenamiento, entrenar } from '../../src/motor/entrenamiento';
 import { condicionesAscension, iniciarAscension } from '../../src/motor/ascension';
 
@@ -53,7 +54,18 @@ function techoVisto(estado: EstadoJuego, h: Heroe): number {
 }
 
 /** Decisiones del día: invertir y lanzar misiones (de la más alta a la más baja). */
+/** Momento de la historia: elige la opción que más suma (puntos, poder, ánimo) y evita vender o perder héroes. */
+function decidirHistoria(estado: EstadoJuego): void {
+  const m = momentoPendiente(estado);
+  if (!m) return;
+  const valor = (o: (typeof m.opciones)[number]): number =>
+    o.efectos.reduce((t, x) => t + (x.puntos ?? 0) * 3 + (x.poder ?? 0) + (x.felicidad ?? 0) / 5 + (x.lealtad ?? 0) / 10 + Math.min(0, x.oro ?? 0) / 300 + (x.accion === 'venderDragon' || x.accion === 'marcharse' ? -40 : 0), 0);
+  const mejor = m.opciones.map((o, i) => [valor(o), i] as const).sort((a, b) => b[0] - a[0])[0]![1];
+  decidirMomento(estado, mejor);
+}
+
 export function jugarDia(estado: EstadoJuego, e: Estrategia, m: MetricasBot): void {
+  decidirHistoria(estado);
   const reserva = (): number => e.reservaSemanas * sueldosDe(estado, estado.jugadorId);
   const j = jugador(estado);
   for (const tipo of ['entrenamiento', 'sede', 'ojeadores'] as const) {

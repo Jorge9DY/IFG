@@ -4,8 +4,8 @@
 import balance from '../datos/balance.json';
 import type { Azar } from './azar';
 import { sueldosDe } from './economia';
-import { gremio, heroesDe, registrar, type EstadoJuego } from './estado';
-import { letraDe, nivelOjeo, potencialEstimado, valorEstimado } from './heroes';
+import { gremio, heroesDe, registrar, temporadaDe, type EstadoJuego } from './estado';
+import { alLimite, ganarExperiencia, letraDe, nivelOjeo, potencialEstimado, valorEstimado } from './heroes';
 import { categoria, multiplicadores } from './categorias';
 import { infoInstalacion, mejorar, plazasLibres, type Instalacion } from './instalaciones';
 import { equiposPosibles, generarTablon, probabilidadMision } from './misiones';
@@ -82,8 +82,10 @@ export function eligeMisiones(estado: EstadoJuego, azar: Azar, gremioId: string,
   const tablon = generarTablon(azar, nuevoId, multiplicadores(categoria(gremio(estado, gremioId))));
   const elegidas: { mision: Mision; equipo: Heroe[]; probabilidad: number }[] = [];
   // Tope de misiones al día. Con decimales, la misión extra llega cada pocos días (1,34: una de cada tres).
-  const base = Math.floor(R.misionesPorDia);
-  const resto = R.misionesPorDia - base;
+  const porTemporada = R.misionesPorDia as number[];
+  const media = porTemporada[Math.min(temporadaDe(estado.dia), porTemporada.length) - 1] ?? 1;
+  const base = Math.floor(media);
+  const resto = media - base;
   const tope = base + (resto > 0 && estado.dia % Math.round(1 / resto) === 0 ? 1 : 0);
   // Igual que el jugador: cada misión se puede repetir mientras queden equipos libres. De la más alta a la más baja.
   for (const carta of [...tablon].reverse()) {
@@ -99,6 +101,11 @@ export function eligeMisiones(estado: EstadoJuego, azar: Azar, gremioId: string,
     }
   }
   return elegidas;
+}
+
+/** Cada semana, los rivales entrenan a los héroes que aún pueden crecer (sus novatos). */
+export function entrenarRivales(estado: EstadoJuego, gremioId: string): void {
+  for (const h of heroesDe(estado, gremioId)) if (!alLimite(h)) ganarExperiencia(h, R.entrenamientoSemanal);
 }
 
 /** Al terminar la semana, un rival puede invertir en instalaciones según su estrategia. */

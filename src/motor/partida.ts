@@ -27,6 +27,7 @@ import { duracionMision, generarTablon, probabilidadMision, resolverMision, sali
 import { alFicharNovato, apuntarConocidas, cadaDia, cadaSemana, huecosEquipo, motivoNoIr } from './habilidades';
 import { riesgoDeMuerte } from './muerte';
 import { actualizarDesbloqueos } from './desbloqueos';
+import { decidirMomento, evaluarHistoria } from './historia';
 import { descansoDelDia, romperVetos } from './relaciones';
 import { caducarEventos, evaluarEventos } from './eventosSociales';
 import { marcharse } from './economia';
@@ -37,7 +38,7 @@ import { resolverAscension, type ResultadoAscension } from './ascension';
 import { actualizarCategoria, categoria, categoriaPorPrestigio, multiplicadores } from './categorias';
 import { prestigio } from './ranking';
 import { calcularRanking, premioTemporada, sumarPuntos } from './ranking';
-import { ajustarPlantilla, eligeMisiones, invertir } from './rivales';
+import { ajustarPlantilla, eligeMisiones, entrenarRivales, invertir } from './rivales';
 import { accionJugador, cerrarSubasta, crearSubasta } from './subasta';
 import type { Clase, Gremio, Heroe, Letra, Mision, PerfilRival } from './tipos';
 
@@ -82,6 +83,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
     caidos: [],
     desbloqueos: [],
     habilidadesConocidas: [],
+    historia: { marcas: [], vistos: [], pendiente: null },
   };
   const nuevoGremio = (g: Omit<Gremio, 'plantilla' | 'misionesAltas' | 'novatosDestacados'> & Partial<Gremio>): Gremio => {
     const completo: Gremio = { plantilla: [], misionesAltas: 0, novatosDestacados: 0, ...g };
@@ -243,6 +245,8 @@ export interface ResumenDia {
 
 export function finalizarDia(estado: EstadoJuego): ResumenDia {
   if (estado.fase !== 'gestion') throw new Error('Ahora no se puede finalizar el día');
+  // Un momento de la historia sin decidir (la interfaz siempre lo pregunta): primera opción.
+  if (estado.historia.pendiente) decidirMomento(estado, 0);
   const dia = estado.dia;
   const desde = estado.registro.length;
   return conAzar(estado, (azar) => {
@@ -274,6 +278,7 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
     descansoDelDia(estado);
     caducarEventos(estado);
     const asuntos = evaluarEventos(estado).length;
+    evaluarHistoria(estado);
 
     // Día 7: sueldos, la semana de relaciones y habilidades y, después, Prueba de los Novatos.
     let sueldos: PagoSueldos | null = null;
@@ -282,6 +287,7 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
       for (const rival of rivales(estado)) {
         pagarSueldos(estado, rival.id);
         invertir(estado, azar, rival.id);
+        entrenarRivales(estado, rival.id);
       }
       semanaDeVida(estado, azar);
       empezarPrueba(estado, azar);

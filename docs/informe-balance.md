@@ -1,5 +1,17 @@
 # Informe de balance
 
+## Arcos de historia y rivales que crecen (2026-11-16)
+
+`npm run simular -- 150 1`. Rivales con tope de misiones creciente por temporada (1,34 → 2) y entrenamiento semanal de sus novatos. El bot decide los momentos de historia con un criterio sencillo: evita vender o perder héroes.
+
+| Métrica | Prudente | Ambiciosa |
+| --- | --: | --: |
+| Puesto medio al cerrar las temporadas 3 / 4 / 5 | 4,4 / 4,2 / 3,8 | 3,8 / 3,3 / 2,7 |
+| Final «Leyenda» / «Respeto» / «Olvido» | 11% / 23% / 66% | 31% / 35% / 34% |
+| Oro final | 32.268 | 16.552 |
+
+Lectura: la historia ya no se vuelve fácil al final (antes el bot ambicioso acababa, de media, 1,9.º en la temporada 5; ahora 2,7.º) y ganarla exige invertir bien. Puede estar algo dura: si los playtests lo confirman, se baja el tope de los rivales en la temporada 5 o su entrenamiento (`balance.json`, `rivales`).
+
 ## Decisiones de la revisión de diseño (2026-11-15)
 
 `npm run simular -- 150 1`, historia completa. Ranking por puntos de temporada (vuelven a 0), recompensas −28%, desbloqueo progresivo y rivales con un tope de unas 1,3 misiones al día.

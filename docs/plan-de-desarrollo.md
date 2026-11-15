@@ -46,8 +46,10 @@ Decisión del propietario: el juego pasa a un **modo historia** con héroes dise
 - [x] Revisión de diseño: objetivo del momento, progreso visible, sede viva, puntos de temporada, economía, desbloqueo progresivo y pista de relaciones
 - [ ] Confirmar los supuestos de las preguntas 19 y 20
 - [ ] Probar a mano el sistema social con 8–12 héroes (prueba de prototipo del documento) antes de añadir más eventos
-- [ ] Guion de temporadas: duración, qué novatos llegan cada semana y qué eventos ocurren
-- [ ] Condiciones de eventos y finales según la inversión del jugador en cada héroe
+- [x] Arcos de héroe con momentos y epílogos (primeros 8 héroes, contenido provisional)
+- [x] Condiciones de eventos y finales según la inversión del jugador en cada héroe
+- [ ] Arcos para más héroes (columna «Historia» de la hoja)
+- [ ] Playtests a mano con `docs/guia-playtest.md`
 - [ ] Profundizar misiones, héroes y fichajes (Prueba de los Novatos, torneo, Ascensión, mercado, retos)
 
 ## Fase 1 — Núcleo económico (foco actual)

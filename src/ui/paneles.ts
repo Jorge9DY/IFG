@@ -64,11 +64,12 @@ import type { Heroe, Mision, RangoMision } from '../motor/tipos';
 import balance from '../datos/balance.json';
 import textosAscension from '../narrativa/ascension.json';
 import type { ResultadoAscension } from '../motor/ascension';
-import { equipoRecomendado, heroesLibres, nivelDificultad, probabilidadRecomendada, objetivoDelMomento } from './ayudas';
+import { equipoRecomendado, heroesLibres, nivelDificultad, probabilidadRecomendada, objetivoDelMomento, equipoQueUne } from './ayudas';
 import { borrar, cargar, guardar } from './guardado';
 import { esc, num, pct } from './html';
 import type { CombateTorneo } from '../motor/torneo';
 import { retrato } from './retrato';
+import { decidirMomento, epilogos, heroeDeCatalogo, momentoPendiente } from '../motor/historia';
 
 export type Panel = 'nueva' | 'misiones' | 'mercado' | 'gremio' | 'prueba' | 'dia' | 'semana' | 'victoria';
 type PestanaGremio = 'heroes' | 'relaciones' | 'instalaciones' | 'ranking';
@@ -151,6 +152,8 @@ export class Interfaz {
   /** Barra de la Ascensión en la pantalla principal y gran reveal del resultado (se crean aquí). */
   private readonly hudAscension: HTMLElement;
   private readonly revelacion: HTMLElement;
+  /** Momento de la historia: escena en el centro de la pantalla con su decisión. */
+  private readonly momento: HTMLElement;
 
   constructor(private readonly el: ElementosInterfaz) {
     const pantalla = el.panel.parentElement ?? document.body;
@@ -163,9 +166,25 @@ export class Interfaz {
     this.revelacion.setAttribute('role', 'dialog');
     this.revelacion.setAttribute('aria-modal', 'true');
     this.revelacion.hidden = true;
-    pantalla.append(this.hudAscension, this.revelacion);
+    this.momento = document.createElement('div');
+    this.momento.className = 'revelacion momento';
+    this.momento.setAttribute('role', 'dialog');
+    this.momento.setAttribute('aria-modal', 'true');
+    this.momento.hidden = true;
+    pantalla.append(this.hudAscension, this.revelacion, this.momento);
     this.revelacion.addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).closest('[data-accion=cerrar-reveal]')) this.revelacion.hidden = true;
+      if ((e.target as HTMLElement).closest('[data-accion=cerrar-reveal]')) {
+        this.revelacion.hidden = true;
+        this.pintarMomento();
+      }
+    });
+    this.momento.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLElement>('[data-opcion]');
+      if (!b || !this.estado) return;
+      this.mensaje = decidirMomento(this.estado, Number(b.dataset.opcion)).slice(1).join(' ');
+      this.momento.hidden = true;
+      this.guardar();
+      this.repintar();
     });
     for (const zona of [el.panel, el.menu, el.accion, el.objetivo, el.equipo, el.cabecera]) {
       zona.addEventListener('click', (e) => this.alHacerClic(e));
@@ -224,8 +243,30 @@ export class Interfaz {
   // Pantalla principal: los cinco elementos
   // ---------------------------------------------------------------------------
 
+  /** Si hay un momento de la historia pendiente (y no hay otra revelación delante), se muestra en el centro. */
+  private pintarMomento(): void {
+    const estado = this.estado;
+    const m = estado ? momentoPendiente(estado) : null;
+    if (!estado || !m || !this.revelacion.hidden) {
+      this.momento.hidden = true;
+      return;
+    }
+    const h = heroeDeCatalogo(estado, m.heroe ?? 'H08');
+    const cara = h ? `<span class="avatar grande">${retrato(h)}</span>` : '';
+    this.momento.innerHTML = `<div class="caja-reveal caja-momento">
+      <div class="cabecera-momento">${cara}<div><em>${h ? esc(h.nombre) : 'Historia'}</em><b>${esc(m.titulo)}</b></div></div>
+      <p>${esc(m.texto)}</p>
+      <div class="opciones-momento">${m.opciones.map((o, i) => `<button class="${i === 0 ? 'principal' : ''}" data-opcion="${i}">${esc(o.texto)}</button>`).join('')}</div>
+    </div>`;
+    if (this.momento.hidden) {
+      this.momento.hidden = false;
+      this.momento.querySelector<HTMLButtonElement>('[data-opcion]')?.focus();
+    }
+  }
+
   private repintar(): void {
     const estado = this.estado;
+    this.pintarMomento();
     const enJuego = !!estado && estado.fase !== 'victoria';
     this.el.menu.hidden = !enJuego;
     this.el.accion.hidden = !enJuego;
@@ -391,6 +432,15 @@ export class Interfaz {
     return `<details class="habilidad"><summary>✦ ${esc(f.nombreHabilidad)}${h.zombie ? ' · Zombie' : ''}</summary><p>${esc(f.texto)}${extra}</p>${f.ascension && f.ascension !== 'Por definir.' ? `<p class="tenue">Ascensión: ${esc(f.ascension)}</p>` : ''}</details>`;
   }
 
+  /** Dilema: el equipo más seguro o el que más une a tus héroes (si son distintos). */
+  private dilema(estado: EstadoJuego, mision: Mision): string {
+    const une = equipoQueUne(estado, mision);
+    if (une.length === 0) return '';
+    const actual = [...this.equipo].sort().join();
+    const esUne = une.map((h) => h.id).sort().join() === actual;
+    return `<div class="dilema"><button data-accion="proponer" data-id="seguro" class="${esUne ? '' : 'activo'}">★ Equipo más seguro</button><button data-accion="proponer" data-id="une" class="${esUne ? 'activo' : ''}">♥ Equipo que une (${esc(une.map((h) => h.nombre).join(', '))})</button></div>`;
+  }
+
   /** Qué harán las habilidades del equipo en esta misión (su impacto, a la vista antes de lanzarla). */
   private efectosHabilidades(estado: EstadoJuego, mision: Mision, equipo: Heroe[]): string {
     if (equipo.length === 0) return '';
@@ -435,7 +485,9 @@ export class Interfaz {
       : `<span class="mental-corto" title="Felicidad ${felicidad(h)}/100 · Estrés ${estres(h)}/100">${textoFelicidad(h)} · ${textoEstres(h).toLowerCase()}</span>`;
     const ind = textoIndices(h);
     const corazon = `<span class="indices" title="Índices de romance: lo fácil que se enamora y lo fácil que es enamorarse de él.">♡ Se enamora: ${esc(ind.enamoradizo.toLowerCase())} · enamora a: ${esc(ind.atractivo.toLowerCase())}</span>`;
-    return `<div class="sentimientos">${mal ? '' : estadoMental}${this.rasgosChips(h)}${asunto}${chips}</div>${mal ? estadoMental : ''}<div class="sentimientos">${corazon}</div>`;
+    // Dos niveles: a la vista solo lo que pide atención (asuntos, malestar); el resto, plegado.
+    const avisos = `${asunto}${mal ? estadoMental : ''}`;
+    return `${avisos ? `<div class="sentimientos">${avisos}</div>` : ''}<details class="mas"><summary>${mal ? '' : `${estadoMental} · `}personalidad y relaciones</summary><div class="sentimientos">${this.rasgosChips(h)}${chips}</div><div class="sentimientos">${corazon}</div></details>`;
   }
 
   /** Icono de una relación: pareja, amor, rivalidad o nivel de afinidad. */
@@ -466,14 +518,14 @@ export class Interfaz {
     return `<article class="carta ${extraClase}">
       <header>
         ${this.avatar(h)}
-        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} Reputación ${h.reputacion} · Lealtad ${h.lealtad}</span></div>
+        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)}</span></div>
         ${estadoTexto}
       </header>
       <div class="identidad"><span class="dato"><span class="etq">Poder</span><b>${num(h.poder)}</b></span>${this.techo(estado, h)}</div>
       ${this.olfato(estado, h)}
       ${this.habilidad(estado, h)}
       ${mio ? this.sentimientos(estado, h, estado.jugadorId) : ''}
-      <p class="sueldo tenue">Sueldo ${num(sueldoTexto)} de oro por semana${huecos(h) > 1 ? ` · ocupa ${huecos(h)} huecos en misión` : ''}</p>
+      <p class="sueldo tenue">Sueldo ${num(sueldoTexto)} de oro por semana${huecos(h) > 1 ? ` · ocupa ${huecos(h)} huecos en misión` : ''} · reputación ${h.reputacion} · lealtad ${h.lealtad}</p>
       ${mio ? this.barraXp(h) : ''}
       <footer>${pie}</footer>
     </article>`;
@@ -573,6 +625,7 @@ export class Interfaz {
         <div class="medidor d-${nivelDificultad(prob)}"><b>${prob === null ? '—' : pct(prob)}</b><span>de éxito</span></div>
       </div>
       ${clases}
+      ${this.dilema(estado, mision)}
       ${this.efectosHabilidades(estado, mision, equipo)}
       ${
         soc.detalles.length || estresados.length
@@ -1074,6 +1127,10 @@ export class Interfaz {
       <p>${esc(j.nombre)} termina la historia en el puesto ${puesto(estado, j.id)}.º del ranking.</p>
       ${mejor ? `<p class="tenue">Vuestra leyenda: ${esc(mejor.nombre)}, con poder ${mejor.poder} (${letraDe(mejor.poder)}).</p>` : ''}
       ${caidos.length ? `<p class="tenue">En el muro de los caídos: ${esc(caidos.map((c) => c.nombre).join(', '))}.</p>` : ''}
+      ${(() => {
+        const ep = epilogos(estado);
+        return ep.length ? `<h3>Qué fue de ellos</h3><ul class="lista epilogos">${ep.map((e) => `<li>${esc(e.texto)}</li>`).join('')}</ul><p class="tenue">Otra partida, otras decisiones: otros finales.</p>` : '';
+      })()}
       <button data-accion="nueva" class="principal">Nueva partida</button>`;
   }
 
@@ -1127,6 +1184,11 @@ export class Interfaz {
         this.misionId = id;
         const mision = estado.tablon.find((m) => m.id === id);
         this.equipo = mision ? equipoRecomendado(estado, mision).map((h) => h.id) : [];
+        return this.repintar();
+      }
+      case 'proponer': {
+        const mision = estado.tablon.find((m) => m.id === this.misionId);
+        if (mision) this.equipo = (id === 'une' ? equipoQueUne(estado, mision) : equipoRecomendado(estado, mision)).map((h) => h.id);
         return this.repintar();
       }
       case 'otra-mision':

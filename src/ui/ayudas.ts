@@ -5,6 +5,7 @@ import { oroLibre, sueldosDe } from '../motor/economia';
 import { diasParaPrueba, heroesDe, jugador, type EstadoJuego } from '../motor/estado';
 import { infoInstalacion, plazasLibres } from '../motor/instalaciones';
 import { motivoNoIr } from '../motor/habilidades';
+import { afinidad, atraccion, choque, sonPareja } from '../motor/relaciones';
 import { equiposPosibles, poderEquipo } from '../motor/misiones';
 import { probabilidadJugador } from '../motor/partida';
 import type { Heroe, Mision } from '../motor/tipos';
@@ -72,4 +73,32 @@ export function objetivoDelMomento(estado: EstadoJuego): { texto: string; abrir:
   const delante = mio ? filas.find((f) => f.puesto === mio.puesto - 1) : undefined;
   if (mio && delante) return { texto: `Alcanza a ${estado.gremios[delante.gremioId]?.nombre}: te faltan ${(delante.puntos - mio.puntos).toLocaleString('es-ES')} puntos`, abrir: null };
   return { texto: 'Defiende el primer puesto', abrir: null };
+}
+
+/**
+ * Dilema diario: el equipo que más une. Entre los equipos con al menos un 70% de éxito, el que junta a
+ * quienes más se aprecian o se atraen (y evita los choques de carácter). Vacío si no hay otro que valga la pena.
+ */
+export function equipoQueUne(estado: EstadoJuego, mision: Mision, candidatos = heroesLibres(estado)): Heroe[] {
+  if (mision.equipo < 2) return [];
+  const ordenados = [...candidatos].sort((a, b) => b.poder - a.poder);
+  const valor = (e: Heroe[]): number => {
+    let v = 0;
+    for (let i = 0; i < e.length; i++)
+      for (let j = i + 1; j < e.length; j++) {
+        const a = e[i]!;
+        const b = e[j]!;
+        v += afinidad(estado, a.id, b.id) + Math.max(atraccion(estado, a.id, b.id), atraccion(estado, b.id, a.id)) + (sonPareja(estado, a.id, b.id) ? 50 : 0) - (choque(a, b) ? 30 : 0);
+      }
+    return v;
+  };
+  const opciones = equiposPosibles(ordenados, mision.equipo)
+    .filter((e) => e.length > 1 && e.every((h) => !motivoNoIr(estado, h, e.map((x) => x.id))))
+    .filter((e) => probabilidadJugador(estado, mision, e) >= 70)
+    .map((e) => ({ e, v: valor(e) }))
+    .sort((a, b) => b.v - a.v);
+  const mejor = opciones[0];
+  if (!mejor || mejor.v <= 0) return [];
+  const seguro = equipoRecomendado(estado, mision).map((h) => h.id).sort().join();
+  return mejor.e.map((h) => h.id).sort().join() === seguro ? [] : mejor.e;
 }

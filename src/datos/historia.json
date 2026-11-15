@@ -1,0 +1,104 @@
+{
+  "_nota": "Modo historia: arcos de héroe (3 momentos) y epílogos. Contenido PROVISIONAL escrito por Claude para que el propietario lo revise. Condiciones: heroe (id del catálogo), dia, temporada, rango (mínimo), alLimite, marca, sinMarca, vidaMax, misionCumplida, puestoMax, enGremio (por defecto true si hay heroe; false = está en otro gremio). Efectos sobre «heroe» o «gremio»: felicidad, estres, lealtad, poder, oro, puntos, marca, accion (marcharse, descanso, venderDragon).",
+  "momentos": [
+    { "id": "allblack1", "heroe": "H02", "si": { "dia": 2 }, "titulo": "Tres voces en una", "texto": "Por la noche, AllBlack discute consigo mismo… en tres voces distintas. A la mañana siguiente actúa como si nada.",
+      "opciones": [
+        { "texto": "Pregúntale quiénes son los otros dos", "efectos": [{ "felicidad": 8 }, { "marca": "allblack_secreto" }] },
+        { "texto": "No es asunto tuyo", "efectos": [{ "estres": -5 }] } ] },
+    { "id": "goblin1", "heroe": "H07", "si": { "dia": 3 }, "titulo": "Media sangre", "texto": "En la taberna se ríen de HalfGoblin por su sangre goblin. Ella aprieta los puños y te mira.",
+      "opciones": [
+        { "texto": "Defiéndela delante de todos", "efectos": [{ "felicidad": 10, "lealtad": 10 }, { "marca": "goblin_defendida" }] },
+        { "texto": "Que aprenda a defenderse sola", "efectos": [{ "estres": 10, "poder": 1 }] } ] },
+    { "id": "solus1", "si": { "dia": 5 }, "titulo": "El número uno", "texto": "Solus, el campeón del Dragón Carmesí, entra en tu sede sin llamar. «Así que este es el peor gremio del reino», dice mirando las paredes.",
+      "opciones": [
+        { "texto": "«Algún día te ganaremos»", "efectos": [{ "objetivo": "gremio", "felicidad": 5 }, { "marca": "solus_desafio" }] },
+        { "texto": "Aceptar su limosna (500 de oro)", "efectos": [{ "oro": 500 }, { "objetivo": "gremio", "felicidad": -5 }, { "marca": "solus_limosna" }] } ] },
+    { "id": "insect1", "heroe": "H04", "si": { "dia": 6 }, "titulo": "Algo se mueve dentro", "texto": "InsectLover se toca la tripa. «Me hacen cosquillas», dice. Algo se mueve bajo su piel.",
+      "opciones": [
+        { "texto": "Llévalo a un sanador (300 de oro)", "efectos": [{ "oro": -300 }, { "marca": "insect_examinado" }] },
+        { "texto": "Será la cena", "efectos": [{ "marca": "insect_ignorado" }] } ] },
+    { "id": "entrman1", "heroe": "H01", "si": { "dia": 9 }, "titulo": "Quiero aprender a fichar", "texto": "Entrman pasa las noches leyendo contratos de otros gremios. Quiere aprender el oficio de fichador.",
+      "opciones": [
+        { "texto": "Enséñale el oficio", "efectos": [{ "felicidad": 10 }, { "marca": "entrman_aprendiz" }] },
+        { "texto": "Céntrate en combatir", "efectos": [{ "poder": 2, "felicidad": -5 }] } ] },
+    { "id": "allblack2", "heroe": "H02", "si": { "rango": "D", "marca": "allblack_secreto" }, "titulo": "Se separan", "texto": "Las tres voces de AllBlack quieren salir por separado. Si los dejas, serán más fuertes… o se perderán.",
+      "opciones": [
+        { "texto": "Déjalos probar un día", "efectos": [{ "poder": 4, "estres": 15 }, { "marca": "allblack_dividido" }] },
+        { "texto": "Mantenlos unidos", "efectos": [{ "felicidad": 10 }, { "marca": "allblack_unido" }] } ] },
+    { "id": "goblin2", "heroe": "H07", "si": { "rango": "D", "dia": 18 }, "titulo": "La tribu llama", "texto": "Llega un cuervo de la tribu de su madre: quieren conocerla.",
+      "opciones": [
+        { "texto": "Dale tres días para ir", "efectos": [{ "accion": "descanso" }, { "poder": 5 }, { "marca": "goblin_raices" }] },
+        { "texto": "La necesitamos aquí", "efectos": [{ "felicidad": -10 }, { "marca": "goblin_olvido" }] } ] },
+    { "id": "insect2", "heroe": "H04", "si": { "alLimite": true }, "titulo": "Los insectos hablan de él", "texto": "Los insectos de la sede forman su nombre en el suelo. InsectLover sonríe: «Me están esperando».",
+      "opciones": [
+        { "texto": "Escúchalos con él", "efectos": [{ "felicidad": 5 }, { "marca": "insect_elegido" }] },
+        { "texto": "Haz que callen", "efectos": [{ "estres": 20 }, { "marca": "insect_rechazo" }] } ] },
+    { "id": "entrman2", "heroe": "H01", "si": { "rango": "C", "marca": "entrman_aprendiz" }, "titulo": "Un contacto en Corona Dorada", "texto": "Entrman ha conseguido un contacto dentro de Corona Dorada. Puede pasarle información… por un precio.",
+      "opciones": [
+        { "texto": "Úsalo", "efectos": [{ "oro": 800, "lealtad": -5 }, { "marca": "entrman_contactos" }] },
+        { "texto": "Juego limpio", "efectos": [{ "felicidad": 5 }, { "marca": "entrman_honesto" }] } ] },
+    { "id": "topo1", "heroe": "H36", "si": {}, "titulo": "Te observa", "texto": "Topo toma notas de todo lo que haces. Cuando le miras, esconde el cuaderno.",
+      "opciones": [
+        { "texto": "Hazle tu confidente", "efectos": [{ "lealtad": 15 }, { "marca": "topo_confianza" }] },
+        { "texto": "Vigílalo de cerca", "efectos": [{ "estres": 10 }, { "marca": "topo_sospecha" }] } ] },
+    { "id": "chimoku1", "heroe": "H10", "si": {}, "titulo": "Un hombre con prisa", "texto": "Chimoku entrena hasta sangrar. «No tengo tiempo», es lo único que dice.",
+      "opciones": [
+        { "texto": "Pregúntale por qué", "efectos": [{ "felicidad": 5 }, { "marca": "chimoku_confesion" }] },
+        { "texto": "Respeta su silencio", "efectos": [{ "lealtad": 10 }] } ] },
+    { "id": "heredero1", "heroe": "H55", "si": {}, "titulo": "La deuda de su familia", "texto": "Heredero recibe otra carta de los acreedores de su familia. Tiembla al leerla.",
+      "opciones": [
+        { "texto": "Paga una parte (1.000 de oro)", "efectos": [{ "oro": -1000, "lealtad": 20 }, { "marca": "heredero_ayudado" }] },
+        { "texto": "Es su deuda, no la tuya", "efectos": [{ "marca": "heredero_solo" }] } ] },
+    { "id": "solus2", "si": { "temporada": 2, "puestoMax": 3 }, "titulo": "La oferta del Dragón", "texto": "El maestro del Dragón Carmesí quiere a tu mejor héroe y ofrece una fortuna por él. Solus sonríe detrás.",
+      "opciones": [
+        { "texto": "Véndelo", "efectos": [{ "accion": "venderDragon" }, { "marca": "solus_vendido" }] },
+        { "texto": "«No está en venta»", "efectos": [{ "objetivo": "gremio", "felicidad": 6 }, { "marca": "solus_orgullo" }] } ] },
+    { "id": "chimoku2", "heroe": "H10", "si": { "vidaMax": 3 }, "titulo": "Tres combates", "texto": "A Chimoku le quedan pocas batallas. Lo sabe. Te pide que decidas tú.",
+      "opciones": [
+        { "texto": "Retíralo: que viva", "efectos": [{ "felicidad": 15, "poder": -10 }, { "marca": "chimoku_retirado" }] },
+        { "texto": "Que luche hasta el final", "efectos": [{ "poder": 5 }, { "marca": "chimoku_final" }] } ] },
+    { "id": "heredero2", "heroe": "H55", "si": { "misionCumplida": true }, "titulo": "Deuda saldada", "texto": "Heredero ha cumplido su misión de vida. Ya no le debe nada a nadie… ni siquiera a ti.",
+      "opciones": [
+        { "texto": "Pídele que se quede", "efectos": [{ "lealtad": 25 }, { "marca": "heredero_queda" }] },
+        { "texto": "Déjale volar (te regala 1.500 de oro)", "efectos": [{ "oro": 1500 }, { "accion": "marcharse" }, { "marca": "heredero_libre" }] } ] },
+    { "id": "topo2", "heroe": "H36", "si": { "temporada": 2 }, "titulo": "La carta de su antiguo gremio", "texto": "Llega una carta para Topo con el sello de su antiguo gremio.",
+      "opciones": [
+        { "texto": "Dásela sin abrir", "efectos": [{ "lealtad": 20 }, { "marca": "topo_leal" }] },
+        { "texto": "Léela tú primero", "efectos": [{ "oro": 500, "lealtad": -20 }, { "marca": "topo_espia" }] } ] },
+    { "id": "goblin3", "heroe": "H07", "si": { "rango": "C+", "marca": "goblin_raices" }, "titulo": "Jefa de guerra", "texto": "La tribu de HalfGoblin la nombra jefa de guerra. Viene con regalos para el gremio.",
+      "opciones": [
+        { "texto": "Celébralo con todos", "efectos": [{ "puntos": 5 }, { "objetivo": "gremio", "felicidad": 5 }, { "marca": "goblin_jefa" }] } ] },
+    { "id": "allblack3", "heroe": "H02", "si": { "rango": "C+", "marca": "allblack_unido" }, "titulo": "El nombre verdadero", "texto": "Las tres voces de AllBlack por fin se ponen de acuerdo y te dicen su nombre verdadero.",
+      "opciones": [
+        { "texto": "Escúchalo", "efectos": [{ "poder": 3, "felicidad": 10 }, { "marca": "allblack_completo" }] } ] },
+    { "id": "entrman3", "heroe": "H01", "si": { "rango": "B", "marca": "entrman_aprendiz" }, "titulo": "El gran golpe", "texto": "Entrman ha preparado el fichaje del siglo. Si sale bien, el gremio será la comidilla del reino.",
+      "opciones": [
+        { "texto": "Adelante", "efectos": [{ "puntos": 6 }, { "marca": "entrman_leyenda" }] },
+        { "texto": "No vale la pena", "efectos": [{ "felicidad": 10, "lealtad": 10 }, { "marca": "entrman_fiel" }] } ] },
+    { "id": "solus3", "si": { "temporada": 5, "puestoMax": 2 }, "titulo": "Cara a cara", "texto": "Última temporada. Solus te espera en la plaza. «Tú y yo sabíamos que esto acabaría así.»",
+      "opciones": [
+        { "texto": "«Esta vez ganamos nosotros»", "efectos": [{ "objetivo": "gremio", "felicidad": 8, "estres": 5 }, { "puntos": 4 }, { "marca": "solus_duelo" }] },
+        { "texto": "Darle la mano", "efectos": [{ "objetivo": "gremio", "estres": -10 }, { "marca": "solus_respeto" }] } ] }
+  ],
+  "epilogos": [
+    { "heroe": "H04", "si": { "muerto": true, "causa": "metamorfosis" }, "texto": "InsectLover se convirtió en GodInsect. Los insectos del reino aún le rezan." },
+    { "heroe": "H04", "si": { "muerto": true }, "texto": "InsectLover murió con una sonrisa: decía que los insectos le esperaban." },
+    { "heroe": "H04", "si": { "marca": "insect_elegido" }, "texto": "InsectLover sigue escuchando a los insectos. Dicen que algún día despertará algo dentro de él." },
+    { "heroe": "H01", "si": { "marca": "entrman_leyenda" }, "texto": "Entrman se convirtió en el fichador más temido del reino." },
+    { "heroe": "H01", "si": { "marca": "entrman_fiel" }, "texto": "Entrman pudo irse a cualquier gremio, pero se quedó en el tuyo." },
+    { "heroe": "H01", "si": { "fuera": true }, "texto": "Entrman siguió su camino lejos del gremio." },
+    { "heroe": "H02", "si": { "marca": "allblack_completo" }, "texto": "AllBlack encontró su nombre verdadero: ya no son tres, sino uno." },
+    { "heroe": "H02", "si": { "marca": "allblack_dividido" }, "texto": "Las tres voces de AllBlack nunca volvieron a estar de acuerdo." },
+    { "heroe": "H07", "si": { "marca": "goblin_jefa" }, "texto": "HalfGoblin, jefa de guerra, une a goblins y humanos bajo la bandera del gremio." },
+    { "heroe": "H07", "si": { "marca": "goblin_defendida" }, "texto": "HalfGoblin nunca olvidó el día en que la defendiste." },
+    { "heroe": "H10", "si": { "marca": "chimoku_retirado" }, "texto": "Chimoku vivió. Abrió una escuela donde enseña a no tener prisa." },
+    { "heroe": "H10", "si": { "muerto": true }, "texto": "Chimoku cayó en combate, como quería." },
+    { "heroe": "H55", "si": { "marca": "heredero_queda" }, "texto": "Heredero se quedó en el gremio por voluntad propia. Ya no le debía nada a nadie." },
+    { "heroe": "H55", "si": { "marca": "heredero_libre" }, "texto": "Heredero recuperó el nombre de su familia y nunca olvidó quién le dio la oportunidad." },
+    { "heroe": "H36", "si": { "marca": "topo_leal" }, "texto": "Topo quemó su cuaderno: su único gremio es el tuyo." },
+    { "heroe": "H36", "si": { "marca": "topo_espia" }, "texto": "Topo volvió a su antiguo gremio con tus secretos." },
+    { "heroe": "H08", "si": { "marca": "solus_duelo" }, "texto": "Solus y tú os enfrentasteis al final. El reino aún habla de aquella temporada." },
+    { "heroe": "H08", "si": { "marca": "solus_vendido" }, "texto": "Le vendiste un héroe al Dragón. Solus nunca dejó de recordártelo." },
+    { "heroe": "H08", "si": { "marca": "solus_desafio" }, "texto": "Solus recordó durante años el día en que el peor gremio del reino le plantó cara." }
+  ]
+}

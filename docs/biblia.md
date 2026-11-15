@@ -60,6 +60,16 @@ El juego deja de generar héroes nuevos en cada partida. Pasa a ser un **modo hi
 - **\[Propuesta\] Correspondencia de gremios:** Gran rival = Dragón Carmesí, Rival 2 = Sombras Negras, Rival 3 = Corona Dorada, Rival 4 = Última Esperanza.
 - **\[Propuesta\] Duración y finales:** 5 temporadas (provisional). Al cerrar la última, el final depende del puesto: «Leyenda» (1.º), «Respeto» (2.º–3.º) u «Olvido». Los finales y eventos por héroe están por diseñar (pregunta 18).
 
+### Arcos de héroe y epílogos \[Propuesta\] (2026-11-16; contenido provisional de Claude)
+
+- **Momentos de historia** (`src/datos/historia.json`, motor en `src/motor/historia.ts`): escenas con guion que llegan cuando se cumplen sus condiciones (día, temporada, rango del héroe, si está en tu gremio, decisiones anteriores…). Se muestran en el centro de la pantalla con el retrato del héroe y dos o tres opciones. Hay un solo momento pendiente a la vez, cada uno ocurre una vez por partida, y la decisión deja una **marca** que abre o cierra momentos posteriores.
+- **Primeros arcos** (20 momentos):
+  - Los 4 Prota (Entrman, AllBlack, InsectLover y HalfGoblin).
+  - Chimoku, Heredero y Topo, si los fichas.
+  - El némesis: Solus y el Dragón Carmesí (visita, oferta por tu mejor héroe y cara a cara final).
+- **Epílogos:** al terminar la historia, «Qué fue de ellos» cuenta el destino de cada héroe con arco según tus decisiones. Junto con el final por puesto, cada partida acaba distinta.
+- **Rivales que crecen:** cada temporada lanzan más misiones (de 1,34 a 2,2 al día) y entrenan cada semana a los héroes que aún pueden crecer. La historia ya no se vuelve fácil en la temporada 3.
+
 ### Foco del diseño \[Aceptado\] (2026-11-14)
 
 El juego se centra en **misiones, héroes y fichajes**. No se añaden sistemas nuevos: cualquier mecánica nueva debe dar profundidad a las que ya existen (la Prueba de los Novatos, el torneo de fin de temporada, la Ascensión, el mercado, los retos…). Queda descartada la propuesta de las tres ramas de desarrollo (economía con establecimientos e investigación), que se quedó en la rama `claude/tres-ramas-desarrollo` sin integrar.
@@ -753,6 +763,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-16 | Mejoras pedidas por el propietario tras el análisis: arcos de héroe con momentos y epílogos \[Propuesta, contenido provisional\]; rivales que crecen por temporada; dilema diario («Equipo más seguro» o «Equipo que une»); carta en dos niveles; momentos destacados en el centro de la pantalla; importador de la hoja de cálculo; guía de playtest. |
 | 2026-11-16 | Decisiones del propietario (pregunta 22): romance mucho más frecuente con índices por personaje («enamoradizo» y «atractivo»); Mascota y Chibi dan o cuentan puntos de temporada; choques de carácter aprobados. |
 | 2026-11-15 | Auditoría de habilidades (`docs/auditoria-habilidades.md`). Decisión del propietario: la descripción de una habilidad solo se ve tras fichar al héroe o con los ojeadores al máximo. Arreglos de impacto: efectos visibles al formar equipo, choques de carácter (propuesta), umbrales de Veyra y Aimul, obsesión de Yandere y Zancadilla contra los puntos de temporada. |
 | 2026-11-15 | Decisiones del propietario tras la revisión de diseño (`docs/revision-de-diseno.md`): ranking por **puntos de temporada** que vuelven a 0 (la fuerza desempata); recompensas de las misiones un 28% más bajas; **desbloqueo progresivo** (semana 1: misiones y Prueba; semana 2: mercado y relaciones; temporada 2: Ascensión y retos); pista de relaciones al formar equipo. Además: objetivo del momento, progreso semanal visible, héroes en la sede 3D, noticias agrupadas y retos a los que se puede responder. |

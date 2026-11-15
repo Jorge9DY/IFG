@@ -2,6 +2,24 @@
 
 Entradas más recientes primero.
 
+## 2026-11-16 — Mejoras del análisis de diseño
+
+- Petición del propietario: desarrollar las mejoras del análisis.
+- **Arcos de héroe** (`src/motor/historia.ts`, `src/datos/historia.json`):
+  - 20 momentos con condiciones, opciones y marcas: los 4 Prota, Chimoku, Heredero y Topo, y Solus como némesis.
+  - Epílogos «Qué fue de ellos» al terminar la historia.
+  - Contenido provisional (pregunta 23).
+- **Momentos destacados:** la escena sale en el centro con el retrato y las opciones (reutiliza el estilo de la gran revelación).
+- **Rivales que crecen:**
+  - El tope de misiones al día sube por temporada.
+  - Entrenan cada semana a los héroes que pueden crecer.
+- **Dilema diario:** al formar equipo, «Equipo más seguro» o «Equipo que une» (`equipoQueUne` en `src/ui/ayudas.ts`).
+- **Carta en dos niveles:** a la vista poder, techo, habilidad y avisos; personalidad y relaciones, plegadas.
+- **Importador de la hoja:** `herramientas/importar-hoja.ts` (CSV exportado → `heroes.json`; conserva habilidades, rasgos e índices).
+- **Guía de playtest:** `docs/guia-playtest.md`.
+- El bot del simulador decide los momentos de historia evitando vender o perder héroes.
+- Simulación: la estrategia ambiciosa gana el 31% y la prudente el 11%. 147 tests; probado en navegador sin errores.
+
 ## 2026-11-16 — Romance con índices por personaje
 
 - Respuestas del propietario a la pregunta 22:
