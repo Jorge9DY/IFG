@@ -24,7 +24,7 @@ import {
 } from './estado';
 import { CATALOGO, generarHeroe, heroeDeCatalogo, indiceLetra, letraPotencialNovato, pisoDe } from './heroes';
 import { duracionMision, generarTablon, probabilidadMision, resolverMision, salirDeMision, type InformeMision } from './misiones';
-import { alFicharNovato, cadaDia, cadaSemana, huecosEquipo, motivoNoIr } from './habilidades';
+import { alFicharNovato, apuntarConocidas, cadaDia, cadaSemana, huecosEquipo, motivoNoIr } from './habilidades';
 import { riesgoDeMuerte } from './muerte';
 import { actualizarDesbloqueos } from './desbloqueos';
 import { descansoDelDia, romperVetos } from './relaciones';
@@ -81,6 +81,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
     bolsaNovatos: CATALOGO.filter((f) => f.gremio === 'libre').map((f) => f.id),
     caidos: [],
     desbloqueos: [],
+    habilidadesConocidas: [],
   };
   const nuevoGremio = (g: Omit<Gremio, 'plantilla' | 'misionesAltas' | 'novatosDestacados'> & Partial<Gremio>): Gremio => {
     const completo: Gremio = { plantilla: [], misionesAltas: 0, novatosDestacados: 0, ...g };
@@ -133,6 +134,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
     generarReto(estado, azar);
   });
   estado.ranking = calcularRanking(estado);
+  apuntarConocidas(estado);
   registrar(estado, 'temporada', `Empieza la temporada 1. ${jugador(estado).nombre} es el último del ranking.`);
   return estado;
 }
@@ -347,6 +349,7 @@ function semanaDeVida(estado: EstadoJuego, azar: Azar): void {
 }
 
 function avanzarDia(estado: EstadoJuego, azar: Azar): void {
+  apuntarConocidas(estado);
   estado.dia += 1;
   estado.fase = 'gestion';
   actualizarDesbloqueos(estado);

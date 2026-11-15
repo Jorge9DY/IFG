@@ -125,6 +125,8 @@ export interface EstadoJuego {
   caidos: Caido[];
   /** Sistemas ya abiertos (desbloqueo progresivo). */
   desbloqueos: string[];
+  /** Héroes del catálogo cuya habilidad conoces (los has fichado alguna vez). */
+  habilidadesConocidas: string[];
 }
 
 const C = balance.calendario;

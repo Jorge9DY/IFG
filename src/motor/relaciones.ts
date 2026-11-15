@@ -390,8 +390,10 @@ export function trasMision(
       decir(cambiar(estado, a.id, b.id, { afinidad: A.misionJuntos.afinidad * factor * balada }));
       // La atracción crece con la química romántica de cada uno (Aimul enamora con más facilidad).
       if (afinidad(estado, a.id, b.id) >= S.chispa.afinidadMinima) {
-        const ab = chispa(estado, a.id, b.id) * S.chispa.porMision * (b.habilidad === 'lookAtMe' ? 2 : 1);
-        const ba = chispa(estado, b.id, a.id) * S.chispa.porMision * (a.habilidad === 'lookAtMe' ? 2 : 1);
+        // Aimul enamora el doble; Yandere se obsesiona el doble de rápido.
+        const extra = (de: Heroe, hacia: Heroe): number => (hacia.habilidad === 'lookAtMe' ? 2 : 1) * (de.habilidad === 'obsesion' ? balance.habilidades.obsesion.atraccion : 1);
+        const ab = chispa(estado, a.id, b.id) * S.chispa.porMision * extra(a, b);
+        const ba = chispa(estado, b.id, a.id) * S.chispa.porMision * extra(b, a);
         decir(cambiar(estado, a.id, b.id, { atraccionAB: ab * balada, atraccionBA: ba * balada }));
       }
       // Dos que se llevan mal discuten (más si sale mal). Teo lo impide.
@@ -403,6 +405,13 @@ export function trasMision(
         cambiarMental(b, S.mental.discusion, 'discutir');
         const t = `${a.nombre} y ${b.nombre} discuten en plena misión.`;
         recordar(estado, 'discusion', [a.id, b.id], t);
+        decir(t);
+      }
+      // Caracteres incompatibles chocan (y Teo lo evita). Es la fuente de las malas relaciones.
+      if (!mediador && choque(a, b) && azar.probabilidad(S.choques.probabilidad)) {
+        decir(cambiar(estado, a.id, b.id, { afinidad: S.choques.afinidad * balada }));
+        const t = `${a.nombre} y ${b.nombre} chocan: ${choque(a, b)}.`;
+        recordar(estado, 'choque', [a.id, b.id], t);
         decir(t);
       }
       // Un rival intenta demostrar su superioridad.
@@ -436,6 +445,17 @@ export function trasMision(
     if (lesionado(h) && !salvados.includes(h.id)) cambiarMental(h, S.mental.lesion);
   }
   return { textos, salvados };
+}
+
+/** Si dos caracteres chocan, cuál es el motivo (para el texto); si no, null. */
+export function choque(a: Heroe, b: Heroe): string | null {
+  const N = S.nombreRasgo as Record<string, string>;
+  for (const [x, y] of S.choques.parejas as [string, string][]) {
+    if ((tieneRasgo(a, x) && tieneRasgo(b, y)) || (tieneRasgo(a, y) && tieneRasgo(b, x))) {
+      return x === y ? `dos ${N[x]?.toLowerCase()}s no caben en la misma misión` : `${N[x]?.toLowerCase()} contra ${N[y]?.toLowerCase()}`;
+    }
+  }
+  return null;
 }
 
 /** Al terminar el día: quien se ha quedado en la sede descansa un poco (el estrés baja; la felicidad, no sola). */

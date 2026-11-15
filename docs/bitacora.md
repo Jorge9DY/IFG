@@ -2,6 +2,23 @@
 
 Entradas más recientes primero.
 
+## 2026-11-15 — Auditoría de habilidades
+
+- Petición del propietario: comprobar las 80 habilidades (si funcionan, si el diseño es bueno, si se sienten con impacto) y que la descripción solo se vea tras fichar al héroe o con los ojeadores al máximo.
+- Herramientas nuevas:
+  - `herramientas/auditoria/habilidades.ts`: mide el efecto de cada habilidad y dónde actúa.
+  - `herramientas/auditoria/social.ts`: mide cuánto actúa el sistema social en partidas completas.
+- Informe en `docs/auditoria-habilidades.md`.
+- Hecho:
+  - «Habilidades en esta misión» al formar equipo (`efectosEnMision`).
+  - Descripción oculta hasta fichar o con los ojeadores al máximo (`conoceHabilidad`; partida con `habilidadesConocidas`).
+  - Choques de carácter.
+  - Veyra y Aimul con umbrales más bajos.
+  - La obsesión de Yandere crece el doble.
+  - Zancadilla quita puntos de temporada.
+- Simulación: la estrategia ambiciosa gana el 55% y la prudente el 27%. 136 tests; probado en navegador sin errores.
+- Pendiente: pregunta 22.
+
 ## 2026-11-15 — Decisiones de la revisión de diseño aplicadas
 
 - El propietario aprueba las cuatro propuestas de la pregunta 21.

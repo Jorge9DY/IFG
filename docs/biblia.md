@@ -353,6 +353,8 @@ Un héroe que ha llegado a su límite puede intentar romperlo. El jugador paga p
 
 Cada héroe del catálogo tiene una habilidad única (hoja «Héroes», columna «Habilidad»). Están todas en el juego (`src/motor/habilidades.ts`, cifras en `balance.json` → `habilidades`) y enganchan en lo que ya existe: el poder en misión, las lesiones, el oro, la experiencia, la semana, el mercado, la Prueba, la Ascensión y la muerte. En la carta del héroe se ven plegadas: el nombre a la vista y el texto al abrirla.
 
+**\[Aceptado\] Visibilidad** (decisión del propietario, 2026-11-15): la descripción de una habilidad solo se ve si has fichado a ese héroe alguna vez o con los ojeadores al nivel máximo; si no, se ve su nombre con un «?». Al formar equipo, «Habilidades en esta misión» dice qué hará cada una y avisa de las que perjudican.
+
 Reglas generales: Tokopi («...») anula las habilidades de su equipo; Echo copia la del compañero más fuerte; AllBlack ocupa tres huecos de misión y Pacto dos (las misiones piden **huecos**, no héroes). Interpretaciones provisionales donde la hoja no lo cerraba: ver la pregunta 19.
 
 ### Clases \[Aceptado\]
@@ -749,6 +751,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-15 | Auditoría de habilidades (`docs/auditoria-habilidades.md`). Decisión del propietario: la descripción de una habilidad solo se ve tras fichar al héroe o con los ojeadores al máximo. Arreglos de impacto: efectos visibles al formar equipo, choques de carácter (propuesta), umbrales de Veyra y Aimul, obsesión de Yandere y Zancadilla contra los puntos de temporada. |
 | 2026-11-15 | Decisiones del propietario tras la revisión de diseño (`docs/revision-de-diseno.md`): ranking por **puntos de temporada** que vuelven a 0 (la fuerza desempata); recompensas de las misiones un 28% más bajas; **desbloqueo progresivo** (semana 1: misiones y Prueba; semana 2: mercado y relaciones; temporada 2: Ascensión y retos); pista de relaciones al formar equipo. Además: objetivo del momento, progreso semanal visible, héroes en la sede 3D, noticias agrupadas y retos a los que se puede responder. |
 | 2026-11-15 | Documento del propietario «Sistema social de héroes» v1.0: relaciones por pareja con afinidad y atracción direccional, rasgos, felicidad y estrés, romance por eventos, eventos sociales con decisiones y cooldowns, consecuencias de muertes, peticiones y pestaña «Relaciones». Sustituye a la propuesta de relaciones y ánimo del 2026-11-14 (el ánimo ya no cambia el poder; solo el estrés alto). |
 | 2026-11-14 | Encargo del propietario: clases y géneros del catálogo a criterio de Claude (equilibrados); escala de diez rangos de la hoja; los héroes de los rivales empiezan en su rango máximo y los libres llegan por la Prueba en F; crear los sistemas que falten, con las **relaciones** como pilar; resolver la **muerte** a criterio de Claude. Aplicado: catálogo de 80 héroes con sus 80 habilidades, relaciones y ánimo \[Propuesta\], muerte \[Propuesta\] (la Ascensión deja de ser la única forma de morir), misiones por huecos, 5 temporadas y tres finales provisionales. |

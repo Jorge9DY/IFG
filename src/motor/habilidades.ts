@@ -6,7 +6,7 @@
 import balance from '../datos/balance.json';
 import { Azar } from './azar';
 import { diaDeTemporada, esFinDeTemporada, heroesDe, puesto, registrar, semanaDe, temporadaDe, type EstadoJuego } from './estado';
-import { alLimite, indiceLetra, pisoDe, rango, valorPublico } from './heroes';
+import { alLimite, ficha as fichaDe, indiceLetra, OJEO_MAXIMO, pisoDe, rango, valorPublico } from './heroes';
 import { morir, gremioDe } from './muerte';
 import { prestigio } from './ranking';
 import { afinidad, amorDe, atraccion, cambiarAfinidad, cambiarMental, factorEstres, felicidad, inmuneARelaciones, quimica, vinculo } from './relaciones';
@@ -131,8 +131,8 @@ function factorPropio(ctx: Contexto, h: Heroe, hab: string | null): number {
       let n = 0;
       for (let i = 0; i < mates.length; i++)
         for (let j = i + 1; j < mates.length; j++) {
-          const v = vinculo(estado, mates[i]!.id, mates[j]!.id);
-          if (v === 'amigos' || v === 'grandes amigos' || v === 'pareja') n++;
+          // Auditoría: cuenta las buenas relaciones (no solo las amistades plenas), o casi nunca actuaba.
+          if (afinidad(estado, mates[i]!.id, mates[j]!.id) >= S.umbrales.buenaRelacion || vinculo(estado, mates[i]!.id, mates[j]!.id) === 'pareja') n++;
         }
       return 1 + Math.min(H.hiloRojo.maximo, n * H.hiloRojo.porVinculo);
     }
@@ -147,7 +147,7 @@ function factorPropio(ctx: Contexto, h: Heroe, hab: string | null): number {
       return 1 + Math.min(H.haters.maximo, n * H.haters.porOdio);
     }
     case 'lookAtMe':
-      return 1 + Math.min(H.lookAtMe.maximo, mates.filter((m) => atraccion(estado, m.id, h.id) >= S.umbrales.enamorado).length * H.lookAtMe.porAmor);
+      return 1 + Math.min(H.lookAtMe.maximo, mates.filter((m) => atraccion(estado, m.id, h.id) >= S.umbrales.interes).length * H.lookAtMe.porAmor);
     case 'farolilloRojo': {
       const p = puesto(estado, gremioId);
       return p === 1 ? H.farolilloRojo.primero : 1 + (p - 1) * H.farolilloRojo.porPuesto;
@@ -632,9 +632,12 @@ export function cadaSemana(estado: EstadoJuego, azar: Azar): ResultadoSemanaHabi
         if (v.esJugador) registrar(estado, 'habilidad', `Tu Guardia frustra un sabotaje de ${g.nombre}.`);
         continue;
       }
+      // Con el ranking por puntos de temporada, el sabotaje también quita puntos.
       v.prestigioExtra = (v.prestigioExtra ?? 0) - H.malaJugada.prestigio;
+      v.puntosTemporada = Math.max(0, (v.puntosTemporada ?? 0) - H.malaJugada.puntos);
       if (azar.probabilidad(H.malaJugada.probPillada)) {
         g.prestigioExtra = (g.prestigioExtra ?? 0) - H.malaJugada.castigo;
+        g.puntosTemporada = Math.max(0, (g.puntosTemporada ?? 0) - H.malaJugada.puntos);
         decir(g, `${z.nombre} sabotea a ${v.nombre}, pero la pillan: ${g.nombre} pierde ${H.malaJugada.castigo} de prestigio.`);
       } else {
         decir(g, `${z.nombre} sabotea a ${v.nombre}: pierde ${H.malaJugada.prestigio} de prestigio.`);
@@ -832,4 +835,136 @@ export function factorEntrenamiento(estado: EstadoJuego, gremioId: string, heroe
 /** Nivel de ojeo extra: con Lucre (Ojo de oro) el gremio ve el techo real de todos. */
 export function veTechoReal(estado: EstadoJuego, gremioId: string): boolean {
   return tiene(estado, gremioId, 'ojoDeOro').length > 0;
+}
+
+// ---------------------------------------------------------------------------
+// Conocer habilidades y ver su efecto (auditoría de habilidades, 2026-11-15)
+// ---------------------------------------------------------------------------
+
+/**
+ * Decisión del propietario: la descripción de la habilidad de un héroe solo se ve si lo has fichado alguna
+ * vez o si tus ojeadores están al nivel máximo.
+ */
+export function conoceHabilidad(estado: EstadoJuego, heroeId: string): boolean {
+  const h = estado.heroes[heroeId];
+  if (!h?.catalogo) return false;
+  const j = estado.gremios[estado.jugadorId];
+  if (!j) return false;
+  return j.plantilla.includes(heroeId) || estado.habilidadesConocidas.includes(h.catalogo) || j.nivelOjeadores >= OJEO_MAXIMO;
+}
+
+/** Apunta como conocidas las habilidades de los héroes que están ahora en el gremio del jugador. */
+export function apuntarConocidas(estado: EstadoJuego): void {
+  for (const id of estado.gremios[estado.jugadorId]?.plantilla ?? []) {
+    const c = estado.heroes[id]?.catalogo;
+    if (c && !estado.habilidadesConocidas.includes(c)) estado.habilidadesConocidas.push(c);
+  }
+}
+
+export interface EfectoVisible {
+  heroeId: string;
+  /** Nombre de la habilidad. */
+  habilidad: string;
+  texto: string;
+  tono: 'bueno' | 'malo' | 'neutro';
+}
+
+const x = (f: number): string => `×${f.toFixed(2).replace(/\.?0+$/, '').replace('.', ',')}`;
+
+/**
+ * Qué van a hacer las habilidades del equipo en esta misión, en palabras: para que el jugador vea su
+ * impacto antes de lanzarla (y los riesgos, como Alaim o Vampire).
+ */
+export function efectosEnMision(ctx: Contexto): EfectoVisible[] {
+  const r: EfectoVisible[] = [];
+  const { equipo, mision } = ctx;
+  const flojo = [...equipo].sort((a, b) => a.poder - b.poder);
+  for (const h of equipo) {
+    if (!h.habilidad) continue;
+    const nombre = fichaDe(h.catalogo)?.nombreHabilidad ?? h.habilidad;
+    const decir = (texto: string, tono: EfectoVisible['tono']): void => {
+      r.push({ heroeId: h.id, habilidad: nombre, texto, tono });
+    };
+    const hab = activa(h, equipo);
+    if (!hab) {
+      if (h.habilidad !== 'silencio') decir('anulada por «...»', 'malo');
+      else decir('anula las habilidades de todo el equipo', 'malo');
+      continue;
+    }
+    if (h.habilidad === 'eco') decir(`copia «${fichaDe(equipo.find((o) => o.habilidad === hab)?.catalogo)?.nombreHabilidad ?? hab}»`, 'neutro');
+    const base = poderBase(ctx, h, hab);
+    if (base !== h.poder) decir(`usa poder ${base} en vez de ${h.poder}`, base > h.poder ? 'bueno' : 'malo');
+    const f = factorPropio(ctx, h, hab);
+    if (Math.abs(f - 1) > 0.005) decir(`${x(f)} a su poder`, f > 1 ? 'bueno' : 'malo');
+    switch (hab) {
+      case 'contagio':
+        decir(`${x(H.contagio.factor)} al poder de sus compañeros`, 'bueno');
+        break;
+      case 'mejorAmigo': {
+        const d = equipo.find((o) => o.id === h.memoria?.dueno);
+        if (d) decir(`${x(H.mejorAmigo.factor)} a ${d.nombre}, su dueño`, 'bueno');
+        break;
+      }
+      case 'obsesion': {
+        const amor = equipo.find((o) => o.id === amorDe(ctx.estado, h.id));
+        if (amor) decir(`${x(H.obsesion.factor)} a ${amor.nombre}`, 'bueno');
+        break;
+      }
+      case 'pocionRara': {
+        const objetivo = flojo.find((o) => o.id !== h.id);
+        if (objetivo) decir(num(h, 'pocion', 1) > 0 ? `poción buena para ${objetivo.nombre} (${x(H.pocionRara.buena)})` : `poción mala para ${objetivo.nombre} (${x(H.pocionRara.mala)})`, num(h, 'pocion', 1) > 0 ? 'bueno' : 'malo');
+        break;
+      }
+      case 'invocacion':
+        decir(`su bestia suma ${poderBestia(h)} de poder`, 'bueno');
+        break;
+      case 'gelatina':
+        decir('no puede lesionarse', 'bueno');
+        break;
+      case 'roboDePoder':
+        decir('sus compañeros volverán con lesiones graves', 'malo');
+        break;
+      case 'godsHateMe':
+        decir('sus compañeros volverán lesionados', 'malo');
+        break;
+      case 'muro':
+        decir(`protege a los demás: ${x(H.muro.lesion)} riesgo de lesión`, 'bueno');
+        break;
+      case 'dosVoces':
+        decir(h.memoria?.voz === 'muneco' ? 'habla el muñeco: puede lesionar a un compañero' : 'habla el ventrílocuo: protege de lesiones', h.memoria?.voz === 'muneco' ? 'malo' : 'bueno');
+        break;
+      case 'atajo':
+        decir(`la misión dura ${H.atajo.dias} día menos`, 'bueno');
+        break;
+      case 'karma':
+        decir(`+${H.karma.bonus}% de éxito ahora, −${H.karma.penalizacion}% en la siguiente misión`, 'neutro');
+        break;
+      case 'presaGrande':
+        if (mision.rango === 'alto') decir(`+${Math.round((H.presaGrande.factor - 1) * 100)}% de oro`, 'bueno');
+        break;
+      case 'dobleONada':
+        decir('si sale bien, el oro se dobla… o se pierde', 'neutro');
+        break;
+      case 'botin':
+        decir('puede traer oro extra; si falla, cuesta oro', 'neutro');
+        break;
+      case 'tesoro':
+        decir(`se guarda el ${Math.round(H.tesoro.fraccion * 100)}% del oro (te lo devuelve si la vendes)`, 'neutro');
+        break;
+      case 'banquete':
+        decir(`se come de ${H.banquete.oro[0]} a ${H.banquete.oro[1]} de oro al salir`, 'malo');
+        break;
+      case 'legado':
+        decir('los de rango C o menos ganan más experiencia', 'bueno');
+        break;
+      case 'balada':
+        decir('las relaciones del equipo cambian el doble', 'neutro');
+        break;
+      case 'mediador':
+        decir('nadie se pelea en esta misión', 'bueno');
+        break;
+    }
+    if (h.habilidad === 'porLasUltimas') decir(`le quedan ${num(h, 'vida', H.porLasUltimas.vida)} misiones de vida`, 'malo');
+  }
+  return r;
 }

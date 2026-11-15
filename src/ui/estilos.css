@@ -699,3 +699,9 @@ button.meta-objetivo:hover { border-color: var(--cian); }
 .nuevo { display: block; font-style: normal; color: var(--cian); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
 .boton-grande.cerrado { opacity: 0.55; }
 .resultado.desbloqueo { border-left: 3px solid var(--cian); }
+.efectos-habilidad { font-size: 13px; border-left: 2px solid var(--cian); padding: 2px 8px; margin: 6px 0; }
+.efectos-habilidad ul { margin: 2px 0 0; padding-left: 4px; list-style: none; }
+.efectos-habilidad li.bueno { color: #8fd98a; }
+.efectos-habilidad li.malo { color: var(--naranja); }
+.efectos-habilidad li.neutro { color: var(--texto); }
+.habilidad.oculta summary { color: var(--tenue); }

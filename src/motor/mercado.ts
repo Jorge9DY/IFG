@@ -5,7 +5,7 @@ import balance from '../datos/balance.json';
 import { dueño, gremio, heroe as obtenerHeroe, jugador, registrar, type EstadoJuego } from './estado';
 import { valorPublico } from './heroes';
 import { desbloqueado, diaDesbloqueo } from './desbloqueos';
-import { alComprar, alGastar, alVender, bloqueoCompra, factorCompra, valorVenta } from './habilidades';
+import { apuntarConocidas, alComprar, alGastar, alVender, bloqueoCompra, factorCompra, valorVenta } from './habilidades';
 import { plazasLibres } from './instalaciones';
 import { perderCompanero } from './relaciones';
 import { comprador } from './rivales';
@@ -58,6 +58,7 @@ export function comprar(estado: EstadoJuego, heroeId: string): void {
   j.oro -= c.precio;
   registrar(estado, 'fichaje', `Compras a ${h.nombre} a ${vendedor.nombre} por ${c.precio} de oro.`);
   alComprar(estado, h, j.id, vendedor.id);
+  apuntarConocidas(estado);
   alGastar(estado, j.id);
 }
 

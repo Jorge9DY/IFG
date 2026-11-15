@@ -50,7 +50,8 @@
     "grandesAmigos": 80,
     "interes": 40,
     "enamorado": 70,
-    "declaracion": 50
+    "declaracion": 50,
+    "buenaRelacion": 25
   },
   "acontecimientos": {
     "_nota": "Cambios de afinidad y atracción por acontecimiento (tabla 5.1).",
@@ -243,5 +244,36 @@
     "maxNuevosPorDia": 2,
     "diasParaCaducar": 3,
     "memoriaMaxima": 300
+  },
+  "choques": {
+    "_nota": "Auditoría de habilidades (2026-11-15): sin fricción, las relaciones casi nunca se torcían y las habilidades sociales (Lumia, Segador, Diván, Teo, Vael) no actuaban. Dos caracteres incompatibles en la misma misión pueden chocar.",
+    "parejas": [
+      [
+        "orgulloso",
+        "orgulloso"
+      ],
+      [
+        "competitivo",
+        "competitivo"
+      ],
+      [
+        "orgulloso",
+        "competitivo"
+      ],
+      [
+        "reservado",
+        "sociable"
+      ],
+      [
+        "celoso",
+        "sociable"
+      ],
+      [
+        "ambicioso",
+        "ambicioso"
+      ]
+    ],
+    "probabilidad": 35,
+    "afinidad": -6
   }
 }

@@ -8,7 +8,7 @@ import { sumarPuntos } from './ranking';
 import { esDestacado, valorPublico } from './heroes';
 import { plazasLibres } from './instalaciones';
 import { limitePuja } from './rivales';
-import { alGastar, martillazo } from './habilidades';
+import { alGastar, apuntarConocidas, martillazo } from './habilidades';
 
 const N = balance.novatos;
 
@@ -145,5 +145,6 @@ export function cerrarSubasta(estado: EstadoJuego, s: Subasta): string | null {
   }
   registrar(estado, g.esJugador ? 'fichaje' : 'novatos', `${h.nombre} (poder ${h.poder}) se une a ${g.nombre} por ${s.precio} de oro.`);
   alGastar(estado, g.id);
+  if (g.esJugador) apuntarConocidas(estado);
   return g.id;
 }

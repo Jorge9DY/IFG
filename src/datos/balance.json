@@ -468,7 +468,8 @@
       "probLesion": 25,
       "diasLesion": 2,
       "felicidad": -10,
-      "estres": 10
+      "estres": 10,
+      "atraccion": 2
     },
     "deudaDeHonor": {
       "maximo": 1.4,
@@ -678,7 +679,8 @@
     "malaJugada": {
       "prestigio": 8,
       "probPillada": 25,
-      "castigo": 10
+      "castigo": 10,
+      "puntos": 3
     },
     "mimo": {
       "prestigio": 3,

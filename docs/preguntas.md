@@ -154,3 +154,11 @@ Detalle y razones en `docs/revision-de-diseno.md`. Recomendación de Claude entr
 2. **Economía:** sobra oro (18.000–25.000 el día 16). ¿Bajar un 25–30% las recompensas o subir los sueldos con el rango? (Probar junto con la 1.)
 3. **Desbloqueo progresivo** de sistemas para el jugador nuevo: semana 1 misiones y Prueba; semana 2 mercado y relaciones; temporada 2 Ascensión y retos. (Recomendado.)
 4. **Pista de relaciones** al formar equipo («si van juntos a menudo, se acercarán»). (Recomendado.)
+
+## 22. Auditoría de habilidades: decisiones pendientes (2026-11-15)
+
+Detalle en `docs/auditoria-habilidades.md`.
+
+1. **Romance raro:** menos de una pareja por partida con el bot (hacen falta muchas misiones con la misma pareja). ¿Se acepta así o se acelera? Afecta a Aimul y Yandere.
+2. **Prestigio:** con el ranking por puntos de temporada, Mascota y Chibi solo ayudan a la categoría. ¿Deben dar también puntos de temporada?
+3. **Choques de carácter** (propuesta de Claude para que existan malas relaciones): ¿parece bien la lista de incompatibilidades (orgulloso con orgulloso, competitivo con competitivo, orgulloso con competitivo, reservado con sociable, celoso con sociable, ambicioso con ambicioso)?

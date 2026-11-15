@@ -99,7 +99,7 @@ function candidatos(estado: EstadoJuego, id: string): Candidato[] {
           !parejaDe(estado, b.id) &&
           Math.min(atraccion(estado, a.id, b.id), atraccion(estado, b.id, a.id)) >= U.declaracion &&
           Math.max(atraccion(estado, a.id, b.id), atraccion(estado, b.id, a.id)) >= U.enamorado &&
-          afinidad(estado, a.id, b.id) >= U.interes,
+          afinidad(estado, a.id, b.id) >= U.buenaRelacion,
       );
     case 'rechazo': {
       const r: Candidato[] = [];

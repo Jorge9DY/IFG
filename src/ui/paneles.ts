@@ -14,7 +14,8 @@ import { LETRAS } from '../motor/tipos';
 import { NOMBRE_INSTALACION, infoInstalacion, mejorar, plazas, type Instalacion } from '../motor/instalaciones';
 import { comprar, condicionesCompra, ofertaVenta, vender } from '../motor/mercado';
 import { clasesCubiertas, duracionMision, socialEquipo } from '../motor/misiones';
-import { ficha, huecos, huecosEquipo, poderBestia } from '../motor/habilidades';
+import { conoceHabilidad, efectosEnMision, ficha, huecos, huecosEquipo, poderBestia } from '../motor/habilidades';
+import { OJEO_MAXIMO } from '../motor/heroes';
 import {
   afinidad,
   estres,
@@ -378,11 +379,26 @@ export class Interfaz {
   }
 
   /** Habilidad única del héroe, plegada: el nombre a la vista y el texto al abrirla. */
-  private habilidad(h: Heroe): string {
+  private habilidad(estado: EstadoJuego, h: Heroe): string {
     const f = ficha(h.catalogo);
     if (!f) return '';
+    // Decisión del propietario: la descripción solo se ve si lo has fichado o con los ojeadores al máximo.
+    if (!conoceHabilidad(estado, h.id)) {
+      return `<details class="habilidad oculta"><summary>✦ ${esc(f.nombreHabilidad)}${h.zombie ? ' · Zombie' : ''} · ?</summary><p class="tenue">Aún no sabes qué hace. Lo descubrirás al ficharlo, o con tus ojeadores al nivel máximo (${OJEO_MAXIMO}).</p></details>`;
+    }
     const extra = h.habilidad === 'invocacion' ? ` Bestia: poder ${poderBestia(h)}.` : h.habilidad === 'porLasUltimas' ? ` Vida: ${Number(h.memoria?.vida ?? 10)}.` : h.habilidad === 'racha' ? ` Racha: ${Number(h.memoria?.racha ?? 0)}.` : '';
     return `<details class="habilidad"><summary>✦ ${esc(f.nombreHabilidad)}${h.zombie ? ' · Zombie' : ''}</summary><p>${esc(f.texto)}${extra}</p>${f.ascension && f.ascension !== 'Por definir.' ? `<p class="tenue">Ascensión: ${esc(f.ascension)}</p>` : ''}</details>`;
+  }
+
+  /** Qué harán las habilidades del equipo en esta misión (su impacto, a la vista antes de lanzarla). */
+  private efectosHabilidades(estado: EstadoJuego, mision: Mision, equipo: Heroe[]): string {
+    if (equipo.length === 0) return '';
+    const efectos = efectosEnMision({ estado, gremioId: estado.jugadorId, mision, equipo, dia: estado.dia });
+    if (efectos.length === 0) return '';
+    const nombre = (id: string): string => esc(estado.heroes[id]?.nombre ?? '');
+    return `<div class="efectos-habilidad"><b>Habilidades en esta misión</b><ul>${efectos
+      .map((e) => `<li class="${e.tono}">✦ ${nombre(e.heroeId)} · ${esc(e.habilidad)}: ${esc(e.texto)}</li>`)
+      .join('')}</ul></div>`;
   }
 
   /** Rasgos de personalidad como etiquetas. */
@@ -452,7 +468,7 @@ export class Interfaz {
       </header>
       <div class="identidad"><span class="dato"><span class="etq">Poder</span><b>${num(h.poder)}</b></span>${this.techo(estado, h)}</div>
       ${this.olfato(estado, h)}
-      ${this.habilidad(h)}
+      ${this.habilidad(estado, h)}
       ${mio ? this.sentimientos(estado, h, estado.jugadorId) : ''}
       <p class="sueldo tenue">Sueldo ${num(sueldoTexto)} de oro por semana${huecos(h) > 1 ? ` · ocupa ${huecos(h)} huecos en misión` : ''}</p>
       ${mio ? this.barraXp(h) : ''}
@@ -554,6 +570,7 @@ export class Interfaz {
         <div class="medidor d-${nivelDificultad(prob)}"><b>${prob === null ? '—' : pct(prob)}</b><span>de éxito</span></div>
       </div>
       ${clases}
+      ${this.efectosHabilidades(estado, mision, equipo)}
       ${
         soc.detalles.length || estresados.length
           ? `<div class="quimica ${quimica >= 0 ? 'buena' : 'mala'}"><b>Relaciones en el equipo: ${quimica > 0 ? '+' : ''}${quimica}% de poder</b>${soc.detalles.length && Math.abs(soc.detalles.reduce((t, d) => t + d.valor, 0)) > social.mision.tope ? ` (tope ±${social.mision.tope}%)` : ''}<ul>${soc.detalles
@@ -816,7 +833,7 @@ export class Interfaz {
         : '';
       return `<div class="fila-heroe e-${h.estado.replace(' ', '-')}">
         ${this.avatar(h)}
-        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} Poder ${h.poder} · sueldo ${num(sueldoEn(estado, j.id, h))} · lealtad ${h.lealtad}</span>${this.techo(estado, h)}${this.barraXp(h)}${this.habilidad(h)}${this.sentimientos(estado, h, j.id)}${aviso}</div>
+        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} Poder ${h.poder} · sueldo ${num(sueldoEn(estado, j.id, h))} · lealtad ${h.lealtad}</span>${this.techo(estado, h)}${this.barraXp(h)}${this.habilidad(estado, h)}${this.sentimientos(estado, h, j.id)}${aviso}</div>
         <div class="situacion"><span class="estado-chip e-${h.estado.replace(' ', '-')}">${h.estado === 'en mision' ? 'de misión' : h.estado}</span><span class="tenue">${detalle}</span></div>
         <div class="accion-fila">${accion}</div>
       </div>`;
