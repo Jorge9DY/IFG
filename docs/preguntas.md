@@ -111,8 +111,8 @@ Aplicado por encargo del propietario («añade las clases…, crea los sistemas 
 3. **Rivales en su rango máximo:** su poder está dentro de la franja de su techo (p. ej. Solus, S, poder 94). La columna «Rango inicial» de la hoja no se usa para ellos.
 4. **Los «Prota»** empiezan con el rango y el poder de la hoja (Entrman E 16, HalfGoblin E 14, InsectLover F 9, AllBlack F 8).
 5. **Duración:** 5 temporadas; finales por puesto («Leyenda», «Respeto», «Olvido»). Los finales por héroe siguen pendientes (pregunta 18).
-6. **Ánimo con efecto en el poder (±15%):** la biblia decía que el ánimo no aplica penalizaciones constantes. Como el propietario pidió que el juego se base en los estados de los héroes, ahora sí las aplica. ¿Se mantiene?
-7. **Amor sin restricciones de género:** cualquier pareja puede enamorarse. ¿Correcto?
+6. ~~Ánimo con efecto en el poder~~: resuelto por el documento del sistema social (2026-11-15). El ánimo desaparece; solo el estrés alto penaliza.
+7. **Romance sin restricciones de género:** cualquier pareja puede sentir atracción (según su «chispa» oculta). ¿Correcto?
 8. **Interpretaciones de habilidades:**
    - Entrman: «heroínas» = héroes con género Mujer.
    - Segador: solo sacrifica si su peor relación es «mala» o peor (si no, se contiene). Techo base C (la hoja dice «Por decidir»).
@@ -129,3 +129,17 @@ Aplicado por encargo del propietario («añade las clases…, crea los sistemas 
    - Echo: copia al compañero más fuerte.
    - Sin implementar aún: la ascensión de Bastión y la de Roble (dejar poder a un discípulo).
 9. **Ascensión genérica:** sigue abierta a cualquier héroe al límite (decisión anterior). ¿O solo a los que la hoja marca con techo final mayor que el base?
+
+## 20. Sistema social: decisiones técnicas tomadas al integrarlo (2026-11-15)
+
+El documento del propietario pide documentar lo que no especifica. Elegido lo más sencillo:
+
+1. **Rasgos de los 80 héroes:** propuestos por Claude según su arquetipo (`src/datos/heroes.json`, campo `rasgos`). Revisables.
+2. **De dónde sale la atracción:** una «chispa» oculta y fija de cada héroe hacia cada otro (0–3), que suma atracción en cada misión juntos cuando ya se llevan algo bien. Así el romance nace de compartir misiones y de la compatibilidad, no de una tirada.
+3. **Declaración:** basta con que los dos superen 50 de atracción y uno esté enamorado (70). Con los dos en 70 casi no surgían parejas.
+4. **Rivalidad:** nace cuando un héroe competitivo ve subir de poder a un compañero en la misma misión.
+5. **Eventos sin respuesta:** a los 3 días se aplica la opción por defecto (la que menos cambia las cosas). Así el juego nunca se queda esperando.
+6. **Rivales:** sus relaciones cambian en misión (algunas habilidades las necesitan), pero no tienen eventos (fuera de alcance según el documento).
+7. **Lealtad:** se queda solo para los impagos; ya no cambia cada semana. El abandono por problemas sociales llega siempre como petición.
+8. **Partidas guardadas antiguas:** se convierten solas (afinidad → relación completa, ánimo → felicidad, amor mutuo → pareja).
+9. Con el bot del simulador surgen pocas parejas (menos de una por partida) porque rota mucho los equipos; un jugador que mantenga parejas fijas verá más. Pendiente de jugarlo a mano.

@@ -26,7 +26,8 @@ import { CATALOGO, generarHeroe, heroeDeCatalogo, indiceLetra, letraPotencialNov
 import { duracionMision, generarTablon, probabilidadMision, resolverMision, salirDeMision, type InformeMision } from './misiones';
 import { alFicharNovato, cadaDia, cadaSemana, huecosEquipo, motivoNoIr } from './habilidades';
 import { riesgoDeMuerte } from './muerte';
-import { semanaRelaciones } from './relaciones';
+import { descansoDelDia, romperVetos } from './relaciones';
+import { caducarEventos, evaluarEventos } from './eventosSociales';
 import { marcharse } from './economia';
 import { caducarReto, generarReto } from './retos';
 import { celebrarTorneo, type CombateTorneo } from './torneo';
@@ -58,7 +59,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
   const semilla = opciones.semilla ?? Math.floor(Math.random() * 2 ** 31);
   const J = balance.jugador;
   const estado: EstadoJuego = {
-    version: 9,
+    version: 10,
     semilla,
     azar: semilla,
     dia: 1,
@@ -75,6 +76,7 @@ export function crearPartida(opciones: OpcionesPartida = {}): EstadoJuego {
     registro: [],
     contadorIds: 0,
     relaciones: {},
+    social: { pendientes: [], cooldowns: {}, unicos: [], memorias: [], vetos: [], contador: 0 },
     bolsaNovatos: CATALOGO.filter((f) => f.gremio === 'libre').map((f) => f.id),
     caidos: [],
   };
@@ -171,6 +173,8 @@ export function lanzarMision(estado: EstadoJuego, misionId: string, equipo: read
   const probabilidad = probabilidadMision(carta, heroes, entorno);
   const diaVuelta = diaDeVuelta(estado, carta, equipo);
   conAzar(estado, (azar) => salirDeMision(azar, mision, heroes, entorno));
+  // Las peticiones aceptadas de no compartir misión no bloquean, pero romperlas tiene consecuencias.
+  romperVetos(estado, equipo);
   for (const h of heroes) h.estado = 'en mision';
   estado.enCurso.push({ mision, gremioId: estado.jugadorId, equipo: [...equipo], diaVuelta, cartaId: carta.id, probabilidad, diaSalida: estado.dia });
 }
@@ -227,6 +231,8 @@ export interface ResumenDia {
   muertes: string[];
   /** Lo que ha pasado entre tus héroes (relaciones y habilidades). */
   vida: string[];
+  /** Asuntos sociales nuevos que esperan tu decisión. */
+  asuntos: number;
 }
 
 export function finalizarDia(estado: EstadoJuego): ResumenDia {
@@ -243,9 +249,9 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
       }
     }
 
-    // Los lesionados se recuperan un día.
+    // Los lesionados se recuperan un día (y los que descansan, también cuentan sus días).
     for (const h of Object.values(estado.heroes)) {
-      if (h.estado === 'lesionado' && --h.diasLesion <= 0) {
+      if ((h.estado === 'lesionado' || h.estado === 'descansando') && --h.diasLesion <= 0) {
         h.estado = 'libre';
         h.diasLesion = 0;
       }
@@ -257,6 +263,11 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
     const entrenamientos = resolverEntrenamientos(estado);
     const categoriaNueva = actualizarCategorias(estado);
     caducarReto(estado);
+
+    // Sistema social: descanso del día, asuntos sin respuesta y asuntos nuevos.
+    descansoDelDia(estado);
+    caducarEventos(estado);
+    const asuntos = evaluarEventos(estado).length;
 
     // Día 7: sueldos, la semana de relaciones y habilidades y, después, Prueba de los Novatos.
     let sueldos: PagoSueldos | null = null;
@@ -273,9 +284,9 @@ export function finalizarDia(estado: EstadoJuego): ResumenDia {
     }
     const nuevos = estado.registro.slice(desde);
     const noticias = nuevos.filter((e) => e.tipo === 'rival' || e.tipo === 'reto').map((e) => e.texto);
-    const vida = nuevos.filter((e) => e.tipo === 'relacion' || e.tipo === 'habilidad' || e.tipo === 'muerte').map((e) => e.texto);
+    const vida = nuevos.filter((e) => e.tipo === 'relacion' || e.tipo === 'habilidad' || e.tipo === 'muerte' || e.tipo === 'social').map((e) => e.texto);
     const muertes = estado.caidos.filter((c) => c.dia === dia && c.gremioId === estado.jugadorId).map((c) => c.nombre);
-    return { dia, informes: informes.filter((i) => i.gremioId === estado.jugadorId), sueldos, noticias, prueba: estado.fase === 'prueba', ascensiones, entrenamientos, categoriaNueva, muertes, vida };
+    return { dia, informes: informes.filter((i) => i.gremioId === estado.jugadorId), sueldos, noticias, prueba: estado.fase === 'prueba', ascensiones, entrenamientos, categoriaNueva, muertes, vida, asuntos };
   });
 }
 
@@ -317,15 +328,11 @@ function resolverRegresos(estado: EstadoJuego, azar: Azar, ascensiones: Resultad
   return informes;
 }
 
-/** El día 7: relaciones (deriva, amor, celos, ánimo y lealtad) y habilidades semanales. Quien pierde la lealtad, se va. */
+/**
+ * El día 7: habilidades semanales. Las relaciones no cambian solas con el tiempo (sistema social): solo por
+ * acontecimientos, y quien quiere irse lo pide con un evento.
+ */
 function semanaDeVida(estado: EstadoJuego, azar: Azar): void {
-  for (const g of Object.values(estado.gremios)) {
-    const r = semanaRelaciones(estado, g.id, azar);
-    for (const id of r.seVan) {
-      const h = estado.heroes[id];
-      if (h && g.plantilla.includes(id)) marcharse(estado, h, g, `${h.nombre} ha perdido la fe en ${g.nombre}`);
-    }
-  }
   const s = cadaSemana(estado, azar);
   for (const { heroeId, motivo } of s.seVan) {
     const h = estado.heroes[heroeId];

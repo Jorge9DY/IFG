@@ -7,7 +7,7 @@ import type { EstadoJuego } from './estado';
 import { activa, huecos as huecosDe, ajustarOro, alSalir, alVolver, bonusExito, diasMenos, factorExperiencia, factorLesion, lesionForzada, poderEquipoEnMision, type Contexto } from './habilidades';
 import { ganarExperiencia, type Progreso } from './heroes';
 import { morir, riesgoDeMuerte } from './muerte';
-import { cambiarAnimo, quimica, relacionesTrasMision } from './relaciones';
+import { modificadorSocial, quimica, trasMision, type ModificadorSocial } from './relaciones';
 import { RANGOS_MISION, type Clase, type Heroe, type Mision, type RangoMision } from './tipos';
 
 /**
@@ -129,6 +129,11 @@ export function quimicaEquipo(estado: EstadoJuego, equipo: readonly Heroe[]): nu
   return quimica(estado, equipo);
 }
 
+/** Desglose de lo que suman y restan las relaciones del equipo (para explicarlo en la interfaz). */
+export function socialEquipo(estado: EstadoJuego, equipo: readonly Heroe[]): ModificadorSocial {
+  return modificadorSocial(estado, equipo);
+}
+
 /** Días que dura la misión con este equipo: un Explorador acorta en un día las más largas (rango alto); Brújula, uno más. */
 export function duracionMision(mision: Mision, equipo: readonly Heroe[]): number {
   const explorador = equipo.some((h) => h.clase === 'Explorador');
@@ -228,7 +233,6 @@ export function resolverMision(
     h.diasLesion = diasLesion;
     if (entorno) {
       h.ultimoRegreso = entorno.estado.dia;
-      cambiarAnimo(h, (exito ? balance.animo.exito : balance.animo.fracaso) + (lesion ? balance.animo.lesion : 0));
       if (lesion && h.habilidad === 'vendetta') h.memoria = { ...(h.memoria ?? {}), vendetta: diasLesion };
     }
     return { heroeId: h.id, diasLesion, progreso };
@@ -241,7 +245,22 @@ export function resolverMision(
     const ajuste = ajustarOro(ctx, azar, oro, exito);
     oro = ajuste.oro;
     textos.push(...ajuste.textos);
-    textos.push(...relacionesTrasMision(entorno.estado, equipo, exito, (h) => activa(h, equipo)));
+    // Sistema social: misión juntos, protecciones, discusiones, rivalidades, felicidad y estrés.
+    const social = trasMision(
+      entorno.estado,
+      azar,
+      equipo,
+      exito,
+      partes.map((p) => ({ heroeId: p.heroeId, diasLesion: p.diasLesion, subio: p.progreso.barras > 0 })),
+      (h) => activa(h, equipo),
+    );
+    for (const p of partes) {
+      if (!social.salvados.includes(p.heroeId)) continue;
+      p.diasLesion = 0;
+      const h = entorno.estado.heroes[p.heroeId];
+      if (h?.habilidad === 'vendetta') h.memoria = { ...(h.memoria ?? {}), vendetta: 0 };
+    }
+    textos.push(...social.textos);
     const lesionados = partes.filter((p) => p.diasLesion > 0).map((p) => p.heroeId);
     textos.push(...alVolver(ctx, azar, exito, lesionados));
     for (const id of muertos) {

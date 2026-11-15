@@ -11,7 +11,7 @@
 
 import balance from '../datos/balance.json';
 import { heroesDe, nuevoId, registrar, temporadaDe, type Caido, type EstadoJuego } from './estado';
-import { perderCompanero } from './relaciones';
+import { encolarEvento, perderCompanero } from './relaciones';
 import type { Heroe, Mision } from './tipos';
 
 const M = balance.muerte;
@@ -59,7 +59,6 @@ function sacar(estado: EstadoJuego, gremioId: string | null, id: string): void {
   for (const c of estado.enCurso) c.equipo = c.equipo.filter((x) => x !== id);
   estado.enCurso = estado.enCurso.filter((c) => c.equipo.length > 0);
   estado.entrenamientos = estado.entrenamientos.filter((e) => e.heroeId !== id);
-  for (const h of Object.values(estado.heroes)) if (h.amor === id) h.amor = null;
 }
 
 /**
@@ -85,6 +84,8 @@ export function morir(estado: EstadoJuego, heroeId: string, causa: Caido['causa'
   textos.push(texto);
   estado.caidos.push({ id: h.id, nombre: h.nombre, clase: h.clase, gremioId: gremioId ?? '', dia: estado.dia, poder: h.poder, causa, texto });
   if (gremioId) textos.push(...perderCompanero(estado, gremioId, h, 'muerte'));
+  // Duelo: en el gremio del jugador, la muerte abre un asunto (funeral o seguir adelante), una vez por héroe.
+  if (g?.esJugador && causa !== 'metamorfosis' && !estado.social.unicos.includes(`duelo:${h.id}`)) encolarEvento(estado, 'duelo', h);
   sacar(estado, gremioId, h.id);
   // Nox hereda parte del poder del caído.
   if (gremioId) {
@@ -108,9 +109,9 @@ export function morir(estado: EstadoJuego, heroeId: string, causa: Caido['causa'
       experiencia: 0,
       estado: 'libre',
       diasLesion: 0,
-      animo: 50,
+      felicidad: 50,
+      estres: 0,
       lealtad: 100,
-      amor: null,
       memoria: { ...(h.memoria ?? {}) },
       zombie: true,
     };

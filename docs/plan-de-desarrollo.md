@@ -42,7 +42,9 @@ Decisión del propietario: el juego pasa a un **modo historia** con héroes dise
 - [x] Relaciones entre héroes: afinidad, compatibilidad, química en misión, amor, celos, ánimo y lealtad (propuesta)
 - [x] Muerte: Ascensión, misiones con «Riesgo de muerte», habilidades, muro de los caídos (propuesta)
 - [x] Duración provisional de 5 temporadas con tres finales por puesto
-- [ ] Confirmar los supuestos de la pregunta 19
+- [x] Sistema social (documento del propietario): relaciones por pareja con atracción direccional, rasgos, felicidad y estrés, romance y ruptura por eventos, eventos con cooldown, duelo, peticiones y pestaña «Relaciones»
+- [ ] Confirmar los supuestos de las preguntas 19 y 20
+- [ ] Probar a mano el sistema social con 8–12 héroes (prueba de prototipo del documento) antes de añadir más eventos
 - [ ] Guion de temporadas: duración, qué novatos llegan cada semana y qué eventos ocurren
 - [ ] Condiciones de eventos y finales según la inversión del jugador en cada héroe
 - [ ] Profundizar misiones, héroes y fichajes (Prueba de los Novatos, torneo, Ascensión, mercado, retos)

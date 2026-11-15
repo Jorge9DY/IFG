@@ -3,6 +3,7 @@
 import balance from '../datos/balance.json';
 import catalogo from '../datos/heroes.json';
 import nombres from '../datos/nombres.json';
+import social from '../datos/social.json';
 import type { Azar } from './azar';
 import { CLASES, LETRAS, type Clase, type Genero, type Heroe, type Letra } from './tipos';
 
@@ -44,6 +45,7 @@ export interface FichaHeroe {
   poder: number;
   habilidad: string;
   nombreHabilidad: string;
+  rasgos?: string[];
   texto: string;
   ascension?: string;
 }
@@ -78,11 +80,12 @@ export function heroeDeCatalogo(azar: Azar, f: FichaHeroe, modo: 'rival' | 'nova
     estado: 'libre',
     diasLesion: 0,
     semanasSinCobrar: 0,
-    animo: balance.animo.inicial,
+    felicidad: social.mentalInicial.felicidad,
+    estres: social.mentalInicial.estres,
+    rasgos: [...(f.rasgos ?? [])],
     genero: f.genero as Genero,
     catalogo: f.id,
     habilidad: f.habilidad,
-    amor: null,
     memoria: {},
   };
   return h;
@@ -109,7 +112,7 @@ export function generarHeroe(azar: Azar, id: string, o: OpcionesHeroe): Heroe {
   const poder = azar.entero(o.poder[0], o.poder[1]);
   const potencial = Math.max(poder, potencialEnLetra(azar, azar.elegir(o.potencial)));
   const clase = o.clase ?? azar.elegir(CLASES);
-  return {
+  const heroe: Heroe = {
     id,
     nombre: `${azar.elegir(nombres.nombres)} ${azar.elegir(nombres.apellidos)}`,
     clase,
@@ -122,9 +125,14 @@ export function generarHeroe(azar: Azar, id: string, o: OpcionesHeroe): Heroe {
     estado: 'libre',
     diasLesion: 0,
     semanasSinCobrar: 0,
-    animo: balance.animo.inicial,
+    felicidad: social.mentalInicial.felicidad,
+    estres: social.mentalInicial.estres,
     genero: azar.elegir(['Hombre', 'Mujer'] as const),
   };
+  // Dos rasgos al azar para los genéricos (los del catálogo vienen de diseño).
+  const r1 = azar.elegir(social.rasgos);
+  heroe.rasgos = [r1, azar.elegir(social.rasgos.filter((r) => r !== r1))];
+  return heroe;
 }
 
 /** Letra de potencial al azar según una tabla de probabilidades (%) por letra. */

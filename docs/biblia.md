@@ -441,17 +441,21 @@ Las etiquetas evolucionan: una rivalidad puede convertirse en amistad y una amis
 
 **Ejemplo de vínculo especial:** dos héroes quieren ser el mejor espadachín del gremio. Se provocan, entrenan juntos y acaban reconociendo el talento del otro; la rivalidad sana mejora a ambos.
 
-### Sistema de relaciones \[Propuesta\] (encargo del propietario: pilar del juego, 2026-11-14)
+### Sistema social \[Aceptado\] (documento «Sistema social de héroes» v1.0 del propietario, 2026-11-15)
 
-El juego consiste en gestionar a la vez las relaciones y los estados de muchos héroes. Primera versión (cifras en `balance.json` → `relaciones` y `animo`):
+El juego se basa en gestionar a la vez las relaciones y los estados de muchos héroes. Implementado en `src/motor/relaciones.ts` (núcleo) y `src/motor/eventosSociales.ts` (eventos); todas las cifras en `src/datos/social.json` y los eventos en `src/datos/eventos-sociales.json`.
 
-- **Afinidad** de −100 a 100 por pareja. Niveles: enemigos (≤ −60), mala relación (≤ −25), neutral, amigos (≥ 25), mejores amigos (≥ 60).
-- **Compatibilidad oculta** (−2 a +2, fija por pareja): unas parejas mejoran solas y otras se tuercen. Cada semana la afinidad se mueve 4 puntos por punto de compatibilidad.
-- **Misiones juntos:** +6 si sale bien, −2 si sale mal, ±3 por compatibilidad. Rima lo duplica; Teo impide que empeore.
-- **Química del equipo** en misión: amigos +4%, mejores amigos +8%, pareja +12%, mala relación −6%, enemigos −12% de poder, con un tope de ±25%. Se ve al formar el equipo.
-- **Amor:** cada semana, quien no está enamorado puede enamorarse (25%) del compañero con quien mejor se lleva si la afinidad llega a 65 (40 con Aimul). Si es mutuo, son **pareja**. Quien quiere a alguien que quiere a otro sufre **celos** (pierde ánimo y afinidad con el rival).
-- **Perder a alguien** (venta, marcha o muerte) baja el ánimo de sus amigos, mejores amigos y su amor, más si muere.
-- En la carta de cada héroe del gremio se ven su ánimo y sus vínculos fuertes; los cambios aparecen en el resumen del día («En el gremio»).
+- **Un registro por pareja** (sin duplicados): **afinidad** compartida (−100 a 100), **atracción** en cada dirección (0 a 100), estado de pareja (ninguna, pareja, expareja), **rivalidad** (puede coexistir con la amistad) e **historial** de hechos importantes. Sin registro, la relación es neutral (Vael es la excepción: empieza en −40).
+- **Niveles:** enemigos (≤ −50), mala relación (≤ −20), neutral, amigos (≥ 50), grandes amigos (≥ 80). Romance direccional derivado de la atracción: interés (≥ 40) y enamorado (≥ 70).
+- **No cambian solas con el tiempo:** solo por acontecimientos. Misión juntos +3; salvar al otro +12; discutir −8; evento positivo +5; rechazo −5 (y −15 de atracción); ruptura −10; celos −10.
+- **Romance por interacción y compatibilidad:** cada héroe tiene una «chispa» oculta (0–3) hacia cada compañero; la atracción sube con ella en cada misión juntos si ya se llevan algo bien (Aimul enamora el doble). **La pareja solo empieza con un evento** que el jugador acepta.
+- **Rasgos de personalidad** (2–3 por héroe, fijos; los del catálogo propuestos por Claude): orgulloso, ambicioso, celoso, leal, tímido, sociable, paciente, competitivo, amable, reservado. Modulan las reacciones (el celoso lleva peor ver subir a otro y los celos; el amable se alegra; el competitivo se vuelve rival; el paciente acumula menos estrés; el leal sufre más las pérdidas…).
+- **En misión** (sección 8.3 del documento): un héroe puede proteger a su pareja o a un amigo de una herida; dos que se llevan mal pueden discutir; un rival intenta demostrar que es mejor; quien sube de poder delante de otros despierta celos, alegría o rivalidad.
+- **Modificadores en misión:** amigos +5%, grandes amigos +6%, pareja +8%, rivales +4%, mala relación −4%, enemigos −8%, con un tope de ±15% para el equipo; estrés > 70: −5% para ese héroe. Nunca se bloquea un equipo: la formación explica cada bonificación y avisa de los conflictos.
+- **Habilidades conectadas:** Rima, Teo, Sable, Nevada, Vael, Lumia, Aimul, Veyra, Yandere, Lirio, Diván, Segador, Hartox, Sparring, Aldo y la Mascota usan este sistema.
+- **Pestaña «Relaciones»** en Gestionar gremio: los asuntos pendientes, una tabla de quién se lleva con quién (cada fila, lo que siente ese héroe) y, al tocar una casilla, el detalle de la pareja con su historia («Por qué»).
+
+**Fuera de alcance por ahora** (según el documento): simulación social de los gremios rivales (sus relaciones cambian en misión, pero no tienen eventos), traumas, cambios de personalidad, triángulos con reglas propias y diálogos generados.
 
 ## 11. Emociones, necesidades y lealtad
 
@@ -496,10 +500,14 @@ Escalada orientativa (no obligatoria): se frustra → lo comenta a un compañero
 
 **\[Abierto\]** Valores iniciales de necesidades y lealtad y cómo se calculan sus cambios.
 
-### Ánimo y lealtad en el prototipo \[Propuesta\] (2026-11-14)
+### Felicidad, estrés y peticiones \[Aceptado\] (sistema social, 2026-11-15)
 
-- **Ánimo** de 0 a 100 (empieza en 60). Sube al cumplir misiones y baja al fracasar, lesionarse, no cobrar o perder a alguien. Cada semana se acerca a lo que le dan sus relaciones (más amigos, más alto). **Cambia el poder en misión hasta un ±15%**: esto matiza el «no aplica penalizaciones constantes» de arriba y espera confirmación (pregunta 19).
-- **Lealtad:** cada semana sube con el ánimo alto y baja con el ánimo bajo. Por debajo de 20 avisa («piensa en irse»); a 0, se va a otro gremio. Sigue valiendo el impago: dos semanas sin cobrar y se va.
+- Sustituyen al ánimo del prototipo. **Felicidad** (empieza en 70) y **estrés** (empieza en 20), de 0 a 100; no son opuestos.
+- Cambian por acontecimientos: misión cumplida (+3 / −2), fracasada (−5 / +5), lesión, discusión, impago, muerte o marcha de un ser querido. Descansar en la sede baja el estrés cada día; la felicidad no sube sola.
+- Solo el **estrés alto** (> 70) penaliza en misión (−5%), de acuerdo con «el estado de ánimo no aplica penalizaciones constantes».
+- **Eventos con decisión** (cooldowns, uno por héroe a la vez, como mucho 3 pendientes; si no decides en 3 días se aplica la opción por defecto): declaración, rechazo, ruptura, celos de una expareja, petición de no compartir equipo, descontento (felicidad < 25), petición de abandono (felicidad < 10), crisis (estrés > 90) y duelo tras una muerte. Algunas opciones cuestan oro (una prima, un funeral, una cena para hacer las paces).
+- **Peticiones de no compartir misión:** si las aceptas, no bloquean nada, pero romperlas baja la felicidad del que la pidió.
+- **Abandono:** un héroe solo se va si lo pide y le dejas marchar (o por impagos, como antes). La lealtad sigue existiendo para los impagos, sin cambios semanales.
 
 ## 12. Autonomía de los héroes
 
@@ -738,6 +746,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-15 | Documento del propietario «Sistema social de héroes» v1.0: relaciones por pareja con afinidad y atracción direccional, rasgos, felicidad y estrés, romance por eventos, eventos sociales con decisiones y cooldowns, consecuencias de muertes, peticiones y pestaña «Relaciones». Sustituye a la propuesta de relaciones y ánimo del 2026-11-14 (el ánimo ya no cambia el poder; solo el estrés alto). |
 | 2026-11-14 | Encargo del propietario: clases y géneros del catálogo a criterio de Claude (equilibrados); escala de diez rangos de la hoja; los héroes de los rivales empiezan en su rango máximo y los libres llegan por la Prueba en F; crear los sistemas que falten, con las **relaciones** como pilar; resolver la **muerte** a criterio de Claude. Aplicado: catálogo de 80 héroes con sus 80 habilidades, relaciones y ánimo \[Propuesta\], muerte \[Propuesta\] (la Ascensión deja de ser la única forma de morir), misiones por huecos, 5 temporadas y tres finales provisionales. |
 | 2026-11-14 | Decisión del propietario: **modo historia** con héroes diseñados, duración de X temporadas, eventos con guion y rejugabilidad por inversión que desbloquea eventos y finales. Foco en misiones, héroes y fichajes; las mecánicas nuevas solo profundizan las existentes. Se descarta la propuesta de las tres ramas (economía e investigación). El torneo de fin de temporada pasa a la versión principal como \[Propuesta\]. |
 | 2026-11-07 | Decisiones del propietario: cada misión del tablón se puede repetir mientras haya equipos libres (con aviso si el oro llega después de la Prueba); retratos provisionales generados para cada héroe. |

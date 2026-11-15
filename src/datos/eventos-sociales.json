@@ -1,0 +1,136 @@
+{
+  "_nota": "Eventos sociales (sección 9 del documento del sistema social). Las condiciones están en src/motor/eventosSociales.ts; aquí, textos, opciones, efectos, cooldown y prioridad. {a} y {b} son los héroes implicados. Prioridad: 3 urgente, 2 relación, 1 general.",
+  "eventos": [
+    {
+      "id": "declaracion",
+      "tipo": "relacion",
+      "prioridad": 2,
+      "titulo": "Algo más que compañeros",
+      "texto": "{a} y {b} ya no se miran como antes. Te piden permiso para estar juntos sin que afecte al gremio.",
+      "cooldown": 14,
+      "unaVez": false,
+      "porDefecto": "bendecir",
+      "opciones": [
+        { "id": "bendecir", "texto": "Dales tu bendición", "efectos": [{ "objetivo": "ambos", "felicidad": 8, "estres": -3 }, { "accion": "pareja" }] },
+        { "id": "esperar", "texto": "Pídeles que esperen", "efectos": [{ "objetivo": "ambos", "felicidad": -5, "estres": 3 }, { "atraccion": -10 }] }
+      ]
+    },
+    {
+      "id": "rechazo",
+      "tipo": "relacion",
+      "prioridad": 2,
+      "titulo": "Un sentimiento sin respuesta",
+      "texto": "{a} se ha declarado a {b}, pero {b} no siente lo mismo.",
+      "cooldown": 21,
+      "unaVez": false,
+      "porDefecto": "nada",
+      "base": "rechazo",
+      "opciones": [
+        { "id": "consolar", "texto": "Pasa la tarde con {a}", "efectos": [{ "objetivo": "a", "felicidad": 3, "estres": -5 }] },
+        { "id": "nada", "texto": "No te metas", "efectos": [{ "objetivo": "a", "felicidad": -3, "estres": 3 }] }
+      ]
+    },
+    {
+      "id": "ruptura",
+      "tipo": "relacion",
+      "prioridad": 2,
+      "titulo": "La pareja hace aguas",
+      "texto": "{a} y {b} no paran de discutir. Su relación está a punto de romperse.",
+      "cooldown": 14,
+      "unaVez": false,
+      "porDefecto": "dejar",
+      "opciones": [
+        { "id": "mediar", "texto": "Media entre ellos (200 de oro en una cena)", "coste": 200, "efectos": [{ "afinidad": 15 }, { "objetivo": "ambos", "estres": -5 }] },
+        { "id": "dejar", "texto": "Que decidan ellos", "efectos": [{ "accion": "ruptura" }, { "objetivo": "ambos", "felicidad": -8, "estres": 10 }] }
+      ]
+    },
+    {
+      "id": "celos",
+      "tipo": "relacion",
+      "prioridad": 2,
+      "titulo": "Una petición incómoda",
+      "texto": "{a} no soporta ver a {b}, su expareja, con otra persona. Te pide no volver a compartir misión con {b}.",
+      "cooldown": 30,
+      "unaVez": false,
+      "porDefecto": "negar",
+      "base": "celos",
+      "opciones": [
+        { "id": "aceptar", "texto": "Acepta: no irán juntos", "efectos": [{ "objetivo": "a", "felicidad": 5, "estres": -5 }, { "accion": "veto" }] },
+        { "id": "negar", "texto": "Niégate", "efectos": [{ "objetivo": "a", "felicidad": -5, "estres": 5 }] }
+      ]
+    },
+    {
+      "id": "peticionEquipo",
+      "tipo": "relacion",
+      "prioridad": 2,
+      "titulo": "No quiero ir con él",
+      "texto": "{a} no aguanta a {b} y te pide no compartir más misiones.",
+      "cooldown": 30,
+      "unaVez": false,
+      "porDefecto": "negar",
+      "opciones": [
+        { "id": "aceptar", "texto": "Acepta: no irán juntos", "efectos": [{ "objetivo": "a", "felicidad": 5, "estres": -5 }, { "accion": "veto" }] },
+        { "id": "reconciliar", "texto": "Obliga a hacer las paces (cena de 150 de oro)", "coste": 150, "efectos": [{ "afinidad": 20 }, { "objetivo": "ambos", "estres": 3 }] },
+        { "id": "negar", "texto": "Niégate", "efectos": [{ "objetivo": "a", "felicidad": -5, "estres": 5 }] }
+      ]
+    },
+    {
+      "id": "descontento",
+      "tipo": "general",
+      "prioridad": 1,
+      "titulo": "Alguien no está bien",
+      "texto": "{a} anda cabizbajo y apenas habla con nadie.",
+      "cooldown": 10,
+      "unaVez": false,
+      "porDefecto": "ignorar",
+      "opciones": [
+        { "id": "prima", "texto": "Dale una prima (300 de oro)", "coste": 300, "efectos": [{ "objetivo": "a", "felicidad": 15, "estres": -5 }] },
+        { "id": "hablar", "texto": "Habla con {a}", "efectos": [{ "objetivo": "a", "felicidad": 6, "estres": -3 }] },
+        { "id": "ignorar", "texto": "Ya se le pasará", "efectos": [{ "objetivo": "a", "felicidad": -3, "estres": 5 }] }
+      ]
+    },
+    {
+      "id": "abandono",
+      "tipo": "general",
+      "prioridad": 3,
+      "titulo": "Quiere irse",
+      "texto": "{a} ha venido a tu despacho: quiere dejar el gremio.",
+      "cooldown": 7,
+      "unaVez": false,
+      "porDefecto": "negar",
+      "opciones": [
+        { "id": "convencer", "texto": "Convéncele con una prima (600 de oro)", "coste": 600, "efectos": [{ "objetivo": "a", "felicidad": 25, "estres": -10 }] },
+        { "id": "dejar", "texto": "Déjale marchar", "efectos": [{ "accion": "abandono" }] },
+        { "id": "negar", "texto": "Niégate", "efectos": [{ "objetivo": "a", "felicidad": -5, "estres": 10, "lealtad": -15 }] }
+      ]
+    },
+    {
+      "id": "crisis",
+      "tipo": "general",
+      "prioridad": 3,
+      "titulo": "Al límite",
+      "texto": "{a} lleva demasiada presión encima. Si sigue así, se romperá.",
+      "cooldown": 7,
+      "unaVez": false,
+      "porDefecto": "seguir",
+      "opciones": [
+        { "id": "descanso", "texto": "Dale dos días de descanso", "efectos": [{ "objetivo": "a", "felicidad": 3, "estres": -30 }, { "accion": "descanso" }] },
+        { "id": "seguir", "texto": "Necesito que siga", "efectos": [{ "objetivo": "a", "felicidad": -10, "estres": 0 }] }
+      ]
+    },
+    {
+      "id": "duelo",
+      "tipo": "general",
+      "prioridad": 3,
+      "titulo": "El gremio despide a {a}",
+      "texto": "Quienes querían a {a} no saben qué hacer con su ausencia.",
+      "cooldown": 0,
+      "unaVez": true,
+      "porDefecto": "seguir",
+      "opciones": [
+        { "id": "funeral", "texto": "Organiza un funeral (300 de oro)", "coste": 300, "efectos": [{ "objetivo": "gremio", "felicidad": 5, "estres": -8 }] },
+        { "id": "seguir", "texto": "Hay que seguir adelante", "efectos": [] }
+      ]
+    }
+  ]
+}

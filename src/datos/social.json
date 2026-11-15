@@ -1,0 +1,247 @@
+{
+  "_nota": "Sistema social de los héroes (documento «Sistema social de héroes» del propietario, v1.0). Todos los umbrales y efectos viven aquí; las cifras son valores iniciales de prototipo.",
+  "rasgos": [
+    "orgulloso",
+    "ambicioso",
+    "celoso",
+    "leal",
+    "timido",
+    "sociable",
+    "paciente",
+    "competitivo",
+    "amable",
+    "reservado"
+  ],
+  "nombreRasgo": {
+    "orgulloso": "Orgulloso",
+    "ambicioso": "Ambicioso",
+    "celoso": "Celoso",
+    "leal": "Leal",
+    "timido": "Tímido",
+    "sociable": "Sociable",
+    "paciente": "Paciente",
+    "competitivo": "Competitivo",
+    "amable": "Amable",
+    "reservado": "Reservado"
+  },
+  "limites": {
+    "afinidad": [
+      -100,
+      100
+    ],
+    "atraccion": [
+      0,
+      100
+    ],
+    "mental": [
+      0,
+      100
+    ]
+  },
+  "mentalInicial": {
+    "felicidad": 70,
+    "estres": 20
+  },
+  "umbrales": {
+    "_nota": "Niveles de la afinidad compartida y de la atracción (direccional). Para el evento de declaración basta con que los dos superen «declaracion» y uno esté enamorado.",
+    "enemigos": -50,
+    "malaRelacion": -20,
+    "amigos": 50,
+    "grandesAmigos": 80,
+    "interes": 40,
+    "enamorado": 70,
+    "declaracion": 50
+  },
+  "acontecimientos": {
+    "_nota": "Cambios de afinidad y atracción por acontecimiento (tabla 5.1).",
+    "misionJuntos": {
+      "afinidad": 3,
+      "atraccion": 0
+    },
+    "salvar": {
+      "afinidad": 12,
+      "atraccion": 2
+    },
+    "discutir": {
+      "afinidad": -8,
+      "atraccion": 0
+    },
+    "traicion": {
+      "afinidad": -25,
+      "atraccion": -5
+    },
+    "eventoPositivo": {
+      "afinidad": 5,
+      "atraccion": 2
+    },
+    "rechazo": {
+      "afinidad": -5,
+      "atraccion": -15
+    },
+    "ruptura": {
+      "afinidad": -10,
+      "atraccion": -20
+    },
+    "celos": {
+      "afinidad": -10,
+      "atraccion": 0
+    },
+    "cuidados": {
+      "afinidad": 3,
+      "atraccion": 0
+    }
+  },
+  "chispa": {
+    "_nota": "Química romántica oculta y fija de cada héroe hacia otro (0–3): atracción que gana por cada misión juntos. El romance surge de interacciones y compatibilidad, no al azar. La atracción sube chispa × porMision en cada misión juntos.",
+    "probabilidades": {
+      "0": 40,
+      "1": 25,
+      "2": 22,
+      "3": 13
+    },
+    "afinidadMinima": 10,
+    "porMision": 3
+  },
+  "mental": {
+    "_nota": "Cambios de felicidad y estrés por acontecimiento (tabla 7.1).",
+    "misionExito": {
+      "felicidad": 3,
+      "estres": -2
+    },
+    "misionFracaso": {
+      "felicidad": -5,
+      "estres": 5
+    },
+    "lesion": {
+      "felicidad": -2,
+      "estres": 5
+    },
+    "discusion": {
+      "felicidad": -5,
+      "estres": 5
+    },
+    "eventoPositivo": {
+      "felicidad": 5,
+      "estres": -3
+    },
+    "descansoDia": {
+      "felicidad": 0,
+      "estres": -3
+    },
+    "descansoEvento": {
+      "felicidad": 3,
+      "estres": -8
+    },
+    "impago": {
+      "felicidad": -15,
+      "estres": 10
+    },
+    "promesaRota": {
+      "felicidad": -10,
+      "estres": 10
+    },
+    "marchaAmigo": {
+      "felicidad": -5,
+      "estres": 3
+    },
+    "marchaPareja": {
+      "felicidad": -15,
+      "estres": 15
+    }
+  },
+  "muerte": {
+    "_nota": "Consecuencias de la muerte de un compañero según la relación (tabla 10.2).",
+    "sinRelacion": {
+      "felicidad": -2,
+      "estres": 2
+    },
+    "amigo": {
+      "felicidad": -10,
+      "estres": 10
+    },
+    "granAmigo": {
+      "felicidad": -15,
+      "estres": 20
+    },
+    "pareja": {
+      "felicidad": -30,
+      "estres": 35
+    },
+    "enamorado": {
+      "felicidad": -20,
+      "estres": 25
+    },
+    "enemigoCompetitivo": {
+      "felicidad": 0,
+      "estres": 5
+    },
+    "enemigoAmable": {
+      "felicidad": -2,
+      "estres": 2
+    }
+  },
+  "personalidad": {
+    "_nota": "Modificadores de rasgo por acontecimiento: multiplican el cambio (afinidad o mental). Si un rasgo no tiene modificador para un acontecimiento, no hace nada.",
+    "celoso": {
+      "celos": 2,
+      "recompensaMayor": -4
+    },
+    "amable": {
+      "recompensaMayor": 2,
+      "discutir": 0.5
+    },
+    "competitivo": {
+      "recompensaMayor": 0,
+      "rivalidad": true
+    },
+    "orgulloso": {
+      "discutir": 1.5,
+      "misionFracaso": 1.5
+    },
+    "leal": {
+      "marcha": 2,
+      "muerte": 1.25
+    },
+    "paciente": {
+      "estres": 0.7
+    },
+    "ambicioso": {
+      "misionFracaso": 1.5
+    },
+    "sociable": {
+      "misionJuntos": 1.5
+    },
+    "reservado": {
+      "misionJuntos": 0.5
+    },
+    "timido": {
+      "rechazo": 1.5
+    }
+  },
+  "mision": {
+    "_nota": "Modificadores sociales en misión (tabla 8.1), en % de poder. El total del equipo tiene un tope.",
+    "amigos": 5,
+    "grandesAmigos": 6,
+    "pareja": 8,
+    "rivales": 4,
+    "malaRelacion": -4,
+    "enemigos": -8,
+    "tope": 15,
+    "estresAlto": 70,
+    "penalizacionEstres": -5,
+    "probSalvar": 35,
+    "probDiscutir": 40,
+    "probRivalidad": 30
+  },
+  "efectos": {
+    "descontento": 25,
+    "abandono": 10,
+    "crisis": 90
+  },
+  "eventos": {
+    "maxPendientes": 3,
+    "maxNuevosPorDia": 2,
+    "diasParaCaducar": 3,
+    "memoriaMaxima": 300
+  }
+}

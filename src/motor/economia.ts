@@ -5,7 +5,8 @@ import balance from '../datos/balance.json';
 import { gremio, heroe as obtenerHeroe, heroesDe, jugador, registrar, type EstadoJuego } from './estado';
 import { sueldo } from './heroes';
 import { ajustarSueldo, alGastar } from './habilidades';
-import { cambiarAnimo, perderCompanero } from './relaciones';
+import { cambiarMental, perderCompanero } from './relaciones';
+import social from '../datos/social.json';
 import { plazasLibres } from './instalaciones';
 import type { Gremio, Heroe } from './tipos';
 
@@ -52,7 +53,7 @@ export function pagarSueldos(estado: EstadoJuego, gremioId: string): PagoSueldos
     } else {
       h.semanasSinCobrar += 1;
       h.lealtad = Math.max(0, h.lealtad - I.lealtadPorSemana);
-      cambiarAnimo(h, balance.animo.impago);
+      cambiarMental(h, social.mental.impago);
       sinCobrar.push(h);
     }
   }
@@ -106,7 +107,6 @@ function prestamoDeUsura(estado: EstadoJuego, g: Gremio, total: number): void {
  */
 export function marcharse(estado: EstadoJuego, h: Heroe, origen: Gremio, motivo?: string): string | null {
   perderCompanero(estado, origen.id, h, 'marcha');
-  for (const otro of Object.values(estado.heroes)) if (otro.amor === h.id && origen.plantilla.includes(otro.id)) otro.amor = null;
   origen.plantilla = origen.plantilla.filter((id) => id !== h.id);
   // Si estaba de misión, el resto del equipo sigue sin él.
   for (const c of estado.enCurso) c.equipo = c.equipo.filter((id) => id !== h.id);

@@ -22,7 +22,7 @@ import { condicionesCompra } from '../src/motor/mercado';
 import { duracionMision, equiposPosibles, probabilidadMision, resolverMision } from '../src/motor/misiones';
 import { morir, riesgoDeMuerte } from '../src/motor/muerte';
 import { motivoNoLanzar } from '../src/motor/partida';
-import { cambiarAfinidad } from '../src/motor/relaciones';
+import { cambiar, cambiarAfinidad } from '../src/motor/relaciones';
 import type { Heroe, Mision } from '../src/motor/tipos';
 import { fichar, heroe, partida } from './fabrica';
 
@@ -36,9 +36,9 @@ function ctx(estado: ReturnType<typeof partida>, equipo: Heroe[], m: Mision = mi
   return { estado, gremioId: 'jugador', mision: m, equipo, dia: estado.dia };
 }
 
-/** Poder en misión con ánimo neutro (50) para aislar la habilidad. */
+/** Poder en misión con estrés bajo para aislar la habilidad. */
 function neutro(datos: Partial<Heroe> & Pick<Heroe, 'id'>): Heroe {
-  return heroe({ animo: 50, ...datos });
+  return heroe({ estres: 20, ...datos });
 }
 
 describe('catálogo del modo historia', () => {
@@ -237,8 +237,9 @@ describe('habilidades en misión', () => {
     const estado = partida();
     const mascota = fichar(estado, 'jugador', heroe({ id: 'm', habilidad: 'mimo' }));
     expect(motivoNoIr(estado, mascota, ['m'])).toMatch(/mascota/);
-    const y = fichar(estado, 'jugador', heroe({ id: 'y', habilidad: 'obsesion', amor: 'amado' }));
+    const y = fichar(estado, 'jugador', heroe({ id: 'y', habilidad: 'obsesion' }));
     fichar(estado, 'jugador', heroe({ id: 'amado' }));
+    cambiar(estado, 'y', 'amado', { atraccionAB: 80 });
     expect(motivoNoIr(estado, y, ['y'])).toMatch(/solo sale/);
     expect(motivoNoIr(estado, y, ['y', 'amado'])).toBeNull();
   });

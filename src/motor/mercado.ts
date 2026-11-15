@@ -54,7 +54,6 @@ export function comprar(estado: EstadoJuego, heroeId: string): void {
   j.plantilla.push(heroeId);
   vendedor.oro += c.precio;
   j.oro -= c.precio;
-  h.amor = null;
   registrar(estado, 'fichaje', `Compras a ${h.nombre} a ${vendedor.nombre} por ${c.precio} de oro.`);
   alComprar(estado, h, j.id, vendedor.id);
   alGastar(estado, j.id);
@@ -85,7 +84,6 @@ export function vender(estado: EstadoJuego, heroeId: string): Oferta {
   g.plantilla.push(heroeId);
   j.oro += oferta.precio;
   g.oro -= oferta.precio;
-  h.amor = null;
   registrar(estado, 'venta', `${h.nombre} se va a ${g.nombre} por ${oferta.precio} de oro.`);
   const azar = new Azar(estado.azar);
   alVender(estado, azar, h, j.id);

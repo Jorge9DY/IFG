@@ -1,5 +1,5 @@
 {
- "_nota": "Catálogo del modo historia: los 80 héroes diseñados por el propietario (hoja de cálculo «Héroes»). Clase y género propuestos por Claude con criterio de equilibrio (20 por clase, 40/40). Los héroes de los gremios rivales empiezan en su rango máximo (techo); los libres llegan por la Prueba de los Novatos en rango F. Textos de habilidad resumidos para la interfaz.",
+ "_nota": "Catálogo del modo historia: los 80 héroes diseñados por el propietario (hoja de cálculo «Héroes»). Clase y género propuestos por Claude con criterio de equilibrio (20 por clase, 40/40). Los héroes de los gremios rivales empiezan en su rango máximo (techo); los libres llegan por la Prueba de los Novatos en rango F. Textos de habilidad resumidos para la interfaz. Rasgos de personalidad (2–3 por héroe) propuestos por Claude a partir de su arquetipo.",
  "gremios": {
   "jugador": "Prota",
   "dragon": "Gran rival",
@@ -22,7 +22,11 @@
    "habilidad": "roboFichaje",
    "nombreHabilidad": "Robo de fichaje",
    "texto": "Se carga tras enviarlo a 3 misiones de rango alto. Al activarse, las heroínas de otros gremios de rango inferior a A cuestan mucho menos. Vuelven al precio original cuando fichas a una heroína.",
-   "ascension": "Techo A. La habilidad pasa a rebajar a todas las heroínas de rango A+ hacia abajo."
+   "ascension": "Techo A. La habilidad pasa a rebajar a todas las heroínas de rango A+ hacia abajo.",
+   "rasgos": [
+    "ambicioso",
+    "sociable"
+   ]
   },
   {
    "id": "H02",
@@ -36,7 +40,11 @@
    "poder": 8,
    "habilidad": "multiplicacion",
    "nombreHabilidad": "Multiplicación",
-   "texto": "Ocupa tres huecos en las misiones, pero su poder se multiplica por tres (equivale a tener tres héroes)."
+   "texto": "Ocupa tres huecos en las misiones, pero su poder se multiplica por tres (equivale a tener tres héroes).",
+   "rasgos": [
+    "reservado",
+    "paciente"
+   ]
   },
   {
    "id": "H03",
@@ -50,7 +58,11 @@
    "poder": 6,
    "habilidad": "vendetta",
    "nombreHabilidad": "Vendetta",
-   "texto": "Tras sufrir una lesión, en su siguiente misión recibe poder extra según la gravedad de la lesión."
+   "texto": "Tras sufrir una lesión, en su siguiente misión recibe poder extra según la gravedad de la lesión.",
+   "rasgos": [
+    "orgulloso",
+    "competitivo"
+   ]
   },
   {
    "id": "H04",
@@ -65,7 +77,11 @@
    "habilidad": "insectos",
    "nombreHabilidad": "Hablar con los insectos",
    "texto": "La habilidad no otorga extras de ningún tipo.",
-   "ascension": "Al ascender muere y su lugar lo toma GodInsect, un insecto que le crecía dentro: rango S y poder altísimo."
+   "ascension": "Al ascender muere y su lugar lo toma GodInsect, un insecto que le crecía dentro: rango S y poder altísimo.",
+   "rasgos": [
+    "timido",
+    "amable"
+   ]
   },
   {
    "id": "H05",
@@ -79,7 +95,11 @@
    "poder": 4,
    "habilidad": "haters",
    "nombreHabilidad": "Haters gonna hate",
-   "texto": "Cuantas más relaciones malas tiene en el gremio (más gente la odia), más poder tiene."
+   "texto": "Cuantas más relaciones malas tiene en el gremio (más gente la odia), más poder tiene.",
+   "rasgos": [
+    "orgulloso",
+    "competitivo"
+   ]
   },
   {
    "id": "H06",
@@ -93,7 +113,12 @@
    "poder": 4,
    "habilidad": "lookAtMe",
    "nombreHabilidad": "Look at me",
-   "texto": "Cuanta más gente enamorada de ella hay en el gremio, más poder tiene. Se enamoran de ella con más facilidad."
+   "texto": "Cuanta más gente enamorada de ella hay en el gremio, más poder tiene. Se enamoran de ella con más facilidad.",
+   "rasgos": [
+    "sociable",
+    "orgulloso",
+    "celoso"
+   ]
   },
   {
    "id": "H07",
@@ -107,7 +132,11 @@
    "poder": 14,
    "habilidad": "goblinDraft",
    "nombreHabilidad": "Goblin Draft",
-   "texto": "Recibe un impulso de poder enorme, pero solo en las misiones de rango bajo."
+   "texto": "Recibe un impulso de poder enorme, pero solo en las misiones de rango bajo.",
+   "rasgos": [
+    "sociable",
+    "leal"
+   ]
   },
   {
    "id": "H08",
@@ -121,7 +150,12 @@
    "poder": 94,
    "habilidad": "cimaSolitaria",
    "nombreHabilidad": "Cima solitaria",
-   "texto": "Su poder crece cuanta más ventaja tenga su gremio en el ranking. Si lo alcanzas, se debilita."
+   "texto": "Su poder crece cuanta más ventaja tenga su gremio en el ranking. Si lo alcanzas, se debilita.",
+   "rasgos": [
+    "orgulloso",
+    "reservado",
+    "competitivo"
+   ]
   },
   {
    "id": "H09",
@@ -135,7 +169,11 @@
    "poder": 93,
    "habilidad": "hiloRojo",
    "nombreHabilidad": "Hilo rojo",
-   "texto": "Gana poder por cada amistad o amor fuerte que tengan sus compañeros. Si pierden a un amigo, baja."
+   "texto": "Gana poder por cada amistad o amor fuerte que tengan sus compañeros. Si pierden a un amigo, baja.",
+   "rasgos": [
+    "reservado",
+    "paciente"
+   ]
   },
   {
    "id": "H10",
@@ -149,7 +187,11 @@
    "poder": 92,
    "habilidad": "porLasUltimas",
    "nombreHabilidad": "Por las últimas",
-   "texto": "Con cada misión reduce su esperanza de vida y, al llegar al mínimo, muere. Cuanta menos esperanza de vida le queda, más fuerte es."
+   "texto": "Con cada misión reduce su esperanza de vida y, al llegar al mínimo, muere. Cuanta menos esperanza de vida le queda, más fuerte es.",
+   "rasgos": [
+    "reservado",
+    "leal"
+   ]
   },
   {
    "id": "H11",
@@ -164,7 +206,12 @@
    "habilidad": "muro",
    "nombreHabilidad": "Muro",
    "texto": "Reduce mucho el riesgo de lesión de los héroes que van con él en misión.",
-   "ascension": "La habilidad mejora: los protege también aunque no vaya en misión."
+   "ascension": "La habilidad mejora: los protege también aunque no vaya en misión.",
+   "rasgos": [
+    "leal",
+    "paciente",
+    "amable"
+   ]
   },
   {
    "id": "H12",
@@ -178,7 +225,11 @@
    "poder": 90,
    "habilidad": "furia",
    "nombreHabilidad": "Furia",
-   "texto": "Su poder sube con cada misión seguida sin descanso, pero su ánimo y su lealtad bajan."
+   "texto": "Su poder sube con cada misión seguida sin descanso, pero su ánimo y su lealtad bajan.",
+   "rasgos": [
+    "competitivo",
+    "orgulloso"
+   ]
   },
   {
    "id": "H13",
@@ -193,7 +244,11 @@
    "habilidad": "racha",
    "nombreHabilidad": "Racha",
    "texto": "Su poder sube con cada misión seguida completada sin lesiones en el equipo, y se reinicia si una falla. No tiene nada de azar.",
-   "ascension": "Al llegar a una racha larga asciende a S. Desde entonces, al fallar conserva la mitad de la racha."
+   "ascension": "Al llegar a una racha larga asciende a S. Desde entonces, al fallar conserva la mitad de la racha.",
+   "rasgos": [
+    "competitivo",
+    "ambicioso"
+   ]
   },
   {
    "id": "H14",
@@ -208,7 +263,12 @@
    "habilidad": "devorar",
    "nombreHabilidad": "Devorar",
    "texto": "Cada vez que tu gremio compra a un héroe de un gremio rival, gana una parte de su poder.",
-   "ascension": "Tras comprar 3 héroes del mismo gremio rival, su techo pasa a S."
+   "ascension": "Tras comprar 3 héroes del mismo gremio rival, su techo pasa a S.",
+   "rasgos": [
+    "ambicioso",
+    "competitivo",
+    "orgulloso"
+   ]
   },
   {
    "id": "H15",
@@ -223,7 +283,11 @@
    "habilidad": "tratado",
    "nombreHabilidad": "Tratado",
    "texto": "Una vez por temporada firma una alianza con un gremio rival: mientras dure, los fichajes entre ambos son más baratos y no pueden sabotearse.",
-   "ascension": "Tras 3 tratados con el mismo gremio, su techo pasa a S."
+   "ascension": "Tras 3 tratados con el mismo gremio, su techo pasa a S.",
+   "rasgos": [
+    "orgulloso",
+    "amable"
+   ]
   },
   {
    "id": "H16",
@@ -238,7 +302,11 @@
    "habilidad": "sacrificio",
    "nombreHabilidad": "Sacrificio",
    "texto": "Cada semana mata al compañero con el que peor se lleva y lo convierte en un Zombie, que conserva su habilidad con la mitad de su poder. Gana mucho poder por cada Zombie del gremio, y más aún si van con él de misión.",
-   "ascension": "Por definir."
+   "ascension": "Por definir.",
+   "rasgos": [
+    "reservado",
+    "celoso"
+   ]
   },
   {
    "id": "H17",
@@ -252,7 +320,11 @@
    "poder": 5,
    "habilidad": "ojoDeOro",
    "nombreHabilidad": "Ojo de oro",
-   "texto": "Su gremio ve el techo real de los novatos de la Prueba y el de los héroes de otros gremios."
+   "texto": "Su gremio ve el techo real de los novatos de la Prueba y el de los héroes de otros gremios.",
+   "rasgos": [
+    "ambicioso",
+    "sociable"
+   ]
   },
   {
    "id": "H18",
@@ -266,7 +338,11 @@
    "poder": 85,
    "habilidad": "cuidados",
    "nombreHabilidad": "Cuidados",
-   "texto": "Los lesionados de su gremio se curan el doble de rápido y, con cada cura, mejoran su relación con ella."
+   "texto": "Los lesionados de su gremio se curan el doble de rápido y, con cada cura, mejoran su relación con ella.",
+   "rasgos": [
+    "amable",
+    "paciente"
+   ]
   },
   {
    "id": "H19",
@@ -281,7 +357,11 @@
    "habilidad": "legado",
    "nombreHabilidad": "Legado",
    "texto": "Los héroes de rango C o menos que van a misión con él ganan experiencia extra.",
-   "ascension": "Puede dejar una parte de su poder a un discípulo."
+   "ascension": "Puede dejar una parte de su poder a un discípulo.",
+   "rasgos": [
+    "paciente",
+    "leal"
+   ]
   },
   {
    "id": "H20",
@@ -295,7 +375,11 @@
    "poder": 6,
    "habilidad": "dobleONada",
    "nombreHabilidad": "Doble o nada",
-   "texto": "Cada vez que sale a una misión y la completa, la recompensa de oro se duplica… o se pierde."
+   "texto": "Cada vez que sale a una misión y la completa, la recompensa de oro se duplica… o se pierde.",
+   "rasgos": [
+    "sociable",
+    "amable"
+   ]
   },
   {
    "id": "H21",
@@ -309,7 +393,11 @@
    "poder": 83,
    "habilidad": "balada",
    "nombreHabilidad": "Balada",
-   "texto": "Las relaciones entre los héroes que van con ella a misión cambian el doble de rápido, para bien o para mal."
+   "texto": "Las relaciones entre los héroes que van con ella a misión cambian el doble de rápido, para bien o para mal.",
+   "rasgos": [
+    "sociable",
+    "amable"
+   ]
   },
   {
    "id": "H22",
@@ -323,7 +411,11 @@
    "poder": 86,
    "habilidad": "tesoro",
    "nombreHabilidad": "Tesoro",
-   "texto": "Guarda parte del oro de las misiones en las que participa. Si la vendes, te devuelve todo lo acumulado."
+   "texto": "Guarda parte del oro de las misiones en las que participa. Si la vendes, te devuelve todo lo acumulado.",
+   "rasgos": [
+    "ambicioso",
+    "celoso"
+   ]
   },
   {
    "id": "H23",
@@ -337,7 +429,11 @@
    "poder": 82,
    "habilidad": "cajaSorpresa",
    "nombreHabilidad": "Caja sorpresa",
-   "texto": "Cada día su poder es aleatorio, desde el de un C hasta el de un A+."
+   "texto": "Cada día su poder es aleatorio, desde el de un C hasta el de un A+.",
+   "rasgos": [
+    "timido",
+    "sociable"
+   ]
   },
   {
    "id": "H24",
@@ -351,7 +447,11 @@
    "poder": 4,
    "habilidad": "farolilloRojo",
    "nombreHabilidad": "Farolillo rojo",
-   "texto": "Su poder sube cuanto más abajo esté tu gremio en el ranking y se apaga si llegas al primer puesto."
+   "texto": "Su poder sube cuanto más abajo esté tu gremio en el ranking y se apaga si llegas al primer puesto.",
+   "rasgos": [
+    "competitivo",
+    "leal"
+   ]
   },
   {
    "id": "H25",
@@ -365,7 +465,11 @@
    "poder": 3,
    "habilidad": "muda",
    "nombreHabilidad": "Muda",
-   "texto": "Las Ascensiones de su gremio son más seguras, pero cada una que ayuda le cuesta poder permanente a ella."
+   "texto": "Las Ascensiones de su gremio son más seguras, pero cada una que ayuda le cuesta poder permanente a ella.",
+   "rasgos": [
+    "paciente",
+    "amable"
+   ]
   },
   {
    "id": "H26",
@@ -379,7 +483,11 @@
    "poder": 84,
    "habilidad": "subastador",
    "nombreHabilidad": "A la una, a las dos",
-   "texto": "Una vez por temporada, anula la puja ganadora de otro gremio en la Prueba de los Novatos y se queda al novato pagando el doble."
+   "texto": "Una vez por temporada, anula la puja ganadora de otro gremio en la Prueba de los Novatos y se queda al novato pagando el doble.",
+   "rasgos": [
+    "orgulloso",
+    "sociable"
+   ]
   },
   {
    "id": "H27",
@@ -393,7 +501,11 @@
    "poder": 7,
    "habilidad": "obsesion",
    "nombreHabilidad": "Obsesión",
-   "texto": "Cuando se enamora, solo puede ir a misiones con su amor. Si él sale sin ella, se pone celosa y lesiona a otros héroes del gremio. Juntos reciben un gran impulso de poder."
+   "texto": "Cuando se enamora, solo puede ir a misiones con su amor. Si él sale sin ella, se pone celosa y lesiona a otros héroes del gremio. Juntos reciben un gran impulso de poder.",
+   "rasgos": [
+    "celoso",
+    "leal"
+   ]
   },
   {
    "id": "H28",
@@ -407,7 +519,11 @@
    "poder": 7,
    "habilidad": "todoJunto",
    "nombreHabilidad": "Todo junto",
-   "texto": "Con cada misión pierde poder hasta llegar a un mínimo. Desde ahí vuelve a crecer al doble de velocidad hasta su techo, y el ciclo empieza de nuevo."
+   "texto": "Con cada misión pierde poder hasta llegar a un mínimo. Desde ahí vuelve a crecer al doble de velocidad hasta su techo, y el ciclo empieza de nuevo.",
+   "rasgos": [
+    "paciente",
+    "reservado"
+   ]
   },
   {
    "id": "H29",
@@ -421,7 +537,11 @@
    "poder": 75,
    "habilidad": "deudaDeHonor",
    "nombreHabilidad": "Deuda de honor",
-   "texto": "Cuanto menos oro tiene el gremio, más poder tiene. Con mucho oro, se apaga."
+   "texto": "Cuanto menos oro tiene el gremio, más poder tiene. Con mucho oro, se apaga.",
+   "rasgos": [
+    "orgulloso",
+    "leal"
+   ]
   },
   {
    "id": "H30",
@@ -435,7 +555,11 @@
    "poder": 74,
    "habilidad": "herencia",
    "nombreHabilidad": "Herencia",
-   "texto": "Cuando muere un héroe de su gremio, hereda una parte de su poder."
+   "texto": "Cuando muere un héroe de su gremio, hereda una parte de su poder.",
+   "rasgos": [
+    "reservado",
+    "timido"
+   ]
   },
   {
    "id": "H31",
@@ -449,7 +573,12 @@
    "poder": 76,
    "habilidad": "mediador",
    "nombreHabilidad": "Mediador",
-   "texto": "Las relaciones malas entre los héroes que van con él a misión no empeoran."
+   "texto": "Las relaciones malas entre los héroes que van con él a misión no empeoran.",
+   "rasgos": [
+    "amable",
+    "paciente",
+    "leal"
+   ]
   },
   {
    "id": "H32",
@@ -463,7 +592,11 @@
    "poder": 77,
    "habilidad": "sinTestigos",
    "nombreHabilidad": "Sin testigos",
-   "texto": "En misiones en solitario duplica su poder. En grupo rinde normal y no le afectan las relaciones."
+   "texto": "En misiones en solitario duplica su poder. En grupo rinde normal y no le afectan las relaciones.",
+   "rasgos": [
+    "reservado",
+    "orgulloso"
+   ]
   },
   {
    "id": "H33",
@@ -477,7 +610,11 @@
    "poder": 73,
    "habilidad": "eco",
    "nombreHabilidad": "Eco",
-   "texto": "En misión, copia la habilidad del compañero más fuerte del equipo."
+   "texto": "En misión, copia la habilidad del compañero más fuerte del equipo.",
+   "rasgos": [
+    "sociable",
+    "ambicioso"
+   ]
   },
   {
    "id": "H34",
@@ -491,7 +628,11 @@
    "poder": 76,
    "habilidad": "dosVoces",
    "nombreHabilidad": "Dos voces",
-   "texto": "Alterna cada misión entre dos personalidades. El ventrílocuo rinde poco y protege de lesiones al equipo. El muñeco rinde mucho y puede lesionar a un compañero."
+   "texto": "Alterna cada misión entre dos personalidades. El ventrílocuo rinde poco y protege de lesiones al equipo. El muñeco rinde mucho y puede lesionar a un compañero.",
+   "rasgos": [
+    "timido",
+    "orgulloso"
+   ]
   },
   {
    "id": "H35",
@@ -505,7 +646,11 @@
    "poder": 74,
    "habilidad": "auditoria",
    "nombreHabilidad": "Auditoría",
-   "texto": "Reduce los sueldos de todo el gremio, pero cada compra le cuesta más."
+   "texto": "Reduce los sueldos de todo el gremio, pero cada compra le cuesta más.",
+   "rasgos": [
+    "reservado",
+    "paciente"
+   ]
   },
   {
    "id": "H36",
@@ -519,7 +664,11 @@
    "poder": 5,
    "habilidad": "dobleJuego",
    "nombreHabilidad": "Doble juego",
-   "texto": "Cada semana te revela qué traman los rivales. Al acabar la temporada, si no está contento, puede volver a su antiguo gremio y llevarse a su mejor amigo."
+   "texto": "Cada semana te revela qué traman los rivales. Al acabar la temporada, si no está contento, puede volver a su antiguo gremio y llevarse a su mejor amigo.",
+   "rasgos": [
+    "sociable",
+    "reservado"
+   ]
   },
   {
    "id": "H37",
@@ -533,7 +682,11 @@
    "poder": 65,
    "habilidad": "pocionRara",
    "nombreHabilidad": "Poción rara",
-   "texto": "Cada día prepara una poción que, en misión, da o quita poder al compañero más flojo del equipo."
+   "texto": "Cada día prepara una poción que, en misión, da o quita poder al compañero más flojo del equipo.",
+   "rasgos": [
+    "sociable",
+    "competitivo"
+   ]
   },
   {
    "id": "H38",
@@ -547,7 +700,11 @@
    "poder": 64,
    "habilidad": "presaGrande",
    "nombreHabilidad": "Presa grande",
-   "texto": "Las misiones de rango alto en las que participa dan más oro."
+   "texto": "Las misiones de rango alto en las que participa dan más oro.",
+   "rasgos": [
+    "reservado",
+    "paciente"
+   ]
   },
   {
    "id": "H39",
@@ -561,7 +718,11 @@
    "poder": 66,
    "habilidad": "invocacion",
    "nombreHabilidad": "Invocación",
-   "texto": "Ocupa dos huecos: el segundo lo ocupa una bestia invocada al azar. Cada bestia tiene su propio poder y crece con la experiencia. En cada misión puede desbloquear una bestia nueva (3 en total)."
+   "texto": "Ocupa dos huecos: el segundo lo ocupa una bestia invocada al azar. Cada bestia tiene su propio poder y crece con la experiencia. En cada misión puede desbloquear una bestia nueva (3 en total).",
+   "rasgos": [
+    "reservado",
+    "ambicioso"
+   ]
   },
   {
    "id": "H40",
@@ -575,7 +736,11 @@
    "poder": 4,
    "habilidad": "redencion",
    "nombreHabilidad": "Redención",
-   "texto": "Empieza llevándose mal con todos. Cada vez que una relación suya mejora de nivel, gana poder permanente."
+   "texto": "Empieza llevándose mal con todos. Cada vez que una relación suya mejora de nivel, gana poder permanente.",
+   "rasgos": [
+    "timido",
+    "leal"
+   ]
   },
   {
    "id": "H41",
@@ -589,7 +754,11 @@
    "poder": 63,
    "habilidad": "imperturbable",
    "nombreHabilidad": "Imperturbable",
-   "texto": "Su poder no cambia por relaciones, ánimo ni habilidades de otros."
+   "texto": "Su poder no cambia por relaciones, ánimo ni habilidades de otros.",
+   "rasgos": [
+    "reservado",
+    "paciente"
+   ]
   },
   {
    "id": "H42",
@@ -603,7 +772,11 @@
    "poder": 62,
    "habilidad": "letraPequena",
    "nombreHabilidad": "Letra pequeña",
-   "texto": "Blinda las cláusulas de su gremio: comprar a sus compañeros cuesta mucho más. A cambio, los sueldos del gremio suben un poco."
+   "texto": "Blinda las cláusulas de su gremio: comprar a sus compañeros cuesta mucho más. A cambio, los sueldos del gremio suben un poco.",
+   "rasgos": [
+    "ambicioso",
+    "orgulloso"
+   ]
   },
   {
    "id": "H43",
@@ -617,7 +790,11 @@
    "poder": 66,
    "habilidad": "banquillo",
    "nombreHabilidad": "Banquillo",
-   "texto": "Gana poder por cada héroe de su gremio que se queda en la sede ese día."
+   "texto": "Gana poder por cada héroe de su gremio que se queda en la sede ese día.",
+   "rasgos": [
+    "sociable",
+    "paciente"
+   ]
   },
   {
    "id": "H44",
@@ -631,7 +808,11 @@
    "poder": 65,
    "habilidad": "sparring",
    "nombreHabilidad": "Entrenamiento",
-   "texto": "Los héroes de su gremio ganan más experiencia en la zona de entrenamiento, pero a él cada sesión le baja el ánimo."
+   "texto": "Los héroes de su gremio ganan más experiencia en la zona de entrenamiento, pero a él cada sesión le baja el ánimo.",
+   "rasgos": [
+    "amable",
+    "paciente"
+   ]
   },
   {
    "id": "H45",
@@ -645,7 +826,11 @@
    "poder": 6,
    "habilidad": "cambiazo",
    "nombreHabilidad": "Cambiazo",
-   "texto": "En misión usa el poder del compañero más fuerte que se queda en la sede."
+   "texto": "En misión usa el poder del compañero más fuerte que se queda en la sede.",
+   "rasgos": [
+    "sociable",
+    "ambicioso"
+   ]
   },
   {
    "id": "H46",
@@ -659,7 +844,11 @@
    "poder": 64,
    "habilidad": "rivalidad",
    "nombreHabilidad": "Rivalidad",
-   "texto": "Elige al héroe más fuerte de otro gremio y gana poder cada vez que ese héroe completa una misión. Si están en el mismo gremio, se apaga."
+   "texto": "Elige al héroe más fuerte de otro gremio y gana poder cada vez que ese héroe completa una misión. Si están en el mismo gremio, se apaga.",
+   "rasgos": [
+    "competitivo",
+    "celoso"
+   ]
   },
   {
    "id": "H47",
@@ -673,7 +862,11 @@
    "poder": 6,
    "habilidad": "banquete",
    "nombreHabilidad": "Banquete",
-   "texto": "Antes de cada misión se come una cantidad de oro al azar del gremio para rendir más."
+   "texto": "Antes de cada misión se come una cantidad de oro al azar del gremio para rendir más.",
+   "rasgos": [
+    "sociable",
+    "amable"
+   ]
   },
   {
    "id": "H48",
@@ -687,7 +880,11 @@
    "poder": 55,
    "habilidad": "pagaONada",
    "nombreHabilidad": "Paga o nada",
-   "texto": "Rinde más mientras cobra al día. Si una semana no le pagas, se va."
+   "texto": "Rinde más mientras cobra al día. Si una semana no le pagas, se va.",
+   "rasgos": [
+    "ambicioso",
+    "reservado"
+   ]
   },
   {
    "id": "H49",
@@ -701,7 +898,11 @@
    "poder": 56,
    "habilidad": "hieloQueSeDerrite",
    "nombreHabilidad": "Hielo que se derrite",
-   "texto": "Cada dos misiones junto al mismo compañero le sube el poder de forma permanente, hasta un tope."
+   "texto": "Cada dos misiones junto al mismo compañero le sube el poder de forma permanente, hasta un tope.",
+   "rasgos": [
+    "orgulloso",
+    "timido"
+   ]
   },
   {
    "id": "H50",
@@ -715,7 +916,11 @@
    "poder": 2,
    "habilidad": "aprendeDerrotas",
    "nombreHabilidad": "Aprende de las derrotas",
-   "texto": "Gana poder permanente cada vez que participa en una misión fallida."
+   "texto": "Gana poder permanente cada vez que participa en una misión fallida.",
+   "rasgos": [
+    "amable",
+    "timido"
+   ]
   },
   {
    "id": "H51",
@@ -729,7 +934,11 @@
    "poder": 57,
    "habilidad": "juramento",
    "nombreHabilidad": "Juramento",
-   "texto": "Jamás acepta ofertas de otros gremios: no se puede comprar. Si su gremio lo vende, bajan la lealtad y el ánimo de todos."
+   "texto": "Jamás acepta ofertas de otros gremios: no se puede comprar. Si su gremio lo vende, bajan la lealtad y el ánimo de todos.",
+   "rasgos": [
+    "leal",
+    "orgulloso"
+   ]
   },
   {
    "id": "H52",
@@ -743,7 +952,11 @@
    "poder": 5,
    "habilidad": "silencio",
    "nombreHabilidad": "«...»",
-   "texto": "Anula todas las habilidades de los héroes que van con él en misión."
+   "texto": "Anula todas las habilidades de los héroes que van con él en misión.",
+   "rasgos": [
+    "reservado",
+    "timido"
+   ]
   },
   {
    "id": "H53",
@@ -757,7 +970,11 @@
    "poder": 3,
    "habilidad": "chapuza",
    "nombreHabilidad": "Chapuza",
-   "texto": "Cada semana las mejoras de instalaciones de su gremio salen más baratas o más caras, al azar."
+   "texto": "Cada semana las mejoras de instalaciones de su gremio salen más baratas o más caras, al azar.",
+   "rasgos": [
+    "sociable",
+    "amable"
+   ]
   },
   {
    "id": "H54",
@@ -771,7 +988,11 @@
    "poder": 54,
    "habilidad": "dopamina",
    "nombreHabilidad": "Dopamina",
-   "texto": "Si pasa una semana sin que su gremio fiche o venda a un héroe, se va a otro gremio."
+   "texto": "Si pasa una semana sin que su gremio fiche o venda a un héroe, se va a otro gremio.",
+   "rasgos": [
+    "ambicioso",
+    "sociable"
+   ]
   },
   {
    "id": "H55",
@@ -785,7 +1006,11 @@
    "poder": 53,
    "habilidad": "misionDeVida",
    "nombreHabilidad": "Misión de vida",
-   "texto": "Rinde poco hasta cumplir su misión personal (completar 8 misiones). Al cumplirla gana mucho poder, pero puede irse."
+   "texto": "Rinde poco hasta cumplir su misión personal (completar 8 misiones). Al cumplirla gana mucho poder, pero puede irse.",
+   "rasgos": [
+    "ambicioso",
+    "orgulloso"
+   ]
   },
   {
    "id": "H56",
@@ -799,7 +1024,11 @@
    "poder": 55,
    "habilidad": "maraton",
    "nombreHabilidad": "Maratón",
-   "texto": "En las misiones de 3 días rinde mucho más, y en las de 1 día rinde mal."
+   "texto": "En las misiones de 3 días rinde mucho más, y en las de 1 día rinde mal.",
+   "rasgos": [
+    "paciente",
+    "competitivo"
+   ]
   },
   {
    "id": "H57",
@@ -813,7 +1042,11 @@
    "poder": 4,
    "habilidad": "sesion",
    "nombreHabilidad": "Sesión",
-   "texto": "Una vez por semana arregla la peor relación del gremio o anima al héroe más hundido, pero se contagia y le baja el ánimo."
+   "texto": "Una vez por semana arregla la peor relación del gremio o anima al héroe más hundido, pero se contagia y le baja el ánimo.",
+   "rasgos": [
+    "paciente",
+    "amable"
+   ]
   },
   {
    "id": "H58",
@@ -827,7 +1060,11 @@
    "poder": 45,
    "habilidad": "contagio",
    "nombreHabilidad": "Contagio",
-   "texto": "Sube un poco el poder de los héroes que van con ella a misión."
+   "texto": "Sube un poco el poder de los héroes que van con ella a misión.",
+   "rasgos": [
+    "sociable",
+    "amable"
+   ]
   },
   {
    "id": "H59",
@@ -841,7 +1078,11 @@
    "poder": 44,
    "habilidad": "primerGolpe",
    "nombreHabilidad": "Primer golpe",
-   "texto": "Si ha descansado al menos un día entero, su siguiente misión tiene el doble de poder."
+   "texto": "Si ha descansado al menos un día entero, su siguiente misión tiene el doble de poder.",
+   "rasgos": [
+    "reservado",
+    "paciente"
+   ]
   },
   {
    "id": "H60",
@@ -855,7 +1096,11 @@
    "poder": 43,
    "habilidad": "estudioso",
    "nombreHabilidad": "Estudioso",
-   "texto": "Gana un poco de poder permanente por cada tipo de misión distinto que completa."
+   "texto": "Gana un poco de poder permanente por cada tipo de misión distinto que completa.",
+   "rasgos": [
+    "timido",
+    "paciente"
+   ]
   },
   {
    "id": "H61",
@@ -869,7 +1114,11 @@
    "poder": 5,
    "habilidad": "fama",
    "nombreHabilidad": "Fama",
-   "texto": "Su precio de venta crece con cada misión completada."
+   "texto": "Su precio de venta crece con cada misión completada.",
+   "rasgos": [
+    "sociable",
+    "ambicioso"
+   ]
   },
   {
    "id": "H62",
@@ -883,7 +1132,11 @@
    "poder": 4,
    "habilidad": "godsHateMe",
    "nombreHabilidad": "God's hate me",
-   "texto": "Todos los héroes que van con ella en una misión se lesionan."
+   "texto": "Todos los héroes que van con ella en una misión se lesionan.",
+   "rasgos": [
+    "timido",
+    "celoso"
+   ]
   },
   {
    "id": "H63",
@@ -897,7 +1150,11 @@
    "poder": 2,
    "habilidad": "cierreTemporada",
    "nombreHabilidad": "Cierre de temporada",
-   "texto": "Rinde la mitad toda la temporada, pero el último día rinde cuatro veces más."
+   "texto": "Rinde la mitad toda la temporada, pero el último día rinde cuatro veces más.",
+   "rasgos": [
+    "timido",
+    "paciente"
+   ]
   },
   {
    "id": "H64",
@@ -911,7 +1168,11 @@
    "poder": 5,
    "habilidad": "malaJugada",
    "nombreHabilidad": "Mala jugada",
-   "texto": "Cada semana sabotea al gremio que va justo por delante y le quita prestigio, pero si la pillan, el suyo pierde prestigio."
+   "texto": "Cada semana sabotea al gremio que va justo por delante y le quita prestigio, pero si la pillan, el suyo pierde prestigio.",
+   "rasgos": [
+    "competitivo",
+    "celoso"
+   ]
   },
   {
    "id": "H65",
@@ -925,7 +1186,11 @@
    "poder": 46,
    "habilidad": "casaLlena",
    "nombreHabilidad": "Casa llena",
-   "texto": "Gana poder por cada plaza ocupada del gremio, pero cobra más por cada una."
+   "texto": "Gana poder por cada plaza ocupada del gremio, pero cobra más por cada una.",
+   "rasgos": [
+    "sociable",
+    "amable"
+   ]
   },
   {
    "id": "H66",
@@ -939,7 +1204,11 @@
    "poder": 3,
    "habilidad": "cantera",
    "nombreHabilidad": "Cantera",
-   "texto": "Los novatos que ficha su gremio en la Prueba empiezan un rango más alto."
+   "texto": "Los novatos que ficha su gremio en la Prueba empiezan un rango más alto.",
+   "rasgos": [
+    "paciente",
+    "amable"
+   ]
   },
   {
    "id": "H67",
@@ -953,7 +1222,11 @@
    "poder": 42,
    "habilidad": "karma",
    "nombreHabilidad": "Karma",
-   "texto": "Sube la probabilidad de éxito de su misión, pero la siguiente misión del gremio tiene menos."
+   "texto": "Sube la probabilidad de éxito de su misión, pero la siguiente misión del gremio tiene menos.",
+   "rasgos": [
+    "reservado",
+    "ambicioso"
+   ]
   },
   {
    "id": "H68",
@@ -967,7 +1240,11 @@
    "poder": 5,
    "habilidad": "brilloFugaz",
    "nombreHabilidad": "Brillo fugaz",
-   "texto": "Gana experiencia al doble de velocidad, pero al alcanzar su techo empieza a perder poder cada semana."
+   "texto": "Gana experiencia al doble de velocidad, pero al alcanzar su techo empieza a perder poder cada semana.",
+   "rasgos": [
+    "ambicioso",
+    "sociable"
+   ]
   },
   {
    "id": "H69",
@@ -981,7 +1258,11 @@
    "poder": 7,
    "habilidad": "roboDePoder",
    "nombreHabilidad": "Robo de poder",
-   "texto": "Los héroes que van con él se lesionan de la forma más grave posible, pero él no se lesiona nunca y gana poder por cada uno."
+   "texto": "Los héroes que van con él se lesionan de la forma más grave posible, pero él no se lesiona nunca y gana poder por cada uno.",
+   "rasgos": [
+    "orgulloso",
+    "reservado"
+   ]
   },
   {
    "id": "H70",
@@ -995,7 +1276,11 @@
    "poder": 6,
    "habilidad": "gelatina",
    "nombreHabilidad": "Cuerpo gelatinoso",
-   "texto": "No puede lesionarse nunca."
+   "texto": "No puede lesionarse nunca.",
+   "rasgos": [
+    "amable",
+    "sociable"
+   ]
   },
   {
    "id": "H71",
@@ -1009,7 +1294,11 @@
    "poder": 35,
    "habilidad": "botin",
    "nombreHabilidad": "Botín",
-   "texto": "Cuando completa una misión puede traer oro extra, pero si la misión falla, el gremio pierde oro."
+   "texto": "Cuando completa una misión puede traer oro extra, pero si la misión falla, el gremio pierde oro.",
+   "rasgos": [
+    "ambicioso",
+    "sociable"
+   ]
   },
   {
    "id": "H72",
@@ -1023,7 +1312,11 @@
    "poder": 4,
    "habilidad": "mejorAmigo",
    "nombreHabilidad": "Mejor amigo",
-   "texto": "Elige a un compañero como dueño. Cuando van juntos a misión, los dos rinden más."
+   "texto": "Elige a un compañero como dueño. Cuando van juntos a misión, los dos rinden más.",
+   "rasgos": [
+    "leal",
+    "amable"
+   ]
   },
   {
    "id": "H73",
@@ -1037,7 +1330,11 @@
    "poder": 3,
    "habilidad": "sombraDeGigantes",
    "nombreHabilidad": "Sombra de gigantes",
-   "texto": "Su poder sube un poco por cada punto de prestigio del gremio."
+   "texto": "Su poder sube un poco por cada punto de prestigio del gremio.",
+   "rasgos": [
+    "timido",
+    "leal"
+   ]
   },
   {
    "id": "H74",
@@ -1051,7 +1348,11 @@
    "poder": 36,
    "habilidad": "ultimaOracion",
    "nombreHabilidad": "Última oración",
-   "texto": "Una vez por temporada evita que muera un héroe de su gremio."
+   "texto": "Una vez por temporada evita que muera un héroe de su gremio.",
+   "rasgos": [
+    "amable",
+    "paciente"
+   ]
   },
   {
    "id": "H75",
@@ -1065,7 +1366,11 @@
    "poder": 4,
    "habilidad": "forja",
    "nombreHabilidad": "Forja",
-   "texto": "Cada vez que el gremio gasta oro, da un punto de poder a un héroe al azar del gremio."
+   "texto": "Cada vez que el gremio gasta oro, da un punto de poder a un héroe al azar del gremio.",
+   "rasgos": [
+    "reservado",
+    "paciente"
+   ]
   },
   {
    "id": "H76",
@@ -1079,7 +1384,11 @@
    "poder": 5,
    "habilidad": "atajo",
    "nombreHabilidad": "Atajo",
-   "texto": "Las misiones en las que participa duran un día menos."
+   "texto": "Las misiones en las que participa duran un día menos.",
+   "rasgos": [
+    "leal",
+    "paciente"
+   ]
   },
   {
    "id": "H77",
@@ -1093,7 +1402,11 @@
    "poder": 36,
    "habilidad": "prestamo",
    "nombreHabilidad": "Préstamo",
-   "texto": "Si a su gremio no le llega para los sueldos, adelanta el oro con intereses. Si la deuda pasa dos semanas sin pagarse, se lleva a un héroe."
+   "texto": "Si a su gremio no le llega para los sueldos, adelanta el oro con intereses. Si la deuda pasa dos semanas sin pagarse, se lleva a un héroe.",
+   "rasgos": [
+    "ambicioso",
+    "reservado"
+   ]
   },
   {
    "id": "H78",
@@ -1107,7 +1420,11 @@
    "poder": 4,
    "habilidad": "falsoRango",
    "nombreHabilidad": "Falso rango",
-   "texto": "Al venderlo, su precio se calcula como si tuviera un rango más. Si lo descubren, el gremio pierde prestigio."
+   "texto": "Al venderlo, su precio se calcula como si tuviera un rango más. Si lo descubren, el gremio pierde prestigio.",
+   "rasgos": [
+    "sociable",
+    "orgulloso"
+   ]
   },
   {
    "id": "H79",
@@ -1121,7 +1438,11 @@
    "poder": 3,
    "habilidad": "guardia",
    "nombreHabilidad": "Guardia",
-   "texto": "Una vez por temporada anula un sabotaje o un robo de fichaje contra su gremio."
+   "texto": "Una vez por temporada anula un sabotaje o un robo de fichaje contra su gremio.",
+   "rasgos": [
+    "leal",
+    "reservado"
+   ]
   },
   {
    "id": "H80",
@@ -1135,7 +1456,11 @@
    "poder": 1,
    "habilidad": "mimo",
    "nombreHabilidad": "Mimo",
-   "texto": "No puede ir a misiones, pero da prestigio cada semana. Si la vendes, baja el ánimo de todos."
+   "texto": "No puede ir a misiones, pero da prestigio cada semana. Si la vendes, baja el ánimo de todos.",
+   "rasgos": [
+    "sociable",
+    "amable"
+   ]
   }
  ]
 }

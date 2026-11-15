@@ -1,5 +1,19 @@
 # Informe de balance
 
+## Sistema social (2026-11-15)
+
+`npm run simular -- 150 1`, historia completa. El ánimo (±15% de poder) desaparece; ahora cuentan las relaciones del equipo (±15% con tope) y el estrés alto (−5%).
+
+| Métrica | Prudente | Ambiciosa |
+| --- | --: | --: |
+| Puesto medio al cerrar la temporada 5 | 5,0 | 3,3 |
+| Final «Leyenda» / «Respeto» / «Olvido» | 0% / 1% / 99% | 29% / 17% / 54% |
+| Héroes muertos en el gremio (media) | 0,0 | 3,9 |
+| Tasa de éxito de misiones | 88% | 89% |
+| Oro final | 103.609 | 37.701 |
+
+Lectura: la estrategia ambiciosa gana algo menos (29% frente a 37%), porque ya no hay bonificación de ánimo y el bot no cuida las relaciones. El Segador casi nunca mata, porque las relaciones ya no empeoran solas con el tiempo. En 10 partidas del bot ambicioso hubo de media 31 amistades, 24 rivalidades, 10 rescates en misión, 11 discusiones y menos de una pareja por partida (el bot rota mucho los equipos).
+
 ## Modo historia con el catálogo de héroes (2026-11-14)
 
 Simulación con `npm run simular -- 300 1`: 300 partidas por estrategia (semillas 1–300), la historia completa (5 temporadas, 140 días). Héroes del catálogo (`src/datos/heroes.json`), escala de diez rangos, relaciones, ánimo, muerte y las 80 habilidades. Cifras provisionales.

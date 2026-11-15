@@ -2,6 +2,17 @@
 
 Entradas más recientes primero.
 
+## 2026-11-15 — Sistema social de los héroes
+
+- Documento del propietario «Sistema social de héroes» v1.0, integrado con lo que ya había y con las habilidades.
+- `relaciones.ts` (núcleo): un registro por pareja con afinidad, atracción en cada dirección, pareja/expareja, rivalidad e historial; rasgos de personalidad; felicidad y estrés (sustituyen al ánimo); memoria de hechos importantes; modificadores en misión con tope; consecuencias de misiones (protecciones, discusiones, rivalidades, celos por subir de poder), marchas y muertes.
+- `eventosSociales.ts` y `src/datos/eventos-sociales.json`: declaración, rechazo, ruptura, celos, petición de no compartir equipo, descontento, abandono, crisis y duelo, con opciones (algunas cuestan oro), cooldowns, eventos únicos, prioridad y caducidad.
+- Cifras en `src/datos/social.json`. Rasgos de los 80 héroes en el catálogo.
+- Partida versión 10; las guardadas antiguas se convierten (`migracion.ts`).
+- Interfaz: pestaña «Relaciones» en Gestionar gremio (asuntos pendientes, tabla de quién se lleva con quién y detalle con la historia de cada pareja); rasgos, felicidad y estrés en las cartas; desglose social y avisos al formar equipo; aviso de asuntos en el resumen del día y en el botón del gremio.
+- Tests de los 14 criterios de aceptación y de la prueba de prototipo del documento (`tests/social.test.ts`). 122 tests; probado en navegador sin errores.
+- Decisiones técnicas en la pregunta 20. Pendiente: jugar a mano la prueba de prototipo; pocas parejas con el bot.
+
 ## 2026-11-14 — Catálogo de héroes, relaciones y muerte
 
 - Petición del propietario: clases y géneros del catálogo a criterio de Claude, escala de rangos de la hoja (rivales en su rango máximo, libres en F por la Prueba), crear los sistemas que falten con las relaciones como pilar, y resolver la muerte.

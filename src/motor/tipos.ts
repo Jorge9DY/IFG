@@ -4,7 +4,8 @@
 export const LETRAS = ['F', 'E', 'D', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S'] as const;
 export type Letra = (typeof LETRAS)[number];
 
-export type EstadoHeroe = 'libre' | 'en mision' | 'lesionado' | 'entrenando';
+/** «descansando»: el jugador le ha dado días libres (evento social); cuenta los días en diasLesion. */
+export type EstadoHeroe = 'libre' | 'en mision' | 'lesionado' | 'entrenando' | 'descansando';
 
 export type Genero = 'Hombre' | 'Mujer';
 
@@ -36,21 +37,38 @@ export interface Heroe {
   techoConocido?: boolean;
   /** Semanas seguidas sin cobrar el sueldo. */
   semanasSinCobrar: number;
-  /** Ánimo (0–100): cambia con las misiones, las relaciones y lo que le pasa a sus compañeros. Por defecto 60. */
-  animo?: number;
+  /** Felicidad (0–100): satisfacción con su vida en el gremio. Sistema social. */
+  felicidad?: number;
+  /** Estrés (0–100): presión acumulada. No es lo contrario de la felicidad. */
+  estres?: number;
+  /** Rasgos de personalidad (2–3, fijos). */
+  rasgos?: string[];
   genero?: Genero;
   /** Héroe diseñado del catálogo (src/datos/heroes.json). Los genéricos no tienen. */
   catalogo?: string;
   /** Habilidad única (id del catálogo). */
   habilidad?: string;
-  /** Héroe del que está enamorado (puede no ser correspondido). */
-  amor?: string | null;
   /** Contadores de su habilidad (rachas, cargas, vida…). Plano y serializable. */
   memoria?: Record<string, number | string | number[] | string[]>;
   /** Último día en que volvió de una misión (para el descanso). */
   ultimoRegreso?: number;
   /** Convertido por el Segador. */
   zombie?: boolean;
+}
+
+/**
+ * Relación entre dos héroes (un solo registro por pareja, clave «a|b» en orden alfabético).
+ * La afinidad es compartida; la atracción es direccional: [del primero al segundo, del segundo al primero].
+ */
+export interface Relacion {
+  afinidad: number;
+  atraccion: [number, number];
+  /** Estado romántico guardado: solo la pareja y la expareja necesitan un evento; el interés se deriva de la atracción. */
+  pareja: 'ninguna' | 'pareja' | 'expareja';
+  /** Rivalidad: puede coexistir con la amistad. */
+  rivales: boolean;
+  /** Hechos importantes de la relación (primera misión juntos, salvado, pareja, ruptura…). */
+  historial: string[];
 }
 
 export type RangoMision = 'bajo' | 'medio' | 'alto';

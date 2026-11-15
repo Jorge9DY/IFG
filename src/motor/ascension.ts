@@ -116,7 +116,6 @@ export function resolverAscension(estado: EstadoJuego, azar: Azar, c: MisionEnCu
         estado: 'libre' as const,
         habilidad: undefined,
         catalogo: undefined,
-        amor: null,
         memoria: {},
         reputacion: Math.min(100, h.reputacion + 30),
       };

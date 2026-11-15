@@ -9,7 +9,8 @@ import { diaDeTemporada, esFinDeTemporada, heroesDe, puesto, registrar, semanaDe
 import { alLimite, indiceLetra, pisoDe, rango, valorPublico } from './heroes';
 import { morir, gremioDe } from './muerte';
 import { prestigio } from './ranking';
-import { afinidad, cambiarAfinidad, cambiarAnimo, factorAnimo, inmuneARelaciones, quimica, vinculo } from './relaciones';
+import { afinidad, amorDe, atraccion, cambiarAfinidad, cambiarMental, factorEstres, felicidad, inmuneARelaciones, quimica, vinculo } from './relaciones';
+import S from '../datos/social.json';
 import type { Gremio, Heroe, Letra, Mision } from './tipos';
 
 const H = balance.habilidades;
@@ -86,8 +87,9 @@ export function huecosEquipo(equipo: readonly Heroe[]): number {
 /** Por qué este héroe no puede ir en este equipo, o null. */
 export function motivoNoIr(estado: EstadoJuego, h: Heroe, equipo: readonly string[]): string | null {
   if (h.habilidad === 'mimo') return `${h.nombre} no sale a misiones: es la mascota del gremio`;
-  if (h.habilidad === 'obsesion' && h.amor) {
-    const amor = estado.heroes[h.amor];
+  const amorId = h.habilidad === 'obsesion' ? amorDe(estado, h.id) : null;
+  if (amorId) {
+    const amor = estado.heroes[amorId];
     const mismoGremio = amor && gremioDe(estado, amor.id) === gremioDe(estado, h.id);
     if (amor && mismoGremio && !equipo.includes(amor.id)) return `${h.nombre} solo sale de misión con ${amor.nombre}`;
   }
@@ -130,7 +132,7 @@ function factorPropio(ctx: Contexto, h: Heroe, hab: string | null): number {
       for (let i = 0; i < mates.length; i++)
         for (let j = i + 1; j < mates.length; j++) {
           const v = vinculo(estado, mates[i]!.id, mates[j]!.id);
-          if (v === 'amigos' || v === 'mejores amigos' || v === 'pareja') n++;
+          if (v === 'amigos' || v === 'grandes amigos' || v === 'pareja') n++;
         }
       return 1 + Math.min(H.hiloRojo.maximo, n * H.hiloRojo.porVinculo);
     }
@@ -145,13 +147,13 @@ function factorPropio(ctx: Contexto, h: Heroe, hab: string | null): number {
       return 1 + Math.min(H.haters.maximo, n * H.haters.porOdio);
     }
     case 'lookAtMe':
-      return 1 + Math.min(H.lookAtMe.maximo, mates.filter((m) => m.amor === h.id).length * H.lookAtMe.porAmor);
+      return 1 + Math.min(H.lookAtMe.maximo, mates.filter((m) => atraccion(estado, m.id, h.id) >= S.umbrales.enamorado).length * H.lookAtMe.porAmor);
     case 'farolilloRojo': {
       const p = puesto(estado, gremioId);
       return p === 1 ? H.farolilloRojo.primero : 1 + (p - 1) * H.farolilloRojo.porPuesto;
     }
     case 'obsesion':
-      return h.amor && equipo.some((x) => x.id === h.amor) ? H.obsesion.factor : 1;
+      return equipo.some((x) => x.id === amorDe(estado, h.id)) ? H.obsesion.factor : 1;
     case 'deudaDeHonor':
       return H.deudaDeHonor.maximo - H.deudaDeHonor.caida * Math.min(1, Math.max(0, g?.oro ?? 0) / H.deudaDeHonor.oroTope);
     case 'sinTestigos':
@@ -210,7 +212,7 @@ function factorCompaneros(ctx: Contexto, h: Heroe): number {
     const hab = activa(x, ctx.equipo);
     if (hab === 'contagio') f *= H.contagio.factor;
     if (hab === 'mejorAmigo' && x.memoria?.dueno === h.id) f *= H.mejorAmigo.factor;
-    if (hab === 'obsesion' && x.amor === h.id) f *= H.obsesion.factor;
+    if (hab === 'obsesion' && amorDe(ctx.estado, x.id) === h.id) f *= H.obsesion.factor;
     if (hab === 'pocionRara' && flojo.find((y) => y.id !== x.id)?.id === h.id) f *= num(x, 'pocion', 1) > 0 ? H.pocionRara.buena : H.pocionRara.mala;
   }
   return f;
@@ -228,7 +230,7 @@ export function poderHeroeEnMision(ctx: Contexto, h: Heroe, quim = quimica(ctx.e
   const base = poderBase(ctx, h, hab);
   const mago = h.clase === 'Mago' && ctx.mision.rango === 'alto' ? balance.clases.poderMagoEnAlto : 1;
   const nevada = h.habilidad === 'imperturbable';
-  const social = nevada ? 1 : factorCompaneros(ctx, h) * factorAnimo(h) * (inmuneARelaciones(h) ? 1 : 1 + quim / 100);
+  const social = nevada ? 1 : factorCompaneros(ctx, h) * factorEstres(h) * (inmuneARelaciones(h) ? 1 : 1 + quim / 100);
   const bestia = hab === 'invocacion' ? poderBestia(h) : 0;
   return base * mago * factorPropio(ctx, h, hab) * social + bestia;
 }
@@ -333,7 +335,7 @@ export function alSalir(ctx: Contexto, azar: Azar): string[] {
     const hab = activa(h, equipo);
     if (h.habilidad === 'furia') {
       poner(h, 'seguidas', seguidas(h, ctx.dia));
-      cambiarAnimo(h, H.furia.animo);
+      cambiarMental(h, { estres: H.furia.estres });
       h.lealtad = Math.max(0, h.lealtad + H.furia.lealtad);
     }
     if (hab === 'banquete' && g) {
@@ -350,10 +352,11 @@ export function alSalir(ctx: Contexto, azar: Azar): string[] {
   }
   // Yandere: si su amor sale sin ella, se pone celosa y la paga con los demás.
   for (const y of tiene(estado, gremioId, 'obsesion')) {
-    if (!y.amor || equipo.includes(y) || !equipo.some((x) => x.id === y.amor)) continue;
-    cambiarAnimo(y, H.obsesion.animo);
+    const amor = amorDe(estado, y.id);
+    if (!amor || equipo.includes(y) || !equipo.some((x) => x.id === amor)) continue;
+    cambiarMental(y, { felicidad: H.obsesion.felicidad, estres: H.obsesion.estres });
     if (azar.probabilidad(H.obsesion.probLesion)) {
-      const victimas = heroesDe(estado, gremioId).filter((x) => x.estado === 'libre' && x.id !== y.id && x.id !== y.amor && x.habilidad !== 'gelatina' && x.habilidad !== 'imperturbable');
+      const victimas = heroesDe(estado, gremioId).filter((x) => x.estado === 'libre' && x.id !== y.id && x.id !== amor && x.habilidad !== 'gelatina' && x.habilidad !== 'imperturbable');
       const v = victimas.length > 0 ? azar.elegir(victimas) : null;
       if (v) {
         v.estado = 'lesionado';
@@ -604,17 +607,17 @@ export function cadaSemana(estado: EstadoJuego, azar: Azar): ResultadoSemanaHabi
       for (let i = 0; i < hs.length; i++)
         for (let j = i + 1; j < hs.length; j++) {
           const af = afinidad(estado, hs[i]!.id, hs[j]!.id);
-          if (af < balance.relaciones.umbrales.mala && (!peor || af < peor[2])) peor = [hs[i]!.id, hs[j]!.id, af];
+          if (af <= S.umbrales.malaRelacion && (!peor || af < peor[2])) peor = [hs[i]!.id, hs[j]!.id, af];
         }
-      const hundido = hs.filter((h) => h.id !== d.id).sort((a, b) => (a.animo ?? 60) - (b.animo ?? 60))[0];
+      const hundido = hs.filter((h) => h.id !== d.id).sort((a, b) => felicidad(a) - felicidad(b))[0];
       if (peor) {
         cambiarAfinidad(estado, peor[0], peor[1], -peor[2]);
         decir(g, `${d.nombre} media entre ${estado.heroes[peor[0]]?.nombre} y ${estado.heroes[peor[1]]?.nombre}: hacen las paces.`);
-      } else if (hundido && (hundido.animo ?? 60) < 40) {
-        hundido.animo = H.sesion.animo;
+      } else if (hundido && felicidad(hundido) < H.sesion.umbral) {
+        hundido.felicidad = H.sesion.felicidad;
         decir(g, `${d.nombre} tiene una sesión con ${hundido.nombre}, que recupera el ánimo.`);
       } else continue;
-      cambiarAnimo(d, H.sesion.coste);
+      cambiarMental(d, { estres: H.sesion.estres });
     }
     // Zancadilla: sabotea al gremio que va justo por delante.
     for (const z of tiene(estado, g.id, 'malaJugada')) {
@@ -727,10 +730,10 @@ export function alVender(estado: EstadoJuego, azar: Azar, h: Heroe, vendedorId: 
     poner(h, 'tesoro', 0);
   }
   if (h.habilidad === 'juramento' || h.habilidad === 'mimo') {
-    const animo = h.habilidad === 'juramento' ? H.juramento.animo : H.mimo.animo;
+    const golpe = h.habilidad === 'juramento' ? H.juramento.felicidad : H.mimo.felicidad;
     for (const m of heroesDe(estado, vendedorId)) {
       if (m.id === h.id) continue;
-      cambiarAnimo(m, animo);
+      cambiarMental(m, { felicidad: golpe });
       if (h.habilidad === 'juramento') m.lealtad = Math.max(0, m.lealtad + H.juramento.lealtad);
     }
     textos.push(h.habilidad === 'juramento' ? `Vender a ${h.nombre} rompe un juramento: todo el gremio lo nota.` : `El gremio echa de menos a ${h.nombre}.`);
@@ -822,7 +825,7 @@ export function trasAscension(estado: EstadoJuego, gremioId: string, heroeId: st
 export function factorEntrenamiento(estado: EstadoJuego, gremioId: string, heroeId: string): number {
   const s = tiene(estado, gremioId, 'sparring').find((x) => x.id !== heroeId && x.estado === 'libre');
   if (!s) return 1;
-  cambiarAnimo(s, H.sparring.animo);
+  cambiarMental(s, { estres: H.sparring.estres });
   return H.sparring.experiencia;
 }
 

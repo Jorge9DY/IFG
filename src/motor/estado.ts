@@ -3,7 +3,7 @@
 import balance from '../datos/balance.json';
 import type { Reto } from './retos';
 import type { Subasta } from './subasta';
-import type { Gremio, Heroe, Mision } from './tipos';
+import type { Gremio, Heroe, Mision, Relacion } from './tipos';
 
 export interface MisionEnCurso {
   mision: Mision;
@@ -35,7 +35,7 @@ export interface Caido {
 
 export interface Evento {
   dia: number;
-  tipo: 'mision' | 'fichaje' | 'venta' | 'sueldos' | 'novatos' | 'instalacion' | 'rival' | 'ranking' | 'temporada' | 'reto' | 'relacion' | 'muerte' | 'habilidad';
+  tipo: 'mision' | 'fichaje' | 'venta' | 'sueldos' | 'novatos' | 'instalacion' | 'rival' | 'ranking' | 'temporada' | 'reto' | 'relacion' | 'muerte' | 'habilidad' | 'social';
   texto: string;
 }
 
@@ -62,8 +62,39 @@ export interface PruebaNovatos {
  */
 export type Fase = 'gestion' | 'prueba' | 'victoria';
 
+/** Recuerdo de un hecho social importante (sección 12 del sistema social). */
+export interface Memoria {
+  dia: number;
+  tipo: string;
+  heroes: string[];
+  texto: string;
+}
+
+/** Evento social esperando la decisión del jugador. */
+export interface EventoPendiente {
+  uid: string;
+  eventoId: string;
+  a: string;
+  b?: string;
+  /** Nombres, por si alguno ya no está (duelo). */
+  nombres: { a: string; b?: string };
+  dia: number;
+}
+
+export interface EstadoSocial {
+  pendientes: EventoPendiente[];
+  /** Clave de evento y participantes → día hasta el que no se puede repetir. */
+  cooldowns: Record<string, number>;
+  /** Eventos de «una vez por partida» ya ocurridos. */
+  unicos: string[];
+  memorias: Memoria[];
+  /** Peticiones aceptadas de no compartir misión. No bloquean: romperlas tiene consecuencias. */
+  vetos: { solicitante: string; otro: string; dia: number }[];
+  contador: number;
+}
+
 export interface EstadoJuego {
-  version: 9;
+  version: 10;
   semilla: number;
   /** Estado del generador aleatorio, para continuar la misma secuencia. */
   azar: number;
@@ -85,8 +116,9 @@ export interface EstadoJuego {
   ranking: FilaRanking[];
   registro: Evento[];
   contadorIds: number;
-  /** Afinidad de cada pareja de héroes (clave «a|b»). Las que faltan valen 0. */
-  relaciones: Record<string, number>;
+  /** Relación de cada pareja de héroes (clave «a|b»). Las que faltan son neutrales. */
+  relaciones: Record<string, Relacion>;
+  social: EstadoSocial;
   /** Héroes libres del catálogo que aún pueden llegar a la Prueba de los Novatos. */
   bolsaNovatos: string[];
   /** Muro de los caídos. */

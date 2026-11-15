@@ -403,69 +403,6 @@
     "ruidoValor": 0.2,
     "nivelSedeMinimo": 5
   },
-  "relaciones": {
-    "_nota": "Pilar del modo historia (propuesta de Claude, cifras provisionales). Afinidad de −100 a 100 por pareja de héroes. La compatibilidad (−2 a +2) es fija y oculta: hace que unas parejas mejoren solas y otras se tuerzan.",
-    "umbrales": {
-      "enemigos": -60,
-      "mala": -25,
-      "amigos": 25,
-      "mejores": 60
-    },
-    "quimica": {
-      "enemigos": -12,
-      "mala": -6,
-      "amigos": 4,
-      "mejores": 8,
-      "pareja": 12,
-      "maximo": 25
-    },
-    "misionExito": 6,
-    "misionFracaso": -2,
-    "porCompatibilidad": 3,
-    "semanalPorCompatibilidad": 4,
-    "compatibilidad": {
-      "-2": 10,
-      "-1": 20,
-      "0": 40,
-      "1": 20,
-      "2": 10
-    },
-    "amor": {
-      "umbral": 65,
-      "umbralFacil": 40,
-      "probabilidad": 25
-    },
-    "celos": 5,
-    "perdida": {
-      "amigos": 10,
-      "mejores": 20,
-      "pareja": 35
-    },
-    "muerte": {
-      "todos": 5,
-      "amigos": 20,
-      "mejores": 35,
-      "pareja": 50
-    }
-  },
-  "animo": {
-    "_nota": "Ánimo de 0 a 100 (propuesta de Claude, provisional). Multiplica el poder en misión (±15% en los extremos) y mueve la lealtad cada semana. Con la lealtad a 0, el héroe se va.",
-    "inicial": 60,
-    "exito": 4,
-    "fracaso": -6,
-    "lesion": -8,
-    "impago": -15,
-    "factorPoder": 0.003,
-    "base": 50,
-    "porAmigo": 4,
-    "porEnemigo": -6,
-    "deriva": 0.3,
-    "umbralAlto": 60,
-    "umbralBajo": 30,
-    "lealtadAlto": 3,
-    "lealtadBajo": -6,
-    "lealtadAviso": 20
-  },
   "muerte": {
     "_nota": "Propuesta de Claude (provisional). Solo se muere por riesgos que el jugador ve antes: la Ascensión, las habilidades que lo dicen (Chimoku, Segador) y las misiones de rango alto con menos del 35% de éxito, marcadas con «Riesgo de muerte».",
     "umbralProbabilidad": 35,
@@ -504,7 +441,7 @@
     "furia": {
       "porMision": 0.1,
       "maximo": 0.5,
-      "animo": -5,
+      "estres": 8,
       "lealtad": -2
     },
     "racha": {
@@ -526,9 +463,10 @@
     },
     "obsesion": {
       "factor": 1.4,
-      "animo": -10,
       "probLesion": 25,
-      "diasLesion": 2
+      "diasLesion": 2,
+      "felicidad": -10,
+      "estres": 10
     },
     "deudaDeHonor": {
       "maximo": 1.4,
@@ -684,7 +622,7 @@
       "prestigio": 10
     },
     "juramento": {
-      "animo": -15,
+      "felicidad": -15,
       "lealtad": -10
     },
     "auditoria": {
@@ -715,7 +653,7 @@
     },
     "sparring": {
       "experiencia": 1.5,
-      "animo": -5
+      "estres": 5
     },
     "sacrificio": {
       "porZombie": 0.15,
@@ -724,8 +662,9 @@
       "umbralAfinidad": -25
     },
     "sesion": {
-      "animo": 70,
-      "coste": -10
+      "felicidad": 70,
+      "umbral": 40,
+      "estres": 10
     },
     "chapuza": {
       "minimo": 0.7,
@@ -741,7 +680,7 @@
     },
     "mimo": {
       "prestigio": 3,
-      "animo": -10
+      "felicidad": -10
     },
     "prestamo": {
       "interes": 0.2,

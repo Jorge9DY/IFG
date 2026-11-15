@@ -13,9 +13,27 @@ import { alLimite, indiceLetra, letraDe, nivelOjeo, potencialEstimado, rango, ra
 import { LETRAS } from '../motor/tipos';
 import { NOMBRE_INSTALACION, infoInstalacion, mejorar, plazas, type Instalacion } from '../motor/instalaciones';
 import { comprar, condicionesCompra, ofertaVenta, vender } from '../motor/mercado';
-import { clasesCubiertas, duracionMision, quimicaEquipo } from '../motor/misiones';
+import { clasesCubiertas, duracionMision, socialEquipo } from '../motor/misiones';
 import { ficha, huecos, huecosEquipo, poderBestia } from '../motor/habilidades';
-import { relacionesDe, textoAnimo, animo, type Vinculo } from '../motor/relaciones';
+import {
+  afinidad,
+  estres,
+  felicidad,
+  memoriasDe,
+  nivelDe,
+  rasgos,
+  relacion,
+  relacionesDe,
+  romance,
+  sonPareja,
+  textoEstres,
+  textoFelicidad,
+  vetosDelEquipo,
+  type Romance,
+  type Vinculo,
+} from '../motor/relaciones';
+import { pendientes, resolverEvento } from '../motor/eventosSociales';
+import social from '../datos/social.json';
 import { sueldoEn } from '../motor/economia';
 import { fraseReto, heroesParaReto, motivoNoAceptar, aceptarReto, rechazarReto } from '../motor/retos';
 import {
@@ -50,7 +68,7 @@ import type { CombateTorneo } from '../motor/torneo';
 import { retrato } from './retrato';
 
 export type Panel = 'nueva' | 'misiones' | 'mercado' | 'gremio' | 'prueba' | 'dia' | 'semana' | 'victoria';
-type PestanaGremio = 'heroes' | 'instalaciones' | 'ranking';
+type PestanaGremio = 'heroes' | 'relaciones' | 'instalaciones' | 'ranking';
 
 const TITULOS: Record<Panel, string> = {
   nueva: 'Gremio de héroes',
@@ -119,6 +137,8 @@ export class Interfaz {
   private pestanaMercado: 'comprar' | 'vender' = 'comprar';
   private gremioRival = 'dragon';
   private pestanaGremio: PestanaGremio = 'heroes';
+  /** Pareja elegida en la tabla de relaciones («a|b»). */
+  private parejaVista: string | null = null;
   private resumenDia: ResumenDia | null = null;
   private resumenSemana: ResumenSemana | null = null;
 
@@ -228,7 +248,9 @@ export class Interfaz {
         .filter(Boolean)
         .join(' · ');
       const sinCobrar = todos.some((h) => h.semanasSinCobrar > 0) ? '<em class="alerta-texto">Hay héroes sin cobrar</em>' : '';
-      this.el.menu.innerHTML = `<button class="boton-grande gastar" data-abrir="gremio" data-pestana="heroes" ${bloqueo}><span class="signo">−</span>Gestionar gremio<small>Héroes: ${resumen}</small><small>Mejorar instalaciones</small>${sinCobrar}</button>`;
+      const asuntos = estado.social.pendientes.length;
+      const avisoAsuntos = asuntos ? `<em class="alerta-texto">${asuntos} ${asuntos === 1 ? 'asunto pendiente' : 'asuntos pendientes'}</em>` : '';
+      this.el.menu.innerHTML = `<button class="boton-grande gastar" data-abrir="gremio" data-pestana="${asuntos ? 'relaciones' : 'heroes'}" ${bloqueo}><span class="signo">−</span>Gestionar gremio<small>Héroes: ${resumen}</small><small>Relaciones · Mejorar instalaciones</small>${sinCobrar}${avisoAsuntos}</button>`;
       this.el.equipo.innerHTML = `<button class="boton-grande ganar" data-abrir="misiones" ${bloqueo}><span class="signo">+</span>Lanzar misiones<small>${estado.tablon.length} en el tablón · ${libres} ${libres === 1 ? 'héroe libre' : 'héroes libres'}</small></button>`;
       const retoPendiente = estado.reto && !estado.reto.resultado ? '<em class="alerta-texto">¡Un maestro rival te reta!</em>' : '';
       this.el.accion.innerHTML = `<button class="boton-grande mercado" data-abrir="mercado" ${bloqueo}>Mercado de héroes<small>Compra a otros gremios o vende a los tuyos</small>${retoPendiente}</button>`;
@@ -345,20 +367,51 @@ export class Interfaz {
     return `<details class="habilidad"><summary>✦ ${esc(f.nombreHabilidad)}${h.zombie ? ' · Zombie' : ''}</summary><p>${esc(f.texto)}${extra}</p>${f.ascension && f.ascension !== 'Por definir.' ? `<p class="tenue">Ascensión: ${esc(f.ascension)}</p>` : ''}</details>`;
   }
 
-  /** Lo que siente: ánimo y sus relaciones más fuertes dentro del gremio. */
+  /** Rasgos de personalidad como etiquetas. */
+  private rasgosChips(h: Heroe): string {
+    const N = social.nombreRasgo as Record<string, string>;
+    return rasgos(h).map((r) => `<span class="rasgo">${esc(N[r] ?? r)}</span>`).join('');
+  }
+
+  /** Felicidad y estrés: dos barras finas con palabra. */
+  private mental(h: Heroe): string {
+    const f = felicidad(h);
+    const e = estres(h);
+    return `<span class="mental" title="Felicidad ${f}/100 · Estrés ${e}/100. Con más de ${social.mision.estresAlto} de estrés rinde un ${-social.mision.penalizacionEstres}% menos.">
+      <span class="medida"><small>Felicidad</small><span class="barra-mental feliz"><i style="--hasta:${f}%"></i></span><b>${textoFelicidad(h)}</b></span>
+      <span class="medida"><small>Estrés</small><span class="barra-mental estres ${e > social.mision.estresAlto ? 'alto' : ''}"><i style="--hasta:${e}%"></i></span><b>${textoEstres(h)}</b></span></span>`;
+  }
+
+  /** Lo que siente: rasgos, felicidad, estrés, sus relaciones más fuertes y si tiene un asunto pendiente. */
   private sentimientos(estado: EstadoJuego, h: Heroe, gremioId: string): string {
-    const ICONO: Record<Vinculo, string> = { pareja: '♥', 'mejores amigos': '★', amigos: '☺', neutral: '', 'mala relación': '☹', enemigos: '✖' };
-    const fuertes = relacionesDe(estado, gremioId, h.id).filter((r) => r.vinculo !== 'neutral' || r.laAma || r.leAma);
-    const chips = fuertes
+    const chips = relacionesDe(estado, gremioId, h.id)
+      .filter((r) => r.vinculo !== 'neutral' || r.rivales || r.romanceDe !== 'ninguno')
       .slice(0, 4)
       .map((r) => {
-        const texto = r.laAma && r.vinculo !== 'pareja' ? `enamorado de ${r.heroe.nombre}` : `${r.vinculo} con ${r.heroe.nombre}`;
-        const icono = r.laAma && r.vinculo !== 'pareja' ? '♡' : ICONO[r.vinculo];
-        return `<span class="vinculo v-${r.vinculo.replace(' ', '-')}" title="${esc(texto)} (afinidad ${r.afinidad})">${icono} ${esc(r.heroe.nombre)}</span>`;
+        const icono = this.icono(r.vinculo, r.romanceDe, r.rivales);
+        return `<span class="vinculo v-${r.vinculo.replace(' ', '-')}" title="${esc(this.textoVinculo(r.vinculo, r.romanceDe, r.rivales))} · ${esc(r.heroe.nombre)}">${icono} ${esc(r.heroe.nombre)}</span>`;
       })
       .join('');
-    const a = animo(h);
-    return `<div class="sentimientos"><span class="animo" title="Ánimo ${a}/100: cambia su poder en misión hasta un ±15%">Ánimo: <b>${textoAnimo(h)}</b></span>${chips}</div>`;
+    const asunto = estado.social.pendientes.some((p) => p.a === h.id || p.b === h.id) ? '<span class="asunto-chip">Asunto pendiente</span>' : '';
+    return `<div class="sentimientos">${this.rasgosChips(h)}${asunto}</div>${this.mental(h)}${chips ? `<div class="sentimientos">${chips}</div>` : ''}`;
+  }
+
+  /** Icono de una relación: pareja, amor, rivalidad o nivel de afinidad. */
+  private icono(v: Vinculo, r: Romance, rivales: boolean): string {
+    if (v === 'pareja') return '♥';
+    if (r === 'enamorado') return '♡';
+    if (r === 'interés') return '❦';
+    const base: Record<Vinculo, string> = { pareja: '♥', 'grandes amigos': '★', amigos: '☺', neutral: '·', 'mala relación': '☹', enemigos: '✖' };
+    return rivales && v === 'neutral' ? '⚔' : `${base[v]}${rivales ? '⚔' : ''}`;
+  }
+
+  private textoVinculo(v: Vinculo, r: Romance, rivales: boolean): string {
+    const partes: string[] = [v];
+    if (r === 'enamorado') partes.push('enamorado');
+    else if (r === 'interés') partes.push('interesado');
+    else if (r === 'expareja') partes.push('expareja');
+    if (rivales) partes.push('rivales');
+    return partes.join(' · ');
   }
 
   private carta(estado: EstadoJuego, h: Heroe, pie: string, extraClase = ''): string {
@@ -445,7 +498,11 @@ export class Interfaz {
     this.equipo = this.equipo.filter((id) => libres.some((h) => h.id === id));
     const equipo = this.equipo.map((id) => obtenerHeroe(estado, id));
     const prob = equipo.length ? probabilidadJugador(estado, mision, equipo) : null;
-    const quimica = equipo.length > 1 ? quimicaEquipo(estado, equipo) : 0;
+    const soc = socialEquipo(estado, equipo);
+    const quimica = equipo.length > 1 ? soc.total : 0;
+    const estresados = equipo.filter((h) => estres(h) > social.mision.estresAlto && h.habilidad !== 'imperturbable');
+    const vetos = vetosDelEquipo(estado, this.equipo);
+    const conAsunto = equipo.filter((h) => estado.social.pendientes.some((p) => p.a === h.id || p.b === h.id));
     const riesgo = hayRiesgoDeMuerte(estado, mision, equipo);
     const ocupa = huecosEquipo(equipo);
     const { cubiertas, faltan } = clasesCubiertas(mision, equipo);
@@ -456,7 +513,7 @@ export class Interfaz {
         const va = this.equipo.includes(h.id);
         return `<button class="ficha-heroe ${va ? 'va' : ''}" data-accion="alternar" data-id="${h.id}" aria-pressed="${va}">
           ${this.avatar(h)}
-          <span class="quien"><strong>${esc(h.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${ICONO_CLASE[h.clase] ?? ''} ${h.clase} · poder ${num(h.poder)}${huecos(h) > 1 ? ` · ${huecos(h)} huecos` : ''} · ${textoAnimo(h).toLowerCase()}</span></span>
+          <span class="quien"><strong>${esc(h.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${ICONO_CLASE[h.clase] ?? ''} ${h.clase} · poder ${num(h.poder)}${huecos(h) > 1 ? ` · ${huecos(h)} huecos` : ''}${estres(h) > social.mision.estresAlto ? ' · <b class="alerta-texto">estresado</b>' : ''}</span></span>
           <span class="marca">${va ? '✓' : '+'}</span>
         </button>`;
       })
@@ -474,7 +531,15 @@ export class Interfaz {
         <div class="medidor d-${nivelDificultad(prob)}"><b>${prob === null ? '—' : pct(prob)}</b><span>de éxito</span></div>
       </div>
       ${clases}
-      ${quimica !== 0 ? `<p class="quimica ${quimica > 0 ? 'buena' : 'mala'}">Química del equipo: ${quimica > 0 ? '+' : ''}${quimica}% de poder (${quimica > 0 ? 'se llevan bien' : 'se llevan mal'})</p>` : ''}
+      ${
+        soc.detalles.length || estresados.length
+          ? `<div class="quimica ${quimica >= 0 ? 'buena' : 'mala'}"><b>Relaciones en el equipo: ${quimica > 0 ? '+' : ''}${quimica}% de poder</b>${soc.detalles.length && Math.abs(soc.detalles.reduce((t, d) => t + d.valor, 0)) > social.mision.tope ? ` (tope ±${social.mision.tope}%)` : ''}<ul>${soc.detalles
+              .map((d) => `<li>${esc(d.texto)} (${d.valor > 0 ? '+' : ''}${d.valor}%)</li>`)
+              .join('')}${estresados.map((h) => `<li class="mala">${esc(h.nombre)}: muy estresado (${social.mision.penalizacionEstres}% su poder)</li>`).join('')}</ul></div>`
+          : ''
+      }
+      ${vetos.map((v) => `<p class="riesgo-muerte">⚠ Prometiste a ${esc(obtenerHeroe(estado, v.solicitante).nombre)} que no iría con ${esc(obtenerHeroe(estado, v.otro).nombre)}. Puedes mandarlos igual, pero lo llevará mal.</p>`).join('')}
+      ${conAsunto.length ? `<p class="tenue">⚑ ${esc(conAsunto.map((h) => h.nombre).join(', '))} ${conAsunto.length === 1 ? 'tiene' : 'tienen'} un asunto pendiente en el gremio. <button data-accion="ir-relaciones">Verlo</button></p>` : ''}
       ${riesgo ? `<p class="riesgo-muerte">☠ Riesgo de muerte: con menos del ${balance.muerte.umbralProbabilidad}% de éxito, si la misión fracasa alguien puede no volver.</p>` : ''}
       <div class="fichas">${fichas || '<p class="tenue">No tienes héroes libres.</p>'}</div>
       ${ocupados ? `<p class="tenue">No disponibles: ${ocupados}. <button data-accion="ir-heroes">Ver héroes</button></p>` : ''}
@@ -563,7 +628,8 @@ export class Interfaz {
   }
 
   private panelGremio(estado: EstadoJuego): string {
-    const nombres: Record<PestanaGremio, string> = { heroes: 'Héroes', instalaciones: 'Instalaciones', ranking: 'Ranking' };
+    const asuntos = estado.social.pendientes.length;
+    const nombres: Record<PestanaGremio, string> = { heroes: 'Héroes', relaciones: asuntos ? `Relaciones (${asuntos})` : 'Relaciones', instalaciones: 'Instalaciones', ranking: 'Ranking' };
     const pestañas = `<div class="pestanas">${(Object.keys(nombres) as PestanaGremio[])
       .map((p) => `<button data-accion="pestana-gremio" data-id="${p}" class="${this.pestanaGremio === p ? 'activo' : ''}">${nombres[p]}</button>`)
       .join('')}</div>`;
@@ -592,12 +658,84 @@ export class Interfaz {
           .join('');
         return `${pestañas}${filas}`;
       }
+      case 'relaciones':
+        return `${pestañas}${this.panelRelaciones(estado)}`;
       case 'ranking':
         return `${pestañas}${this.tablaRanking(estado)}
           <p class="tenue">Puntos = Fuerza (poder de tus 5 mejores héroes) + Prestigio (instalaciones, misiones de rango alto y novatos destacados fichados). El ranking oficial se actualiza el día 7; al final de cada temporada (28 días) se reparte un premio según la posición.</p>`;
       default:
         return `${pestañas}${this.inventario(estado)}${this.muroCaidos(estado)}`;
     }
+  }
+
+  /** Asuntos sociales que esperan tu decisión. */
+  private asuntos(estado: EstadoJuego): string {
+    const lista = pendientes(estado);
+    if (lista.length === 0) return '';
+    return `<h3>Asuntos pendientes · ${lista.length}</h3>${lista
+      .map(
+        (v) => `<section class="asunto ${v.urgente ? 'urgente' : ''}"><b>${esc(v.titulo)}</b><p>${esc(v.texto)}</p>
+          <div class="botones">${v.opciones
+            .map((o) => `<button data-accion="decidir" data-id="${v.uid}:${o.id}" ${o.bloqueo ? `disabled title="${esc(o.bloqueo)}"` : ''} class="${o.porDefecto ? '' : 'principal'}">${esc(o.texto)}</button>`)
+            .join('')}</div>
+          <small class="tenue">${v.caduca === 0 ? 'Si no decides hoy' : `Si no decides en ${v.caduca} ${v.caduca === 1 ? 'día' : 'días'}`}, pasará lo de «${esc(v.opciones.find((o) => o.porDefecto)?.texto ?? '')}».</small></section>`,
+      )
+      .join('')}`;
+  }
+
+  /**
+   * Relaciones del gremio: los asuntos pendientes, una tabla de quién se lleva con quién y, al tocar una
+   * casilla, el detalle de esa pareja con su historia (por qué están así).
+   */
+  private panelRelaciones(estado: EstadoJuego): string {
+    const heroes = heroesDe(estado, estado.jugadorId).sort((a, b) => b.poder - a.poder);
+    if (heroes.length < 2) return `${this.asuntos(estado)}<p class="tenue">Con menos de dos héroes no hay relaciones que ver.</p>`;
+    const corto = (h: Heroe): string => esc(h.nombre.split(' ')[0] ?? h.nombre);
+    const cabecera = `<tr><th></th>${heroes.map((h) => `<th><span class="vertical">${corto(h)}</span></th>`).join('')}</tr>`;
+    const filas = heroes
+      .map((a) => {
+        const celdas = heroes
+          .map((b) => {
+            if (a.id === b.id) return '<td class="vacia"></td>';
+            const k = a.id < b.id ? `${a.id}|${b.id}` : `${b.id}|${a.id}`;
+            const r = relacion(estado, a.id, b.id);
+            const v = sonPareja(estado, a.id, b.id) ? 'pareja' : nivelDe(r.afinidad);
+            const rom = romance(estado, a.id, b.id);
+            const elegida = this.parejaVista === k ? 'elegida' : '';
+            return `<td><button class="celda v-${v.replace(' ', '-')} ${elegida}" data-accion="ver-pareja" data-id="${k}" title="${esc(`${a.nombre} → ${b.nombre}: ${this.textoVinculo(v, rom, r.rivales)} (afinidad ${r.afinidad})`)}">${this.icono(v, rom, r.rivales)}</button></td>`;
+          })
+          .join('');
+        return `<tr><th>${corto(a)}</th>${celdas}</tr>`;
+      })
+      .join('');
+    const leyenda = '<p class="tenue leyenda">♥ pareja · ♡ enamorado · ❦ interesado · ★ grandes amigos · ☺ amigos · ☹ se llevan mal · ✖ enemigos · ⚔ rivales. Cada fila dice lo que siente ese héroe. Toca una casilla para ver la historia.</p>';
+    return `${this.asuntos(estado)}<h3>Quién se lleva con quién</h3><div class="matriz-rel"><table>${cabecera}${filas}</table></div>${leyenda}${this.detallePareja(estado)}
+      <p class="tenue">Las relaciones cambian con lo que viven juntos: misiones, rescates, discusiones, ascensos, rupturas y muertes. Los amigos y las parejas rinden más juntos; los enemigos, menos.</p>`;
+  }
+
+  private detallePareja(estado: EstadoJuego): string {
+    if (!this.parejaVista) return '';
+    const [ia, ib] = this.parejaVista.split('|') as [string, string];
+    const a = estado.heroes[ia];
+    const b = estado.heroes[ib];
+    if (!a || !b) return '';
+    const r = relacion(estado, a.id, b.id);
+    const v = sonPareja(estado, a.id, b.id) ? 'pareja' : nivelDe(r.afinidad);
+    const sentir = (x: Heroe, y: Heroe): string => {
+      const rom = romance(estado, x.id, y.id);
+      return rom === 'ninguno' ? 'sin sentimientos románticos' : rom === 'interés' ? 'se ha fijado en ' + esc(y.nombre) : rom === 'enamorado' ? 'está enamorado de ' + esc(y.nombre) : rom === 'pareja' ? 'son pareja' : 'son expareja';
+    };
+    const historia = memoriasDe(estado, a.id, b.id)
+      .slice(0, 8)
+      .map((m) => `<li><span class="tenue">${esc(textoCalendario({ ...estado, dia: m.dia }).split(' · ')[1] ?? '')}, T${Math.floor((m.dia - 1) / balance.calendario.diasPorTemporada) + 1}:</span> ${esc(m.texto)}</li>`)
+      .join('');
+    const veto = vetosDelEquipo(estado, [a.id, b.id]).length ? '<p class="alerta-texto">Prometiste que no irían juntos de misión.</p>' : '';
+    return `<section class="detalle-pareja">
+      <header>${this.avatar(a)}<b>${esc(a.nombre)}</b><span class="vinculo v-${v.replace(' ', '-')}">${this.icono(v, 'ninguno', r.rivales)} ${esc(this.textoVinculo(v, 'ninguno', r.rivales))}</span><b>${esc(b.nombre)}</b>${this.avatar(b)}</header>
+      <p>Afinidad <b>${afinidad(estado, a.id, b.id)}</b> (de −100 a 100). ${esc(a.nombre)} ${sentir(a, b)}; ${esc(b.nombre)} ${sentir(b, a)}.</p>
+      ${veto}
+      ${historia ? `<h4>Por qué</h4><ul class="lista vida">${historia}</ul>` : '<p class="tenue">Todavía no han vivido nada importante juntos.</p>'}
+    </section>`;
   }
 
   /** Muro de los caídos: los héroes del gremio que han muerto. */
@@ -629,7 +767,7 @@ export class Interfaz {
         detalle = `${h.diasLesion} ${h.diasLesion === 1 ? 'día' : 'días'} de reposo`;
         accion = `<button class="principal" data-accion="curar" data-id="${h.id}" ${c.bloqueo ? `disabled title="${esc(c.bloqueo)}"` : ''}>Curar por ${num(c.precio)}</button>`;
       } else {
-        detalle = h.lealtad < balance.animo.lealtadAviso ? 'Piensa en irse: su lealtad está muy baja' : 'Listo para una misión';
+        detalle = felicidad(h) < social.efectos.descontento ? 'Está descontento: mira sus relaciones' : 'Listo para una misión';
         const a = condicionesAscension(estado, h.id);
         if (alLimite(h) && a.rangoNuevo) {
           detalle = 'Ha llegado a su límite';
@@ -655,7 +793,7 @@ export class Interfaz {
       </div>`;
     };
     // Primero los libres: son los que puedes usar ahora mismo.
-    const grupos: [Heroe['estado'], string][] = [['libre', 'Libres'], ['lesionado', 'Lesionados'], ['entrenando', 'Entrenando'], ['en mision', 'De misión']];
+    const grupos: [Heroe['estado'], string][] = [['libre', 'Libres'], ['lesionado', 'Lesionados'], ['descansando', 'Descansando'], ['entrenando', 'Entrenando'], ['en mision', 'De misión']];
     const bloques = grupos
       .map(([e, titulo]) => {
         const lista = heroes.filter((h) => h.estado === e);
@@ -795,6 +933,9 @@ export class Interfaz {
     const dentro = r.informes.flatMap((i) => i.textos);
     const vida = r.vida.filter((t) => !dentro.includes(t));
     const gremio = vida.length ? `<h3>En el gremio</h3><ul class="lista vida">${vida.slice(0, 8).map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : '';
+    const asuntos = estado.social.pendientes.length
+      ? `<div class="resultado asunto-aviso"><b>${estado.social.pendientes.length === 1 ? 'Hay un asunto' : `Hay ${estado.social.pendientes.length} asuntos`} en el gremio esperando tu decisión</b><button data-accion="ir-relaciones">Ver asuntos</button></div>`
+      : '';
     const boton = r.prueba
       ? '<button class="principal" data-accion="ir-prueba">Ir a la Prueba de los Novatos</button>'
       : '<button class="principal" data-accion="cerrar">Seguir</button>';
@@ -811,7 +952,7 @@ export class Interfaz {
     const entrenos = r.entrenamientos.length
       ? `<div class="resultado entreno"><b>Vuelven de entrenar</b><span>Sin lesiones.</span><div class="regresos">${r.entrenamientos.map((e) => this.tarjetaRegreso(estado.heroes[e.heroeId], e.progreso, 0)).join('')}</div></div>`
       : '';
-    return `${ascenso}${ascensiones}${misiones}${entrenos}${misiones || ascensiones || entrenos ? '' : '<p>Hoy no ha vuelto ninguna misión.</p>'}${sueldos}${gremio}${noticias}
+    return `${ascenso}${ascensiones}${misiones}${entrenos}${misiones || ascensiones || entrenos ? '' : '<p>Hoy no ha vuelto ninguna misión.</p>'}${asuntos}${sueldos}${gremio}${noticias}
       ${r.prueba ? '' : `<p class="tenue">Empieza el ${esc(textoCalendario(estado).split(' · ')[1] ?? '')}.</p>`}
       <div class="botones">${boton}</div>`;
   }
@@ -955,6 +1096,19 @@ export class Interfaz {
         this.pestanaGremio = id as PestanaGremio;
         this.mensaje = '';
         return this.repintar();
+      case 'ver-pareja':
+        this.parejaVista = this.parejaVista === id ? null : id;
+        return this.repintar();
+      case 'ir-relaciones':
+        this.pestanaGremio = 'relaciones';
+        return this.abrir('gremio');
+      case 'decidir': {
+        const [uid, opcion] = id.split(':') as [string, string];
+        const textos = resolverEvento(estado, uid, opcion);
+        this.mensaje = textos.join(' ');
+        this.guardar();
+        return this.repintar();
+      }
       case 'comprar': {
         const h = obtenerHeroe(estado, id);
         comprar(estado, id);
