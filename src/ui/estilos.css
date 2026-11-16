@@ -720,3 +720,6 @@ button.meta-objetivo:hover { border-color: var(--cian); }
 .mas { font-size: 12px; margin: 2px 0; }
 .mas summary { cursor: pointer; color: var(--tenue); }
 .mas[open] summary { margin-bottom: 2px; }
+.ficha-envoltorio { display: flex; flex-direction: column; gap: 2px; }
+.ficha-envoltorio .habilidad { margin: 0; font-size: 12px; }
+.genero { font-size: 12px; color: var(--tenue); white-space: nowrap; }

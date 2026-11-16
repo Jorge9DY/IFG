@@ -2,6 +2,10 @@
 
 Entradas más recientes primero.
 
+## 2026-11-16 — Habilidad desplegable al formar equipo y género visible
+
+- Petición del propietario: al elegir héroes para una misión, cada uno tiene su habilidad desplegable debajo (con la misma regla de visibilidad). El género (♂ Hombre / ♀ Mujer) se ve en las cartas, en el inventario y en la formación. 147 tests; probado en navegador sin errores.
+
 ## 2026-11-16 — Mejoras del análisis de diseño
 
 - Petición del propietario: desarrollar las mejoras del análisis.

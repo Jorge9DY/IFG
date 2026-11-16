@@ -452,6 +452,12 @@ export class Interfaz {
       .join('')}</ul></div>`;
   }
 
+  /** Hombre o mujer, con símbolo. */
+  private genero(h: Heroe): string {
+    if (!h.genero) return '';
+    return `<span class="genero" title="${h.genero}">${h.genero === 'Mujer' ? '♀ Mujer' : '♂ Hombre'}</span>`;
+  }
+
   /** Rasgos de personalidad como etiquetas. */
   private rasgosChips(h: Heroe): string {
     const N = social.nombreRasgo as Record<string, string>;
@@ -518,7 +524,7 @@ export class Interfaz {
     return `<article class="carta ${extraClase}">
       <header>
         ${this.avatar(h)}
-        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)}</span></div>
+        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} ${this.genero(h)}</span></div>
         ${estadoTexto}
       </header>
       <div class="identidad"><span class="dato"><span class="etq">Poder</span><b>${num(h.poder)}</b></span>${this.techo(estado, h)}</div>
@@ -605,11 +611,11 @@ export class Interfaz {
     const fichas = libres
       .map((h) => {
         const va = this.equipo.includes(h.id);
-        return `<button class="ficha-heroe ${va ? 'va' : ''}" data-accion="alternar" data-id="${h.id}" aria-pressed="${va}">
+        return `<div class="ficha-envoltorio"><button class="ficha-heroe ${va ? 'va' : ''}" data-accion="alternar" data-id="${h.id}" aria-pressed="${va}">
           ${this.avatar(h)}
-          <span class="quien"><strong>${esc(h.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${ICONO_CLASE[h.clase] ?? ''} ${h.clase} · poder ${num(h.poder)}${huecos(h) > 1 ? ` · ${huecos(h)} huecos` : ''}${estres(h) > social.mision.estresAlto ? ' · <b class="alerta-texto">estresado</b>' : ''}</span></span>
+          <span class="quien"><strong>${esc(h.nombre.split(' ')[0] ?? '')}</strong><span class="tenue">${ICONO_CLASE[h.clase] ?? ''} ${h.clase} · ${this.genero(h)} · poder ${num(h.poder)}${huecos(h) > 1 ? ` · ${huecos(h)} huecos` : ''}${estres(h) > social.mision.estresAlto ? ' · <b class="alerta-texto">estresado</b>' : ''}</span></span>
           <span class="marca">${va ? '✓' : '+'}</span>
-        </button>`;
+        </button>${this.habilidad(estado, h)}</div>`;
       })
       .join('');
     const ocupados = heroesDe(estado, estado.jugadorId)
@@ -890,7 +896,7 @@ export class Interfaz {
         : '';
       return `<div class="fila-heroe e-${h.estado.replace(' ', '-')}">
         ${this.avatar(h)}
-        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} Poder ${h.poder} · sueldo ${num(sueldoEn(estado, j.id, h))} · lealtad ${h.lealtad}</span>${this.techo(estado, h)}${this.barraXp(h)}${this.habilidad(estado, h)}${this.sentimientos(estado, h, j.id)}${aviso}</div>
+        <div class="quien"><strong>${esc(h.nombre)}</strong><span class="tenue">${this.claseChip(h.clase)} ${this.genero(h)} · Poder ${h.poder} · sueldo ${num(sueldoEn(estado, j.id, h))} · lealtad ${h.lealtad}</span>${this.techo(estado, h)}${this.barraXp(h)}${this.habilidad(estado, h)}${this.sentimientos(estado, h, j.id)}${aviso}</div>
         <div class="situacion"><span class="estado-chip e-${h.estado.replace(' ', '-')}">${h.estado === 'en mision' ? 'de misión' : h.estado}</span><span class="tenue">${detalle}</span></div>
         <div class="accion-fila">${accion}</div>
       </div>`;
