@@ -179,7 +179,9 @@ Los arcos de héroe y los epílogos (`src/datos/historia.json`) los ha escrito C
 3. ¿Los finales deben cambiar algo más que el texto (por ejemplo, desbloquear un héroe o un modo en la siguiente partida)?
 4. El importador (`npx tsx herramientas/importar-hoja.ts Heroes.csv --escribir`) actualiza el catálogo desde la hoja exportada en CSV. ¿Lo usamos como flujo normal a partir de ahora?
 
-## 24. Apartado gráfico: dirección de arte (2026-11-16)
+## 24. Apartado gráfico: dirección de arte — RESUELTA (2026-11-16)
+
+Respuestas del propietario: 1, maqueta fija con toda la sede; 2, de acuerdo; 3, el héroe espera con «!»; 4, vale; 5, Bolita es un slime rosa, Tokopi un pulpo gracioso, todos los héroes muy distintos entre sí y HalfGoblin es chica; 6, fuentes del sistema. Texto original:
 
 Detalle en `docs/direccion-de-arte.md` (sección «Dirección de arte detallada»). No se programa nada hasta tener el visto bueno. Recomendación de Claude entre paréntesis.
 

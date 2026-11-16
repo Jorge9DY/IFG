@@ -161,6 +161,7 @@ Variación por héroe (desde su semilla y sus ajustes): altura × 0,86–1,12, c
 | Accesorio de clase | 20–60 |
 | **Total típico** | **350–550** (tope 700) |
 
+- **Medido en la muestra (fase 1):** HalfGoblin 636 y Lumia 838, por encima de lo previsto, porque el pelo suelto y los faldones largos se dibujan por las dos caras. El presupuesto real queda en **600–850**; no afecta al rendimiento.
 - Las formas especiales pueden llegar a 1.200 (AllBlack son tres cuerpos que comparten geometría).
 - 20 héroes son unos 10.000 triángulos: los triángulos no son el problema. Lo que cuenta son las llamadas de dibujo y las sombras (apartado 10).
 
@@ -223,8 +224,7 @@ La expresión y el parpadeo se cambian moviendo las coordenadas de la cara a otr
 
 | Plano | Cámara | Uso |
 | --- | --- | --- |
-| **Sede** | Perspectiva de 30°, unos 38° de picado y girada 32°. Sigue al maestro con suavidad y encuadra una sala y un poco más: los héroes ocupan cerca del 20% del alto. Las paredes del lado de la cámara se cortan bajas. | Juego normal |
-| **Maqueta** | La misma cámara, alejada hasta ver toda la sede | Sola durante 2–3 segundos al mejorar una instalación, para ver crecer la sala; también con la rueda del ratón |
+| **Sede (maqueta fija)** | Perspectiva de 30°, unos 38° de picado y girada 32°. Fija, con **toda la sede a la vista** y los héroes pequeños (decisión del propietario, 2026-11-16). Las paredes del lado de la cámara se cortan bajas. Al crecer la sede, la cámara se aleja lo justo para que siga cabiendo entera. | Juego normal |
 | **Escena** | Perspectiva de 35° a 1,35 de altura y a 2,2–2,8 del héroe, que queda de rodillas para arriba y algo descentrado. El hombro del maestro, de espaldas, en primer plano | Momentos de historia y asuntos sociales |
 | **Retrato** | Perspectiva de 20°, cabeza y hombros, girada 15°, con luz fija | Cartas y listas |
 
@@ -310,6 +310,10 @@ Los héroes genéricos (sin catálogo) se generan igual, sin el paso 5.
 | Pacto | Invocadora con marcas rúnicas y grimorio. La sigue su bestia activa (la que diga su estado): Lobo de ceniza, Gólem de musgo o Grifo pálido, tres cuerpos sencillos de unos 250 triángulos, algo fantasmales. |
 | Mascota | Criatura pequeña no humana (0,55), entre gato y zorro, con orejas grandes, cola en bloque y el pañuelo del gremio. Anda a cuatro patas; para saludar se sienta y levanta una pata. Como no va a misiones, siempre está en la sede. |
 | Zombies | Modificador sobre cualquier figura: piel gris verdosa, ropa desaturada con rotos pintados, ojos en blanco con ojeras y costuras. Anda encorvado, con los brazos por delante. |
+| Bolita | Criatura con forma de bola, como el típico *slime* de los juegos de aventuras, pero **rosa** (decisión del propietario). Cara pintada, sin extremidades; avanza botando. |
+| Tokopi | Un **pulpo gracioso y mono** (decisión del propietario): cabeza redonda grande, ojos enormes y tentáculos cortos en bloques. |
+
+Regla del propietario para los 80: **todos muy distintos entre sí**. En la fase 2 se comprueba en la hoja de contacto: no puede haber dos héroes con la misma combinación de silueta, peinado y colores, y cada uno tendrá al menos un rasgo visual propio. HalfGoblin es chica.
 
 **Animaciones** (por código, sobre los huesos; el carácter cambia la amplitud y el ritmo):
 
@@ -455,9 +459,16 @@ Al cerrar cada fase: `npm run typecheck`, `npm test`, `npm run build`, Playwrigh
 - **El recuadro central es pequeño para una escena.** Si el bocadillo y las opciones quedan apretados, se propondrá que el recuadro crezca mientras dura la escena.
 - **No se parecerá a las referencias 1 y 2 en el dibujo de los personajes:** esas usan ilustraciones planas tipo recortable. Aquí los personajes son 3D como en las 3 y 4. Lo que sí se busca de las 1 y 2 es la luz, el encuadre y la interfaz.
 
-### 14. Decisiones que necesito del propietario
+### 14. Decisiones del propietario — respondidas el 2026-11-16
 
-Con mi recomendación; también en `docs/preguntas.md` (pregunta 24).
+1. **Cámara:** maqueta fija con toda la sede y héroes más pequeños.
+2. **Solares y enfermería:** de acuerdo.
+3. **Asuntos sociales:** el héroe espera con una «!».
+4. **El maestro:** vale la figura de espaldas con abrigo oliva y bufanda naranja.
+5. **Formas:** Bolita es una criatura con forma de bola, como un *slime*, pero rosa. Tokopi es un pulpo gracioso y mono. Todos los héroes deben ser muy distintos entre sí. HalfGoblin es chica.
+6. **Fuentes:** las del sistema si se parecen más a las de las referencias. Se parecen más (las referencias usan una gótica limpia, no la letra cuadrada de Rajdhani), así que la interfaz pasará a fuentes del sistema en la fase 4; las escenas de la muestra ya las usan.
+
+Texto original de las preguntas, con la recomendación de Claude (también en `docs/preguntas.md`, pregunta 24):
 
 1. **Cámara de la sede:** cercana, siguiendo al maestro, con plano de maqueta al mejorar (recomendada; es la de las referencias). La alternativa es una maqueta fija con toda la sede a la vista y héroes más pequeños.
 2. **Salas sin construir como solares** y **enfermería** como sala que llega con la sede en el nivel 3. Son solo visuales y no cambian reglas. ¿De acuerdo?

@@ -2,6 +2,20 @@
 
 Entradas más recientes primero.
 
+## 2026-11-16 — Muestra del apartado gráfico (fase 1)
+
+- Respuestas del propietario a la pregunta 24, anotadas en `docs/direccion-de-arte.md`: maqueta fija con toda la sede, solares y enfermería, asuntos con «!», maestro de espaldas, Bolita como slime rosa, Tokopi como pulpo, todos los héroes muy distintos y fuentes del sistema.
+- Hecho, en una página aparte (`muestra.html`, `src/muestra.ts`) que no toca el juego ni el motor:
+  - `src/datos/aspecto.json` y `src/escena3d/aspecto.ts` (catálogo → aspecto, puro, con `tests/aspecto.test.ts`).
+  - `src/escena3d/texturas/atlas.ts`: atlas de 256 px por héroe con seis expresiones y tres variantes de cara (A, B y C).
+  - `src/escena3d/figura/`: malla única con esqueleto y las cinco animaciones; AllBlack como trío.
+  - `src/escena3d/sede/escenario.ts`: sala común con sol de ventana y persianas de lamas reales.
+  - `src/ui/escena.ts` y `escena.css`: bocadillo, opciones inclinadas, título, lugar y nombres flotantes.
+- Vistas: `muestra.html?vista=sala|escena|caras|cuerpos|animaciones|rendimiento`, con `cara=A|B|C`, `pixel=0` y `contorno=1`.
+- Medidas: HalfGoblin 636 triángulos y Lumia 838 (por encima de los 350–550 previstos: el pelo suelto y los faldones se dibujan por las dos caras). Con 20 figuras andando: 148 llamadas de dibujo y 18 ms por fotograma **sin tarjeta gráfica** (render por software de la máquina de pruebas); en un portátil real irá bastante más rápido. Las lamas y los muebles aún son mallas sueltas; se unirán en la fase 3.
+- 153 tests; typecheck y build correctos; Playwright sin errores de consola en las siete capturas.
+- Queda: el visto bueno del propietario (variante de cara, contorno, píxel o suavizado) antes de la fase 2.
+
 ## 2026-11-16 — Dirección de arte del nuevo apartado gráfico (fase 0)
 
 - Encargo del propietario: rehacer el apartado gráfico (héroes low poly con texturas pintadas por código, sede que crece, escenas de diálogo y retratos sacados del modelo). Encargo y dirección de arte en `docs/direccion-de-arte.md`.

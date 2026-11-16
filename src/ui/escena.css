@@ -1,0 +1,50 @@
+/* Escenas de diálogo y nombres flotantes (docs/direccion-de-arte.md, apartado 7).
+   Fuentes del sistema: gótica limpia, como la de las referencias. */
+:root {
+  --fuente-escena: 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo UI', 'Segoe UI', 'Helvetica Neue', 'Noto Sans', 'Inter', Arial, sans-serif;
+}
+
+.capa-nombres, .capa-escena { position: absolute; inset: 0; pointer-events: none; overflow: hidden; font-family: var(--fuente-escena); }
+.capa-escena { pointer-events: auto; }
+
+.nombre-flotante {
+  position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); white-space: nowrap;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #f4f5f6;
+  text-shadow: 0 0 3px #000, 0 1px 2px #000, 0 0 1px #000;
+}
+.nombre-flotante span { margin-left: 6px; font-size: 11px; font-weight: 400; color: #cfd3d6; }
+.nombre-flotante.lejos { font-size: 11px; opacity: 0.8; }
+
+.escena-lugar {
+  position: absolute; left: 3%; top: 5%; padding: 5px 14px; font-size: 13px; letter-spacing: 0.08em;
+  background: rgba(12, 13, 15, 0.72); border-left: 3px solid var(--cian, #3fd8e8); color: #eceef0;
+}
+.escena-titulo {
+  position: absolute; right: 0; top: 5%; width: min(46%, 430px); padding: 6px 22px 7px; text-align: right; color: #f4f5f6;
+  background: linear-gradient(90deg, transparent 0, rgba(184, 103, 58, 0.4) 35%, #b8673a 100%);
+  border-bottom: 1px solid rgba(235, 238, 240, 0.85);
+}
+.escena-titulo span { display: block; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.8; }
+.escena-titulo b { font-size: 22px; font-weight: 600; letter-spacing: 0.06em; }
+
+.bocadillo {
+  position: absolute; left: 6%; top: 36%; width: min(34%, 320px); padding: 10px 14px 12px;
+  background: rgba(12, 13, 15, 0.78); border: 1px solid rgba(235, 238, 240, 0.22); color: #eceef0;
+  font-size: 14px; line-height: 1.5;
+}
+.bocadillo em { display: block; margin-bottom: 4px; font-style: normal; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cian, #3fd8e8); }
+.bocadillo p { margin: 0; }
+
+.opciones-escena { position: absolute; left: 50%; bottom: 6%; width: min(52%, 470px); transform: translateX(-42%); display: flex; flex-direction: column; gap: 7px; }
+.opciones-escena button {
+  margin-left: calc(var(--i) * 14px); padding: 0; border: 1px solid rgba(240, 242, 244, 0.85); color: #f4f5f6;
+  background: rgba(150, 155, 160, 0.42); transform: skewX(-14deg); font: inherit; font-size: 15px; cursor: pointer;
+  backdrop-filter: blur(2px); transition: background 0.12s, border-color 0.12s;
+}
+.opciones-escena button span { display: flex; align-items: center; gap: 10px; padding: 9px 20px; transform: skewX(14deg); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6); }
+.opciones-escena button kbd { font: inherit; font-size: 11px; opacity: 0.6; }
+.opciones-escena button i { margin-left: auto; font-style: normal; font-weight: 600; color: var(--cian, #3fd8e8); white-space: nowrap; }
+.opciones-escena button:hover, .opciones-escena button:focus-visible { background: rgba(63, 216, 232, 0.28); border-color: var(--cian, #3fd8e8); outline: none; }
+.opciones-escena button:disabled { opacity: 0.45; cursor: not-allowed; }
+.opciones-escena small { margin-left: 30px; font-size: 12px; color: #c4c8cc; text-shadow: 0 1px 2px #000; }
+@media (prefers-reduced-motion: reduce) { .opciones-escena button { transition: none; } }

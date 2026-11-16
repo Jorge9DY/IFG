@@ -110,8 +110,8 @@ Se detallarán al superar la puerta 2 (biblia, secciones 9–13 y 18).
 
 Encargo y dirección de arte en [direccion-de-arte.md](direccion-de-arte.md). Sustituye a la idea de usar assets CC0 para la sede: todo se genera por código.
 
-- [x] Fase 0: dirección de arte detallada (pendiente del visto bueno del propietario)
-- [ ] Fase 1: muestra (una sala, tres héroes y una escena de diálogo)
+- [x] Fase 0: dirección de arte detallada
+- [x] Fase 1: muestra (una sala, tres héroes y una escena de diálogo); pendiente del visto bueno del propietario
 - [ ] Fase 2: los 80 héroes, formas especiales y animaciones
 - [ ] Fase 3: la sede que crece y los héroes viviendo en ella
 - [ ] Fase 4: interfaz y escenas (momentos de historia y asuntos sociales)

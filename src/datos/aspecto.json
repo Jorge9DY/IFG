@@ -1,0 +1,85 @@
+{
+  "_nota": "Aspecto visual (docs/direccion-de-arte.md). Colores, medidas y reglas con las que se genera cada héroe y la sede. Fase 1 (muestra): solo están los ajustes a mano de los héroes de la muestra; el resto llega en la fase 2. Todo es provisional hasta el visto bueno del propietario.",
+  "paleta": {
+    "piel": ["#f6e3d3", "#f0cfb4", "#e6b995", "#c99468", "#a8744e", "#7d5236"],
+    "pielFantasia": { "goblin": "#9fb37a", "ceniza": "#b9bcc4", "zombie": "#9aa79a" },
+    "pelo": ["#24211f", "#4a3426", "#7a5233", "#c9b07a", "#e9dfc8", "#b9bcc0", "#ecebe6", "#a8452f", "#d49aa5", "#8fa3d9", "#7f9a78", "#7e6aa8"],
+    "ojos": ["#6f9a4a", "#d9952f", "#4f86c6", "#3fb8c8", "#8a6fd1", "#c2473d", "#7d868c", "#6b4a2e"],
+    "ropaNeutra": ["#26272a", "#4a4e54", "#c9cdd0", "#eeeae2", "#cdbb9a", "#2f3a55"],
+    "clase": { "Guerrero": "#b8673a", "Mago": "#7d62c4", "Explorador": "#6f8f4a", "Sanador": "#3fb8c8" },
+    "gremio": { "jugador": "#3fd8e8", "dragon": "#a8322d", "sombras": "#3a3550", "corona": "#c9a13a", "esperanza": "#6f9fb0" },
+    "escenario": {
+      "pared": "#8a8780", "paredSombra": "#5e5c58", "suelo": "#a9b0b4", "junta": "#7f858a",
+      "madera": "#9a8468", "maderaSombra": "#6b5a4a", "mueble": "#4a4e54", "muebleSombra": "#3a3d40",
+      "metal": "#8d9499", "papel": "#e6e1d3", "alfombra": "#5b6a72"
+    }
+  },
+  "luz": {
+    "cielo": "#cfd8dd", "suelo": "#4a4f55", "ambiente": 2.1,
+    "sol": "#fff1d6", "intensidadSol": 2.6, "direccionSol": [-8.5, 5.6, 3.2],
+    "fuego": "#ff8a3d", "sombraMinima": 0.62, "mapaSombras": 2048
+  },
+  "camara": {
+    "maqueta": { "campo": 30, "picado": 38, "giro": 32 },
+    "escena": { "campo": 35, "altura": 1.35, "distancia": 2.5 },
+    "retrato": { "campo": 20, "giro": 15 }
+  },
+  "proporciones": {
+    "altura": 1.6,
+    "cabezaAlto": 0.3, "cabezaAncho": 0.27,
+    "hombros": 0.34, "cadera": 0.77,
+    "radioPierna": 0.052, "zapato": [0.13, 0.11, 0.26],
+    "variacionAltura": [0.9, 1.1]
+  },
+  "clases": {
+    "Guerrero": { "prenda": "chaqueta", "largo": 0.5, "vuelo": 1.05, "manga": 1.25, "piernas": "corto", "zapato": 1.25, "accesorios": ["maza", "espada"], "hombros": 1.12 },
+    "Mago": { "prenda": "tunica", "largo": 0.9, "vuelo": 1.55, "manga": 1.9, "piernas": "medias", "zapato": 1.0, "accesorios": ["baston"], "hombros": 0.95 },
+    "Explorador": { "prenda": "capa", "largo": 0.45, "vuelo": 1.35, "manga": 1.0, "piernas": "corto", "zapato": 1.1, "accesorios": ["mochila"], "hombros": 1.0 },
+    "Sanador": { "prenda": "bata", "largo": 0.75, "vuelo": 1.4, "manga": 1.5, "piernas": "calcetines", "zapato": 1.05, "accesorios": ["bolsa"], "hombros": 0.95 }
+  },
+  "rasgos": {
+    "orgulloso": { "ojo": "rasgado", "cejas": "inclinadas", "boca": "linea", "barbilla": 0.12 },
+    "ambicioso": { "boca": "media", "detalle": "dorado" },
+    "celoso": { "ojo": "rasgado", "cejas": "inclinadas" },
+    "leal": { "ojo": "redondo", "detalle": "emblema" },
+    "timido": { "rubor": 0.7, "flequillo": "lateral", "amplitud": 0.6 },
+    "sociable": { "boca": "sonrisa", "amplitud": 1.3 },
+    "paciente": { "ojo": "entrecerrado", "amplitud": 0.8 },
+    "competitivo": { "cejas": "inclinadas", "detalle": "cinta" },
+    "amable": { "ojo": "redondo", "boca": "sonrisa", "detalle": "lazo" },
+    "reservado": { "ojo": "entrecerrado", "boca": "linea", "amplitud": 0.7 }
+  },
+  "peinados": {
+    "Hombre": ["corto", "pincho", "bob", "lateral"],
+    "Mujer": ["bob", "melena", "largo", "coletas", "coleta", "pincho"]
+  },
+  "heroes": {
+    "_nota": "Ajustes a mano por id del catálogo. Propuestos por Claude; pendientes de revisión.",
+    "H07": {
+      "_quien": "HalfGoblin: chica medio goblin, guerrera bajita y alegre.",
+      "piel": "#9fb37a", "pelo": "#a8452f", "ojos": "#d9952f", "peinado": "pincho", "flequillo": "abierto",
+      "orejas": "puntiagudas", "extras": ["colmillo", "pecas"], "altura": 0.88, "boca": "sonrisa", "ojo": "redondo",
+      "ropa": "#3a3d40", "ropa2": "#b8673a", "piernas": "corto", "colorPiernas": "#4a3426", "zapatos": "#5a4636", "accesorio": "maza"
+    },
+    "H05": {
+      "_quien": "Lumia: maga orgullosa y luminosa a la que medio gremio odia.",
+      "piel": "#f6e3d3", "pelo": "#e9dfc8", "ojos": "#8a6fd1", "peinado": "largo", "flequillo": "recto",
+      "altura": 1.06, "ropa": "#eeeae2", "ropa2": "#7d62c4", "detalle": "estrella", "piernas": "medias", "colorPiernas": "#2f3a55",
+      "zapatos": "#eeeae2", "accesorio": "baston"
+    },
+    "H02": {
+      "_quien": "AllBlack: tres figuras iguales de negro que se mueven como una.",
+      "forma": "trio", "piel": "#2a2b2f", "pelo": "#1b1c1e", "peinado": "capucha", "flequillo": "ninguno",
+      "ropa": "#2a2b2f", "ropa2": "#4c4f55", "prenda": "mono", "largo": 0.62, "vuelo": 1.15, "manga": 1.3,
+      "piernas": "pantalon", "colorPiernas": "#26272b", "zapatos": "#1b1c1e", "cara": "mascara", "accesorio": "ninguno",
+      "ojosTrio": ["#e8574f", "#eceef0", "#3fd8e8"], "alturasTrio": [1.08, 0.98, 0.9]
+    }
+  },
+  "maestro": {
+    "_quien": "El jugador: siempre de espaldas en las escenas y sin cara.",
+    "cara": "lisa",
+    "piel": "#e6b995", "pelo": "#24211f", "ojos": "#7d868c", "peinado": "corto", "flequillo": "ninguno",
+    "ropa": "#8a9a4b", "ropa2": "#b8673a", "prenda": "abrigo", "largo": 0.95, "vuelo": 1.3, "manga": 1.3,
+    "piernas": "pantalon", "colorPiernas": "#3a3d40", "zapatos": "#26272a", "accesorio": "bufanda", "altura": 1.04
+  }
+}
