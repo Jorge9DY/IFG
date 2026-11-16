@@ -178,3 +178,16 @@ Los arcos de héroe y los epílogos (`src/datos/historia.json`) los ha escrito C
 2. ¿Qué otros héroes deben tener arco? La columna «Historia» de la hoja sigue vacía: si la rellenas, la convierto en momentos.
 3. ¿Los finales deben cambiar algo más que el texto (por ejemplo, desbloquear un héroe o un modo en la siguiente partida)?
 4. El importador (`npx tsx herramientas/importar-hoja.ts Heroes.csv --escribir`) actualiza el catálogo desde la hoja exportada en CSV. ¿Lo usamos como flujo normal a partir de ahora?
+
+## 24. Apartado gráfico: dirección de arte (2026-11-16)
+
+Detalle en `docs/direccion-de-arte.md` (sección «Dirección de arte detallada»). No se programa nada hasta tener el visto bueno. Recomendación de Claude entre paréntesis.
+
+1. **Cámara de la sede:** ¿cercana, siguiendo al maestro, con un plano de maqueta al mejorar una instalación (recomendada), o una maqueta fija con toda la sede a la vista y héroes más pequeños?
+2. **Salas sin construir como solares** y **enfermería** como sala que llega con la sede en el nivel 3. Son solo visuales y no cambian reglas. ¿De acuerdo? (Recomendado.)
+3. **Asuntos sociales:** ¿el héroe espera en la sede con una «!» y la escena se abre desde él, desde el objetivo del momento o desde la pestaña Relaciones (recomendado), o saltan solos como los momentos de historia?
+4. **El maestro:** figura de espaldas con abrigo oliva y bufanda naranja, sin cara. ¿Te vale?
+5. **Héroes cuyo aspecto no se deduce de los datos:** ¿Bolita es una persona o una criatura? ¿Algún otro héroe debe tener forma especial además de los siete del encargo (por ejemplo Don Hueso como esqueleto, o Chibi diminuta)?
+6. **Fuentes:** el juego ya carga Rajdhani y Noto Sans desde Google Fonts, que es un recurso externo. ¿Se mantiene, o se pasa a fuentes del sistema?
+
+Contorno, píxel o suavizado, y variante de cara se deciden viendo la muestra (fase 1).

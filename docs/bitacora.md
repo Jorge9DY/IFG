@@ -2,6 +2,14 @@
 
 Entradas más recientes primero.
 
+## 2026-11-16 — Dirección de arte del nuevo apartado gráfico (fase 0)
+
+- Encargo del propietario: rehacer el apartado gráfico (héroes low poly con texturas pintadas por código, sede que crece, escenas de diálogo y retratos sacados del modelo). Encargo y dirección de arte en `docs/direccion-de-arte.md`.
+- Hecho: la sección «Dirección de arte detallada», con paleta, proporciones y polígonos, texturas, luz, cámara, interfaz, generación de cada héroe desde el catálogo, formas especiales, sede por niveles, rendimiento, organización del código, plan por fases y riesgos.
+- No se ha programado nada: no cambian el código, los datos ni los tests.
+- Queda: el visto bueno del propietario y sus respuestas a la pregunta 24. Después, la fase 1 (muestra en `muestra.html` con una sala, HalfGoblin, Lumia, AllBlack y una escena de diálogo).
+- Rama de trabajo aparte; no se mezcla con `main` sin permiso.
+
 ## 2026-11-16 — Habilidad desplegable al formar equipo y género visible
 
 - Petición del propietario: al elegir héroes para una misión, cada uno tiene su habilidad desplegable debajo (con la misma regla de visibilidad). El género (♂ Hombre / ♀ Mujer) se ve en las cartas, en el inventario y en la formación. 147 tests; probado en navegador sin errores.
