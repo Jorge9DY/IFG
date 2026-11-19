@@ -178,3 +178,28 @@ Los arcos de héroe y los epílogos (`src/datos/historia.json`) los ha escrito C
 2. ¿Qué otros héroes deben tener arco? La columna «Historia» de la hoja sigue vacía: si la rellenas, la convierto en momentos.
 3. ¿Los finales deben cambiar algo más que el texto (por ejemplo, desbloquear un héroe o un modo en la siguiente partida)?
 4. El importador (`npx tsx herramientas/importar-hoja.ts Heroes.csv --escribir`) actualiza el catálogo desde la hoja exportada en CSV. ¿Lo usamos como flujo normal a partir de ahora?
+
+## 24. Evolución y modo historia — RESUELTA EN PARTE (2026-11-19)
+
+Respuestas del propietario:
+1. El cuarto Prota se quita y **los tres héroes iniciales son nuevos**; los antiguos Prota se fichan en la Prueba. **Aplicado** con un trío provisional (Kenta, Ryo y Hana; H81–H83).
+2. **Una gran decisión moral por semana** y escenas pequeñas los demás días. **Aplicado:** 4 dilemas en la temporada 1 (días 7, 14, 21 y 28).
+3. Cuántos héroes del trío se van: **se decidirá al escribir la trama.**
+
+## 25. El trío y la maestra: revisar (2026-11-19)
+
+Todo esto es propuesta de Claude y se cambia desde el panel de tramas (pestaña Héroes):
+1. **Nombres:** Kenta (Guerrero, impulsivo), Ryo (Explorador, talento frío) y Hana (Sanadora, leal). La maestra: Isolda.
+2. **Cifras:** empiezan en F–E con poder 8–11 para que el gremio siga empezando último. Con 13–16 de poder, el gremio cerraba la temporada 1 en 3,9.º de media en lugar de 5.º.
+3. **Habilidades:** el trío aún no tiene habilidad propia («Por diseñar»). Hay que inventarlas y programarlas.
+4. **Textos:** la temporada 1 del trío, la maestra y los 4 dilemas están escritos como borrador (`docs/guia-narrativa.md`).
+
+## 26. ¿Cómo se decide a quién favoreces en el trío? (2026-11-19)
+
+Hoy solo cuentan las decisiones de las escenas (lealtad, ánimo y marcas). Propuesta de Claude, sin implementar: un **registro oculto de atención** por héroe que sume también lo que ya haces en el juego (a quién mandas a misiones, a quién entrenas, a quién asciendes). Sin botones nuevos. Al cerrar la temporada 3, quien menos atención haya recibido (o quien rompa en la escena final) se marcha a un rival. ¿Te encaja, o prefieres que dependa solo de las decisiones de las escenas?
+
+## 27. Subir el panel al juego con un clic (2026-11-19)
+
+El panel de tramas guarda todo en su propia base de datos. Para llevarlo al juego, hoy hay que pedírselo a Claude en el chat («Sube el panel de tramas al juego»). Claude lo lee, ejecuta `herramientas/panel.ts`, pasa los tests y hace el commit.
+
+Para que el botón «Subir al juego» lo haga solo, hace falta una tarea programada que Claude pueda lanzar. Al intentar crearla, el entorno lo denegó por permisos. Si la quieres, autoriza la creación de tareas programadas a Claude Code y pídeselo.

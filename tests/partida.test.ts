@@ -19,8 +19,9 @@ describe('partida', () => {
     const estado = partida();
     const j = jugador(estado);
     expect(j.oro).toBe(balance.jugador.oro);
-    expect(j.plantilla).toHaveLength(4);
-    expect(j.plantilla.map((id) => estado.heroes[id]!.nombre)).toContain('AllBlack');
+    expect(j.plantilla).toHaveLength(3); // el trío inicial (decisión del propietario, 2026-11-19)
+    expect(j.plantilla).not.toContain('H02'); // AllBlack ya llega por la Prueba
+    expect(estado.bolsaNovatos).toContain('H02');
     expect(puesto(estado, j.id)).toBe(5);
     expect(estado.tablon).toHaveLength(3);
   });

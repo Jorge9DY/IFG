@@ -1,5 +1,5 @@
 {
- "_nota": "Catálogo del modo historia: los 80 héroes diseñados por el propietario (hoja de cálculo «Héroes»). Clase y género propuestos por Claude con criterio de equilibrio (20 por clase, 40/40). Los héroes de los gremios rivales empiezan en su rango máximo (techo); los libres llegan por la Prueba de los Novatos en rango F. Textos de habilidad resumidos para la interfaz. Rasgos de personalidad (2–3 por héroe) propuestos por Claude a partir de su arquetipo. Índices de romance (1–5, propuestos por Claude por encargo del propietario): «enamoradizo» (lo fácil que se enamora) y «atractivo» (lo fácil que es que se enamoren de él).",
+ "_nota": "Catálogo del modo historia: los 80 héroes diseñados por el propietario (hoja de cálculo «Héroes»). Clase y género propuestos por Claude con criterio de equilibrio (20 por clase, 40/40). Los héroes de los gremios rivales empiezan en su rango máximo (techo); los libres llegan por la Prueba de los Novatos en rango F. Textos de habilidad resumidos para la interfaz. Rasgos de personalidad (2–3 por héroe) propuestos por Claude a partir de su arquetipo. Índices de romance (1–5, propuestos por Claude por encargo del propietario): «enamoradizo» (lo fácil que se enamora) y «atractivo» (lo fácil que es que se enamoren de él). Trío inicial (H81–H83, «provisional»: nombres, clase y cifras propuestos por Claude el 2026-11-19 por encargo del propietario; se editan desde el panel de tramas). Los 4 antiguos «Prota» (H01, H02, H04, H07) pasan a la bolsa de la Prueba de los Novatos.",
  "gremios": {
   "jugador": "Prota",
   "dragon": "Gran rival",
@@ -14,7 +14,7 @@
    "nombre": "Entrman",
    "clase": "Explorador",
    "genero": "Hombre",
-   "gremio": "jugador",
+   "gremio": "libre",
    "techo": "C+",
    "techoFinal": "A",
    "rangoInicial": "E",
@@ -35,7 +35,7 @@
    "nombre": "AllBlack",
    "clase": "Guerrero",
    "genero": "Hombre",
-   "gremio": "jugador",
+   "gremio": "libre",
    "techo": "B",
    "techoFinal": "B",
    "rangoInicial": "F",
@@ -75,7 +75,7 @@
    "nombre": "InsectLover",
    "clase": "Mago",
    "genero": "Hombre",
-   "gremio": "jugador",
+   "gremio": "libre",
    "techo": "C",
    "techoFinal": "S",
    "rangoInicial": "F",
@@ -137,7 +137,7 @@
    "nombre": "HalfGoblin",
    "clase": "Guerrero",
    "genero": "Mujer",
-   "gremio": "jugador",
+   "gremio": "libre",
    "techo": "C+",
    "techoFinal": "C+",
    "rangoInicial": "E",
@@ -1621,6 +1621,75 @@
    ],
    "enamoradizo": 2,
    "atractivo": 2
+  },
+  {
+   "id": "H81",
+   "nombre": "Kenta",
+   "clase": "Guerrero",
+   "genero": "Hombre",
+   "gremio": "jugador",
+   "techo": "B",
+   "techoFinal": "A",
+   "rangoInicial": "F",
+   "poder": 9,
+   "habilidad": "",
+   "nombreHabilidad": "Por diseñar",
+   "texto": "Habilidad por diseñar.",
+   "ascension": "Por definir.",
+   "rasgos": [
+    "competitivo",
+    "sociable",
+    "orgulloso"
+   ],
+   "enamoradizo": 4,
+   "atractivo": 3,
+   "provisional": true
+  },
+  {
+   "id": "H82",
+   "nombre": "Ryo",
+   "clase": "Explorador",
+   "genero": "Hombre",
+   "gremio": "jugador",
+   "techo": "B",
+   "techoFinal": "S",
+   "rangoInicial": "E",
+   "poder": 11,
+   "habilidad": "",
+   "nombreHabilidad": "Por diseñar",
+   "texto": "Habilidad por diseñar.",
+   "ascension": "Por definir.",
+   "rasgos": [
+    "reservado",
+    "ambicioso",
+    "orgulloso"
+   ],
+   "enamoradizo": 2,
+   "atractivo": 5,
+   "provisional": true
+  },
+  {
+   "id": "H83",
+   "nombre": "Hana",
+   "clase": "Sanador",
+   "genero": "Mujer",
+   "gremio": "jugador",
+   "techo": "B",
+   "techoFinal": "A",
+   "rangoInicial": "F",
+   "poder": 8,
+   "habilidad": "",
+   "nombreHabilidad": "Por diseñar",
+   "texto": "Habilidad por diseñar.",
+   "ascension": "Por definir.",
+   "rasgos": [
+    "leal",
+    "amable",
+    "competitivo"
+   ],
+   "enamoradizo": 3,
+   "atractivo": 4,
+   "provisional": true
   }
  ]
 }

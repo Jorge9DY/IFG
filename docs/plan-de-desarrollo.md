@@ -100,6 +100,19 @@ Decisión del propietario: el juego pasa a un **modo historia** con héroes dise
 
 Se detallarán al superar la puerta 2 (biblia, secciones 9–13 y 18).
 
+Adelantado a petición del propietario (2026-11-19):
+
+- [x] Trío inicial (dos chicos y una chica) en lugar de los 4 Prota, que pasan a la Prueba de los Novatos
+- [x] La antigua maestra como personaje guía (escenas de la maestra)
+- [x] Tramas, personajes y condiciones con varias marcas en el motor de historia; efectos sobre un héroe concreto
+- [x] Guía narrativa (`docs/guia-narrativa.md`) y revisión automática del guion (`tests/revision-historia.test.ts`)
+- [x] Panel de tramas con base de datos y puente con el repositorio (`herramientas/panel.ts`)
+- [x] Temporada 1 del trío y 4 dilemas de la semana (borrador)
+- [ ] Dilemas de la semana de las temporadas 2–5 (16)
+- [ ] Trama del trío en las temporadas 2–5: grietas, ruptura, el que se va compite en un rival y reencuentro (pregunta 26)
+- [ ] Habilidades del trío (pregunta 25)
+- [ ] Huecos en los textos (`{el_que_se_va}`) para no duplicar escenas
+
 ## Sede 3D
 
 - [x] Sala con formas simples, protagonista con teclado y puntos de interacción (tablón, mostrador, recepción, dormitorios, pizarra, puerta)

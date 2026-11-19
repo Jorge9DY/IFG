@@ -1,5 +1,6 @@
 // Modo historia (decisión del propietario: eventos con guion y finales según en qué héroes inviertes).
-// Arcos de héroe de tres momentos y epílogos, en src/datos/historia.json (contenido provisional).
+// Tramas (arcos por grupo de personajes), momentos y epílogos en src/datos/historia.json. Ese archivo se
+// genera desde el panel de tramas con herramientas/importar-panel.ts (ver docs/guia-narrativa.md).
 // Cada día, al terminar, se busca el primer momento cuyas condiciones se cumplen. Solo hay uno pendiente a
 // la vez y el jugador lo decide antes de seguir. Cada momento ocurre una vez por partida.
 
@@ -19,6 +20,12 @@ export interface Condicion {
   alLimite?: boolean;
   marca?: string;
   sinMarca?: string;
+  /** Hacen falta todas estas marcas. */
+  marcas?: string[];
+  /** Basta con una de estas marcas (varias decisiones que llevan al mismo momento). */
+  algunaMarca?: string[];
+  /** Ninguna de estas marcas. */
+  sinMarcas?: string[];
   vidaMax?: number;
   misionCumplida?: boolean;
   puestoMax?: number;
@@ -30,6 +37,8 @@ export interface Condicion {
 
 export interface EfectoHistoria {
   objetivo?: 'heroe' | 'gremio';
+  /** Héroe del catálogo al que afecta (si no, el del momento). Sirve para favorecer a uno y perjudicar a otro. */
+  heroe?: string;
   felicidad?: number;
   estres?: number;
   lealtad?: number;
@@ -40,16 +49,48 @@ export interface EfectoHistoria {
   accion?: 'marcharse' | 'descanso' | 'venderDragon';
 }
 
+export type TipoMomento = 'momento' | 'dilema' | 'evento';
+
 export interface Momento {
   id: string;
+  /** Trama a la que pertenece (agrupa los momentos de un grupo de personajes). */
+  trama?: string;
+  /** «dilema»: la gran decisión moral de la semana; «momento» y «evento»: escenas más pequeñas. */
+  tipo?: TipoMomento;
   heroe?: string;
+  /** Personaje que no es héroe (p. ej. la antigua maestra) y que protagoniza la escena. */
+  personaje?: string;
+  /** Héroe del catálogo cuyo retrato se muestra aunque no sea el protagonista (p. ej. Solus). */
+  cara?: string;
   si: Condicion;
   titulo: string;
   texto: string;
   opciones: { texto: string; efectos: EfectoHistoria[] }[];
 }
 
+/** Personaje sin ficha de héroe: no lucha ni sale en misiones. */
+export interface Personaje {
+  id: string;
+  nombre: string;
+  papel: string;
+  descripcion?: string;
+}
+
+/** Trama: un grupo de personajes y su arco (ficha de trama de docs/guia-narrativa.md). */
+export interface Trama {
+  id: string;
+  nombre: string;
+  premisa?: string;
+  reparto?: string[];
+}
+
 export const MOMENTOS: readonly Momento[] = datos.momentos as Momento[];
+export const PERSONAJES: readonly Personaje[] = (datos.personajes ?? []) as Personaje[];
+export const TRAMAS: readonly Trama[] = (datos.tramas ?? []) as Trama[];
+
+export function personaje(id: string | undefined): Personaje | null {
+  return PERSONAJES.find((p) => p.id === id) ?? null;
+}
 const EPILOGOS = datos.epilogos as { heroe: string; si: Condicion; texto: string }[];
 
 /** El héroe del catálogo, esté donde esté (los Zombies no cuentan). */
@@ -68,6 +109,9 @@ export function cumple(estado: EstadoJuego, si: Condicion, catalogoId?: string):
   if (si.temporada !== undefined && temporadaDe(estado.dia) < si.temporada) return false;
   if (si.marca && !tieneMarca(estado, si.marca)) return false;
   if (si.sinMarca && tieneMarca(estado, si.sinMarca)) return false;
+  if (si.marcas && !si.marcas.every((x) => tieneMarca(estado, x))) return false;
+  if (si.algunaMarca?.length && !si.algunaMarca.some((x) => tieneMarca(estado, x))) return false;
+  if (si.sinMarcas?.some((x) => tieneMarca(estado, x))) return false;
   if (si.puestoMax !== undefined && puesto(estado, j.id) > si.puestoMax) return false;
   if (!catalogoId) return true;
   const caido = estado.caidos.find((c) => c.id === catalogoId);
@@ -111,7 +155,9 @@ export function decidirMomento(estado: EstadoJuego, opcion: number): string[] {
   const h = m.heroe ? heroeDeCatalogo(estado, m.heroe) : null;
   const textos: string[] = [];
   for (const e of o.efectos) {
-    const objetivos = e.objetivo === 'gremio' ? heroesDe(estado, j.id) : h ? [h] : [];
+    const otro = e.heroe ? heroeDeCatalogo(estado, e.heroe) : null;
+    const delJugador = otro && j.plantilla.includes(otro.id) ? otro : null;
+    const objetivos = e.objetivo === 'gremio' ? heroesDe(estado, j.id) : e.heroe ? (delJugador ? [delJugador] : []) : h ? [h] : [];
     for (const x of objetivos) {
       if (e.felicidad || e.estres) cambiarMental(x, { felicidad: e.felicidad, estres: e.estres });
       if (e.lealtad) x.lealtad = Math.max(0, Math.min(100, x.lealtad + e.lealtad));
@@ -123,10 +169,11 @@ export function decidirMomento(estado: EstadoJuego, opcion: number): string[] {
     if (e.oro) j.oro += e.oro;
     if (e.puntos) j.puntosTemporada = (j.puntosTemporada ?? 0) + e.puntos;
     if (e.marca && !tieneMarca(estado, e.marca)) estado.historia.marcas.push(e.marca);
-    if (e.accion === 'marcharse' && h && j.plantilla.includes(h.id)) marcharse(estado, h, j, `${h.nombre} se despide`);
-    if (e.accion === 'descanso' && h && h.estado === 'libre') {
-      h.estado = 'descansando';
-      h.diasLesion = 3;
+    const quien = e.heroe ? delJugador : h;
+    if (e.accion === 'marcharse' && quien && j.plantilla.includes(quien.id)) marcharse(estado, quien, j, `${quien.nombre} se despide`);
+    if (e.accion === 'descanso' && quien && quien.estado === 'libre') {
+      quien.estado = 'descansando';
+      quien.diasLesion = 3;
     }
     if (e.accion === 'venderDragon') {
       const mejor = mejorHeroe(estado);

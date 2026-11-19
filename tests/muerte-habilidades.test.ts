@@ -24,7 +24,7 @@ import { morir, riesgoDeMuerte } from '../src/motor/muerte';
 import { motivoNoLanzar } from '../src/motor/partida';
 import { cambiar, cambiarAfinidad } from '../src/motor/relaciones';
 import type { Heroe, Mision } from '../src/motor/tipos';
-import { fichar, heroe, partida } from './fabrica';
+import { fichar, ficharDeCatalogo, heroe, partida } from './fabrica';
 
 const H = balance.habilidades;
 
@@ -42,11 +42,16 @@ function neutro(datos: Partial<Heroe> & Pick<Heroe, 'id'>): Heroe {
 }
 
 describe('catálogo del modo historia', () => {
-  it('tiene 80 héroes, 20 de cada clase y 40 de cada género, todos con habilidad', () => {
-    expect(CATALOGO).toHaveLength(80);
-    for (const c of ['Guerrero', 'Mago', 'Explorador', 'Sanador']) expect(CATALOGO.filter((f) => f.clase === c)).toHaveLength(20);
-    expect(CATALOGO.filter((f) => f.genero === 'Mujer')).toHaveLength(40);
-    expect(new Set(CATALOGO.map((f) => f.habilidad)).size).toBe(80);
+  it('tiene los 80 héroes de la hoja (20 de cada clase, 40 de cada género, todos con habilidad) y el trío inicial', () => {
+    const hoja = CATALOGO.filter((f) => !f.provisional);
+    expect(hoja).toHaveLength(80);
+    for (const c of ['Guerrero', 'Mago', 'Explorador', 'Sanador']) expect(hoja.filter((f) => f.clase === c)).toHaveLength(20);
+    expect(hoja.filter((f) => f.genero === 'Mujer')).toHaveLength(40);
+    expect(new Set(hoja.map((f) => f.habilidad)).size).toBe(80);
+    // Decisión del propietario (2026-11-19): el jugador empieza con un trío nuevo, dos chicos y una chica.
+    const trio = CATALOGO.filter((f) => f.gremio === 'jugador');
+    expect(trio).toHaveLength(3);
+    expect(trio.filter((f) => f.genero === 'Mujer')).toHaveLength(1);
   });
 
   it('los rivales empiezan en su rango máximo y los libres esperan en la bolsa de la Prueba', () => {
@@ -106,7 +111,7 @@ describe('muerte', () => {
     for (let s = 1; s <= 20; s++) {
       const estado = partida(s);
       jugador(estado).oro = 100_000;
-      const insecto = estado.heroes.H04!;
+      const insecto = ficharDeCatalogo(estado, 'H04');
       insecto.poder = insecto.potencial;
       iniciarAscension(estado, 'H04');
       const r = resolverAscension(estado, new Azar(s), estado.enCurso.find((c) => c.ascension)!)!;
@@ -147,7 +152,7 @@ describe('muerte', () => {
 describe('habilidades en misión', () => {
   it('AllBlack ocupa tres huecos y rinde por tres', () => {
     const estado = partida();
-    const all = estado.heroes.H02!;
+    const all = ficharDeCatalogo(estado, 'H02');
     expect(huecos(all)).toBe(3);
     const alto = estado.tablon.find((m) => m.rango === 'alto')!;
     expect(motivoNoLanzar(estado, alto.id, ['H02'])).toBeNull();

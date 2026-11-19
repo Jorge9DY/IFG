@@ -50,6 +50,8 @@ export interface FichaHeroe {
   atractivo?: number;
   texto: string;
   ascension?: string;
+  /** Héroe aún por cerrar (el trío inicial): nombre y cifras propuestos, sin habilidad todavía. */
+  provisional?: boolean;
 }
 
 export const CATALOGO: readonly FichaHeroe[] = catalogo.heroes as FichaHeroe[];

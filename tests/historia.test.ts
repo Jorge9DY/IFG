@@ -2,10 +2,10 @@
 import { describe, expect, it } from 'vitest';
 import balance from '../src/datos/balance.json';
 import { jugador } from '../src/motor/estado';
-import { arcosCompletos, cumple, decidirMomento, epilogos, evaluarHistoria, MOMENTOS, momentoPendiente } from '../src/motor/historia';
+import { arcosCompletos, cumple, decidirMomento, epilogos, evaluarHistoria, heroeDeCatalogo, MOMENTOS, momentoPendiente, personaje } from '../src/motor/historia';
 import { crearPartida, finalizarDia, terminarPrueba } from '../src/motor/partida';
 import { entrenarRivales } from '../src/motor/rivales';
-import { heroe, fichar } from './fabrica';
+import { heroe, fichar, ficharDeCatalogo } from './fabrica';
 import { leerCsv } from '../herramientas/importar-hoja';
 
 function nueva() {
@@ -20,17 +20,52 @@ describe('arcos de héroe', () => {
     expect(new Set(MOMENTOS.map((m) => m.id)).size).toBe(MOMENTOS.length);
   });
 
-  it('el primer momento llega el día 2 y espera la decisión del jugador; cada uno ocurre una vez', () => {
+  it('el primer momento (la maestra) espera la decisión del jugador; cada uno ocurre una vez', () => {
     const estado = nueva();
+    estado.dia = 0;
     expect(evaluarHistoria(estado)).toBeNull();
-    estado.dia = 2;
+    estado.dia = 1;
     const m = evaluarHistoria(estado)!;
-    expect(m.id).toBe('allblack1');
+    expect(m.id).toBe('maestra1');
+    expect(personaje(m.personaje)?.nombre).toBeTruthy();
     expect(evaluarHistoria(estado)).toBeNull(); // solo uno pendiente a la vez
     decidirMomento(estado, 0);
-    expect(estado.historia.marcas).toContain('allblack_secreto');
+    expect(estado.historia.marcas).toContain('maestra_mentora');
     expect(momentoPendiente(estado)).toBeNull();
+    expect(evaluarHistoria(estado)?.id).not.toBe('maestra1');
+  });
+
+  it('los arcos de los antiguos Prota solo llegan si los fichas', () => {
+    const estado = nueva();
+    estado.dia = 2;
+    estado.historia.vistos.push('maestra1');
     expect(evaluarHistoria(estado)?.id).not.toBe('allblack1');
+    estado.historia.pendiente = null;
+    ficharDeCatalogo(estado, 'H02');
+    expect(cumple(estado, MOMENTOS.find((m) => m.id === 'allblack1')!.si, 'H02')).toBe(true);
+  });
+
+  it('un efecto puede favorecer a un héroe y perjudicar a otro (el trío)', () => {
+    const estado = nueva();
+    const kenta = heroeDeCatalogo(estado, 'H81')!;
+    const ryo = heroeDeCatalogo(estado, 'H82')!;
+    const [lealtad, felicidad] = [kenta.lealtad, ryo.felicidad!];
+    estado.historia.pendiente = 'trio1';
+    decidirMomento(estado, 0);
+    expect(kenta.lealtad).toBe(lealtad + 8);
+    expect(ryo.felicidad).toBeLessThan(felicidad);
+    expect(estado.historia.marcas).toContain('trio_lider_kenta');
+  });
+
+  it('condiciones con varias marcas: todas, alguna o ninguna', () => {
+    const estado = nueva();
+    estado.historia.marcas.push('a', 'b');
+    expect(cumple(estado, { marcas: ['a', 'b'] })).toBe(true);
+    expect(cumple(estado, { marcas: ['a', 'c'] })).toBe(false);
+    expect(cumple(estado, { algunaMarca: ['c', 'b'] })).toBe(true);
+    expect(cumple(estado, { algunaMarca: ['c', 'd'] })).toBe(false);
+    expect(cumple(estado, { sinMarcas: ['c', 'd'] })).toBe(true);
+    expect(cumple(estado, { sinMarcas: ['c', 'a'] })).toBe(false);
   });
 
   it('las condiciones miran rango, marcas y si el héroe está en tu gremio', () => {

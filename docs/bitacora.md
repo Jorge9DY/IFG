@@ -2,6 +2,35 @@
 
 Entradas más recientes primero.
 
+## 2026-11-19 — Evolución y modo historia: el trío, la maestra, los dilemas y el panel de tramas
+
+- **Decisiones del propietario:**
+  - El jugador empieza con tres héroes nuevos (dos chicos y una chica). Los 4 antiguos Prota pasan a la Prueba de los Novatos.
+  - La antigua maestra hace de guía.
+  - Una gran decisión moral por semana y escenas pequeñas el resto de días.
+- **Catálogo:** trío provisional Kenta, Ryo y Hana (H81–H83, sin habilidad todavía). Los antiguos Prota pasan a ser libres.
+- **Motor de historia** (`src/motor/historia.ts`):
+  - Tramas y personajes.
+  - Tipos de escena (momento, dilema, evento).
+  - Condiciones con varias marcas: todas, alguna o ninguna.
+  - Efectos sobre un héroe concreto, para favorecer a uno y perjudicar a otro.
+  - Retrato de otro héroe (Solus) sin ser protagonista.
+  - La interfaz muestra «Dilema de la semana» o el nombre del personaje.
+- **Contenido (borrador):** temporada 1 del trío (3 escenas), la maestra (2) y 4 dilemas (Heinz, el tranvía, el asesino a la puerta y el dilema del prisionero).
+- **Guía narrativa:** `docs/guia-narrativa.md` recoge las reglas contra la explosión de ramas, el presupuesto y las fichas de trama.
+- **Revisión automática del guion** (`tests/revision-historia.test.ts`):
+  - Ids, tramas, héroes y personajes existen.
+  - De 1 a 3 opciones por escena.
+  - Escena de 90 palabras como máximo y opción de 12.
+  - Ninguna escena lee una marca que nadie pone.
+- **Panel de tramas:** artefacto privado del propietario con base de datos.
+  - Mapa de cada trama, calendario de dilemas, edición de héroes y personajes, y revisión de marcas.
+  - `herramientas/panel.ts` lo exporta e importa, con test de ida y vuelta.
+  - Subirlo al juego se pide en el chat (pregunta 27).
+- **Balance:** con poder 13–16 el trío cerraba la temporada 1 en 3,9.º. Bajado a 8–11, vuelve al 5.º. Los dilemas daban demasiados puntos de temporada (30): ahora de −3 a 6. Ver `informe-balance.md`.
+- 157 tests; build correcto; probado en navegador sin errores.
+- **Queda:** preguntas 25 a 27, los dilemas de las temporadas 2–5 y la trama del trío más allá de la temporada 1.
+
 ## 2026-11-16 — Habilidad desplegable al formar equipo y género visible
 
 - Petición del propietario: al elegir héroes para una misión, cada uno tiene su habilidad desplegable debajo (con la misma regla de visibilidad). El género (♂ Hombre / ♀ Mujer) se ve en las cartas, en el inventario y en la formación. 147 tests; probado en navegador sin errores.

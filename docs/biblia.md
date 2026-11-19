@@ -56,15 +56,20 @@ El juego deja de generar héroes nuevos en cada partida. Pasa a ser un **modo hi
 - **Duración fija:** el modo historia dura un número cerrado de temporadas (\[Abierto\]: cuántas).
 - **Eventos con guion:** los acontecimientos importantes ocurren cuando lo decide el diseño (qué semana, qué temporada, con qué condiciones), no al azar.
 - **Rejugabilidad por inversión:** en cada partida el jugador reparte sus recursos (oro, tiempo, misiones, entrenamientos, Ascensiones, fichajes) entre unos héroes u otros. Esas elecciones **desbloquean eventos y finales distintos**.
-- **\[Aceptado\] Catálogo:** 80 héroes diseñados por el propietario en su hoja de cálculo («Héroes»), copiados en `src/datos/heroes.json`. Clase y género los propuso Claude por encargo del propietario (20 por clase; 40 hombres y 40 mujeres, 5 y 5 en cada rival). El jugador empieza con los 4 «Prota»; cada rival, con sus 10 héroes **en su rango máximo**; los 36 «Libre» llegan por la Prueba de los Novatos y **todos empiezan en rango F**.
+- **\[Aceptado\] Catálogo:** 80 héroes diseñados por el propietario en su hoja de cálculo («Héroes»), copiados en `src/datos/heroes.json`. Clase y género los propuso Claude por encargo del propietario (20 por clase; 40 hombres y 40 mujeres, 5 y 5 en cada rival). Cada rival empieza con sus 10 héroes **en su rango máximo**; los «Libre» llegan por la Prueba de los Novatos y **todos empiezan en rango F**.
+- **\[Aceptado\] Plantilla inicial: el trío** (decisión del propietario, 2026-11-19; sustituye a «el jugador empieza con los 4 Prota»): el jugador empieza con **tres héroes nuevos, dos chicos y una chica**, el típico grupo protagonista. Los 4 antiguos Prota (Entrman, AllBlack, InsectLover y HalfGoblin) pasan a la bolsa de la Prueba de los Novatos y sus arcos solo llegan si los fichas. Nombres, clases y cifras del trío: \[Propuesta\] de Claude (Kenta, Ryo y Hana; H81–H83, marcados «provisional»).
+- **\[Aceptado\] La antigua maestra** (decisión del propietario, 2026-11-19): la anterior maestra del gremio acompaña al jugador. No sale de misión; explica el juego y es la voz de la experiencia. Es un **personaje**, no un héroe. Nombre provisional: Isolda.
+- **\[Aceptado\] Conflictos del trío** (decisión del propietario, 2026-11-19): a lo largo de las temporadas surgen conflictos que obligan a favorecer a uno de los tres, hasta que uno (o los otros dos) se marcha a otro gremio. Cuántos se van se decidirá al escribir la trama.
 - **\[Propuesta\] Correspondencia de gremios:** Gran rival = Dragón Carmesí, Rival 2 = Sombras Negras, Rival 3 = Corona Dorada, Rival 4 = Última Esperanza.
 - **\[Propuesta\] Duración y finales:** 5 temporadas (provisional). Al cerrar la última, el final depende del puesto: «Leyenda» (1.º), «Respeto» (2.º–3.º) u «Olvido». Los finales y eventos por héroe están por diseñar (pregunta 18).
 
 ### Arcos de héroe y epílogos \[Propuesta\] (2026-11-16; contenido provisional de Claude)
 
 - **Momentos de historia** (`src/datos/historia.json`, motor en `src/motor/historia.ts`): escenas con guion que llegan cuando se cumplen sus condiciones (día, temporada, rango del héroe, si está en tu gremio, decisiones anteriores…). Se muestran en el centro de la pantalla con el retrato del héroe y dos o tres opciones. Hay un solo momento pendiente a la vez, cada uno ocurre una vez por partida, y la decisión deja una **marca** que abre o cierra momentos posteriores.
-- **Primeros arcos** (20 momentos):
-  - Los 4 Prota (Entrman, AllBlack, InsectLover y HalfGoblin).
+- **\[Aceptado\] Ritmo** (decisión del propietario, 2026-11-19): **una gran decisión moral cada semana** (día 7, 14, 21…), inspirada en dilemas clásicos de la historia y la filosofía, y los demás días escenas más pequeñas. Sin barra de karma: las marcas guardan qué valor priorizaste.
+- **Tramas:** los momentos se agrupan por grupos de personajes (el trío, la maestra, los dilemas de la semana, cada héroe con arco). Método de diseño para que las ramas no se descontrolen: `docs/guia-narrativa.md` \[Propuesta\]. Se escriben en el **panel de tramas** (artefacto privado del propietario con base de datos compartida) y se llevan al juego con `herramientas/panel.ts`.
+- **Primeros arcos** (20 momentos de 2026-11-16, más 9 de 2026-11-19: el trío, la maestra y los 4 dilemas de la temporada 1):
+  - Los 4 antiguos Prota (Entrman, AllBlack, InsectLover y HalfGoblin), si los fichas.
   - Chimoku, Heredero y Topo, si los fichas.
   - El némesis: Solus y el Dragón Carmesí (visita, oferta por tu mejor héroe y cara a cara final).
 - **Epílogos:** al terminar la historia, «Qué fue de ellos» cuenta el destino de cada héroe con arco según tus decisiones. Junto con el final por puesto, cada partida acaba distinta.
@@ -763,6 +768,7 @@ Primero se cierran las que bloquean la fase 1; las demás pueden esperar.
 
 | Fecha | Cambio |
 | --- | --- |
+| 2026-11-19 | Decisiones del propietario sobre la evolución y el modo historia: el jugador empieza con un trío nuevo (dos chicos y una chica) en lugar de los 4 Prota, que pasan a la Prueba de los Novatos; la antigua maestra como personaje guía; conflictos del trío que acaban con la marcha de uno; una gran decisión moral por semana y escenas pequeñas el resto de días. Guía narrativa y panel de tramas \[Propuesta\]. |
 | 2026-11-16 | Mejoras pedidas por el propietario tras el análisis: arcos de héroe con momentos y epílogos \[Propuesta, contenido provisional\]; rivales que crecen por temporada; dilema diario («Equipo más seguro» o «Equipo que une»); carta en dos niveles; momentos destacados en el centro de la pantalla; importador de la hoja de cálculo; guía de playtest. |
 | 2026-11-16 | Decisiones del propietario (pregunta 22): romance mucho más frecuente con índices por personaje («enamoradizo» y «atractivo»); Mascota y Chibi dan o cuentan puntos de temporada; choques de carácter aprobados. |
 | 2026-11-15 | Auditoría de habilidades (`docs/auditoria-habilidades.md`). Decisión del propietario: la descripción de una habilidad solo se ve tras fichar al héroe o con los ojeadores al máximo. Arreglos de impacto: efectos visibles al formar equipo, choques de carácter (propuesta), umbrales de Veyra y Aimul, obsesión de Yandere y Zancadilla contra los puntos de temporada. |

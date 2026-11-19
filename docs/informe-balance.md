@@ -1,5 +1,24 @@
 # Informe de balance
 
+## Trío inicial y dilemas de la semana (2026-11-19)
+
+`npm run simular -- 150 1`. El jugador empieza con el trío (3 héroes) en lugar de los 4 Prota. Se añaden escenas de la maestra, del trío y 4 dilemas en la temporada 1.
+
+| Métrica | Prudente (antes → ahora) | Ambiciosa (antes → ahora) |
+| --- | --: | --: |
+| Puesto medio al cerrar la temporada 1 | 5,0 → 5,0 | 5,0 → 5,0 |
+| Puesto medio al cerrar la temporada 5 | 3,8 → 4,2 | 2,7 → 2,8 |
+| Final «Leyenda» / «Respeto» / «Olvido» | 11/23/66% → 5/19/76% | 31/35/34% → 31/34/35% |
+| Semanas con sueldos impagados (media) | 0,7 → 1,3 | 0,5 → 0,5 |
+| Oro final | 32.268 → 23.899 | 16.552 → 17.304 |
+
+Primera prueba, con el trío a poder 13–16 y dilemas de hasta 30 puntos de temporada: el gremio cerraba la temporada 1 en 3,9.º y dejaba de empezar último. El trío se bajó a poder 8–11 (F–E) y los dilemas a entre −3 y 6 puntos.
+
+Lectura:
+- La estrategia ambiciosa queda igual.
+- La prudente sufre más con 3 héroes al empezar: menos equipos y un dilema de 800 de oro en la primera semana.
+- Si el playtest lo confirma, se puede dar al trío algo más de poder o bajar el coste del dilema 1.
+
 ## Arcos de historia y rivales que crecen (2026-11-16)
 
 `npm run simular -- 150 1`. Rivales con tope de misiones creciente por temporada (1,34 → 2) y entrenamiento semanal de sus novatos. El bot decide los momentos de historia con un criterio sencillo: evita vender o perder héroes.

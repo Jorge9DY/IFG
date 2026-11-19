@@ -1,5 +1,7 @@
 // Utilidades para crear héroes y partidas de prueba.
+import { Azar } from '../src/motor/azar';
 import type { EstadoJuego } from '../src/motor/estado';
+import { CATALOGO, heroeDeCatalogo } from '../src/motor/heroes';
 import { MOMENTOS } from '../src/motor/historia';
 import { crearPartida } from '../src/motor/partida';
 import type { Heroe } from '../src/motor/tipos';
@@ -36,4 +38,11 @@ export function fichar(estado: EstadoJuego, gremioId: string, h: Heroe): Heroe {
   estado.heroes[h.id] = h;
   estado.gremios[gremioId]!.plantilla.push(h.id);
   return h;
+}
+
+/** Ficha en el gremio del jugador a un héroe del catálogo (los antiguos Prota ahora llegan por la Prueba). */
+export function ficharDeCatalogo(estado: EstadoJuego, catalogoId: string): Heroe {
+  const f = CATALOGO.find((x) => x.id === catalogoId)!;
+  estado.bolsaNovatos = estado.bolsaNovatos.filter((id) => id !== catalogoId);
+  return fichar(estado, 'jugador', heroeDeCatalogo(new Azar(1), f, 'hoja'));
 }

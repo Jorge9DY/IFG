@@ -9,7 +9,7 @@ import { OJEO_MAXIMO } from '../src/motor/heroes';
 import { comprar } from '../src/motor/mercado';
 import { afinidad, atraccion, cambiar, chispa, choque, trasMision } from '../src/motor/relaciones';
 import type { Heroe, Mision } from '../src/motor/tipos';
-import { fichar, heroe, partida } from './fabrica';
+import { fichar, ficharDeCatalogo, heroe, partida } from './fabrica';
 
 const siempre = { probabilidad: (): boolean => true, elegir: <T,>(l: readonly T[]): T => l[0]! };
 
@@ -21,7 +21,8 @@ function ctx(estado: ReturnType<typeof partida>, equipo: Heroe[], datos: Partial
 describe('conocer la habilidad de un héroe', () => {
   it('solo se conoce la de los héroes fichados alguna vez, o todas con los ojeadores al máximo', () => {
     const estado = partida();
-    expect(conoceHabilidad(estado, 'H02')).toBe(true); // AllBlack, del jugador
+    ficharDeCatalogo(estado, 'H02');
+    expect(conoceHabilidad(estado, 'H02')).toBe(true); // AllBlack, fichado por el jugador
     expect(conoceHabilidad(estado, 'H08')).toBe(false); // Solus, del Dragón
     jugador(estado).oro = 1_000_000;
     comprar(estado, 'H22'); // Pirita
@@ -33,6 +34,7 @@ describe('conocer la habilidad de un héroe', () => {
 
   it('una vez fichado, se sigue conociendo aunque se vaya', () => {
     const estado = partida();
+    ficharDeCatalogo(estado, 'H07');
     apuntarConocidas(estado);
     const j = jugador(estado);
     j.plantilla = j.plantilla.filter((id) => id !== 'H07');
@@ -44,7 +46,7 @@ describe('conocer la habilidad de un héroe', () => {
 describe('efectos visibles de las habilidades en misión', () => {
   it('dice cuánto multiplica una habilidad de poder y avisa de las que perjudican', () => {
     const estado = partida();
-    const goblin = estado.heroes.H07!;
+    const goblin = ficharDeCatalogo(estado, 'H07');
     const efectos = efectosEnMision(ctx(estado, [goblin]));
     expect(efectos.some((e) => e.texto.includes('×2,5') && e.tono === 'bueno')).toBe(true);
     const alaim = fichar(estado, 'jugador', heroe({ id: 'al', catalogo: 'H62', habilidad: 'godsHateMe' }));
@@ -56,7 +58,7 @@ describe('efectos visibles de las habilidades en misión', () => {
   it('Tokopi anula y lo dice', () => {
     const estado = partida();
     const t = fichar(estado, 'jugador', heroe({ id: 't', catalogo: 'H52', habilidad: 'silencio' }));
-    const g = estado.heroes.H07!;
+    const g = ficharDeCatalogo(estado, 'H07');
     const efectos = efectosEnMision(ctx(estado, [t, g], { equipo: 2 }));
     expect(efectos.find((e) => e.heroeId === 'H07')?.texto).toMatch(/anulada/);
   });

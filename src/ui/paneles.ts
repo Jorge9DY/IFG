@@ -69,7 +69,7 @@ import { borrar, cargar, guardar } from './guardado';
 import { esc, num, pct } from './html';
 import type { CombateTorneo } from '../motor/torneo';
 import { retrato } from './retrato';
-import { decidirMomento, epilogos, heroeDeCatalogo, momentoPendiente } from '../motor/historia';
+import { decidirMomento, epilogos, heroeDeCatalogo, momentoPendiente, personaje } from '../motor/historia';
 
 export type Panel = 'nueva' | 'misiones' | 'mercado' | 'gremio' | 'prueba' | 'dia' | 'semana' | 'victoria';
 type PestanaGremio = 'heroes' | 'relaciones' | 'instalaciones' | 'ranking';
@@ -251,10 +251,12 @@ export class Interfaz {
       this.momento.hidden = true;
       return;
     }
-    const h = heroeDeCatalogo(estado, m.heroe ?? 'H08');
+    const h = m.heroe || m.cara ? heroeDeCatalogo(estado, (m.heroe ?? m.cara)!) : null;
+    const p = personaje(m.personaje);
     const cara = h ? `<span class="avatar grande">${retrato(h)}</span>` : '';
+    const quien = m.tipo === 'dilema' ? 'Dilema de la semana' : h ? h.nombre : p ? `${p.nombre} · ${p.papel}` : 'Historia';
     this.momento.innerHTML = `<div class="caja-reveal caja-momento">
-      <div class="cabecera-momento">${cara}<div><em>${h ? esc(h.nombre) : 'Historia'}</em><b>${esc(m.titulo)}</b></div></div>
+      <div class="cabecera-momento">${cara}<div><em>${esc(quien)}</em><b>${esc(m.titulo)}</b></div></div>
       <p>${esc(m.texto)}</p>
       <div class="opciones-momento">${m.opciones.map((o, i) => `<button class="${i === 0 ? 'principal' : ''}" data-opcion="${i}">${esc(o.texto)}</button>`).join('')}</div>
     </div>`;
